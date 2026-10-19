@@ -206,7 +206,7 @@
             <button type="button" class="btnMotionCode" data-code="2" data-title="모션 롤러">02 · 모션 롤러</button>
             <button type="button" class="btnMotionCode" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
             <button type="button" class="btnMotionCode" data-code="4" data-title="세로 말씀 쇼츠">04 · 세로 말씀 쇼츠</button>
-            <button type="button" class="btnMotionCode" data-code="5" data-title="은혜 강조 배지">05 · 은혜 배지</button>
+            <button type="button" class="btnMotionCode" data-code="5" data-title="값없는 은혜 (Grace)">05 · 값없는 은혜</button>
             <button type="button" class="btnMotionCode" data-code="6" data-title="기도 손과 말씀">06 · 기도 손·말씀</button>
             <button type="button" class="btnMotionCode" data-code="7" data-title="면류관 쇼케이스">07 · 면류관 쇼케이스</button>
             <button type="button" class="btnMotionCode" data-code="8" data-title="패럴랙스 장면">08 · 패럴랙스</button>
@@ -996,81 +996,106 @@
 
           ctx.restore();
         }
-            } else if (code === 2) { // 02 모션 롤러 / 3단 말씀 카드: 입력한 1, 2, 3번째 줄 단어가 각 카드에 각각 매핑
+                  } else if (code === 2) { // 02 모션 롤러 (세로 직사각형 1:1.5 카드 + 순차적 회전 안착)
         const motionFont = state.fontFamily || "'Pretendard', sans-serif";
-        const panelGap = W * .025, panelW = (W - panelGap * 4) / 3;
-        const panelH = H * .62, panelY = H * .20;
-        const phase = (f % 240) / 240;
-        const cardW = panelW * .70, cardH = panelH * .36;
-        const ease = Math.min(1, phase / .28);
-        const cardX = -cardW + ease * (panelW + cardW * .6);
-        const spin = Math.min(1, phase / .35) * Math.PI * 2;
+        const panelGap = W * 0.025;
+        const panelW = (W - panelGap * 4) / 3;
+        const panelH = H * 0.62;
+        const panelY = H * 0.20;
 
-        const drawCard = (x, y, cardText) => {
-          ctx.save();
-          ctx.translate(x + cardW / 2, y + cardH / 2);
-          ctx.rotate(spin);
-          ctx.fillStyle = '#ffc93c';
-          ctx.shadowColor = 'rgba(255, 201, 60, 0.4)';
-          ctx.shadowBlur = 18;
-          ctx.beginPath();
-          ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
-          ctx.fill();
-          ctx.shadowColor = 'transparent';
-          ctx.restore();
+        // [수정 1] 세로 직사각형 카드 규격 (신용카드 비율 1 : 1.5)
+        const cardW = panelW * 0.55;
+        const cardH = cardW * 1.5;
+        const targetCenterX = (panelW - cardW) / 2;
+        const targetCenterY = (panelH - cardH) / 2 - 10;
 
-          // 카드 내부 글씨: 사용자가 입력한 단어(lines[0], lines[1], lines[2])를 각각 정확히 표시
-          ctx.save();
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#050914';
-          ctx.font = `900 ${portrait ? 16 : Math.max(18, panelW * .13)}px ${motionFont}`;
-          ctx.fillText(cardText, x + cardW / 2, y + cardH * .54);
-          ctx.restore();
-        };
-
-        // 다크 네이비 배경
+        // 배경
         ctx.fillStyle = '#050914';
         ctx.fillRect(0, 0, W, H);
 
-        // 상단 헤더: 성경 장절 (입력 구절과 중복되지 않도록 성경 장절 표시)
-        drawText(state.verse || '말씀 모션 3단 카드', W / 2, H * .11, portrait ? 20 : 26, '#ffd166', W * .88, 'center', motionFont);
+        // 상단 장절
+        drawText(state.verse || '이사야 41:10', W / 2, H * 0.11, portrait ? 20 : 26, '#ffd166', W * 0.88, 'center', motionFont);
 
-        const panels = [
-          ['깔끔한 등장', '선명한 말씀 상자'],
-          ['부드러운 이동', '천천히 중심으로'],
-          ['또렷한 강조', '그림자 없이 선명하게']
+        const cards = [
+          { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: lines[0] || '두려워말라', delay: 0 },
+          { title: '부드러운 이동', sub: '천천히 중심으로', text: lines[1] || '내가 너와', delay: 25 },
+          { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: lines[2] || '함께 함이라', delay: 50 },
         ];
 
-        // 3개 패널 순회: 각 카드에 lines[0], lines[1], lines[2]를 각각 배정하여 절대 같은 글자가 나오지 않게 함
-        panels.forEach(([name, sub], i) => {
-          const x = panelGap + i * (panelW + panelGap);
+        cards.forEach((card, i) => {
+          const panelX = panelGap + i * (panelW + panelGap);
+
+          // 패널 배경
           ctx.save();
           ctx.fillStyle = '#13224d';
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.roundRect(x, panelY, panelW, panelH, 14);
+          ctx.roundRect(panelX, panelY, panelW, panelH, 18);
           ctx.fill();
+          ctx.stroke();
           ctx.restore();
 
-          const cardY = panelY + panelH * .32;
-          // ★ 사용자 입력 1, 2, 3번째 줄 각각 매핑 (모두 같지 않고 입력한 글자대로 각각 표시)
-          const thisCardText = lines[i] || (i === 0 ? '구원' : i === 1 ? '믿음' : '생명');
-          drawCard(x + cardX, cardY, thisCardText);
+          // [수정 3] 순차적 감속 및 회전 계산
+          const localFrame = Math.max(0, f - card.delay);
+          const progress = Math.min(1, localFrame / 45);
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const spin = (1 - ease) * -360;
+          const currentX = -cardW * 1.5 + ease * (targetCenterX - (-cardW * 1.5));
+
+          const cx = panelX + currentX + cardW / 2;
+          const cy = panelY + targetCenterY + cardH / 2;
+
+          // 노란색 세로 직사각형 카드 렌더링
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate((spin * Math.PI) / 180);
+
+          // 카드 그라데이션 및 그림자
+          const cardGrad = ctx.createLinearGradient(-cardW / 2, -cardH / 2, cardW / 2, cardH / 2);
+          cardGrad.addColorStop(0, '#fde047');
+          cardGrad.addColorStop(1, '#eab308');
+          ctx.fillStyle = cardGrad;
+          ctx.shadowColor = 'rgba(255, 201, 60, 0.35)';
+          ctx.shadowBlur = 18;
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 3;
+
+          ctx.beginPath();
+          ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 16);
+          ctx.fill();
+          ctx.stroke();
+          ctx.shadowColor = 'transparent';
+
+          // 세로 텍스트 출력 (writingMode vertical-rl 효과)
+          ctx.fillStyle = '#050914';
+          ctx.font = `900 ${portrait ? 16 : Math.max(16, cardW * 0.28)}px ${motionFont}`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          const chars = Array.from(card.text);
+          const charSpacing = portrait ? 22 : Math.max(20, cardH / (chars.length + 1.2));
+          const startY = -((chars.length - 1) * charSpacing) / 2;
+          chars.forEach((ch, idx) => {
+            ctx.fillText(ch, 0, startY + idx * charSpacing);
+          });
+
+          ctx.restore();
 
           // 패널 하단 라벨
           ctx.save();
           ctx.textAlign = 'left';
-          ctx.font = `900 ${portrait ? 13 : Math.max(13, panelW * .102)}px ${motionFont}`;
+          ctx.font = `900 ${portrait ? 12 : Math.max(12, panelW * 0.095)}px ${motionFont}`;
           ctx.fillStyle = '#ffc93c';
-          ctx.fillText(name, x + 16, panelY + panelH + 24);
-          ctx.font = `700 ${portrait ? 10 : Math.max(10, panelW * .070)}px ${motionFont}`;
-          ctx.fillStyle = 'rgba(255,255,255,.85)';
-          ctx.fillText(sub, x + 16, panelY + panelH + 42);
+          ctx.fillText(card.title, panelX + 16, panelY + panelH - 42);
+          ctx.font = `600 ${portrait ? 10 : Math.max(9, panelW * 0.065)}px ${motionFont}`;
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.fillText(card.sub, panelX + 16, panelY + panelH - 24);
           ctx.restore();
         });
 
-        // 하단 안내
-        drawText(state.youtube || '별내사랑의교회', W / 2, H * .95, portrait ? 13 : 16, 'rgba(255,255,255,.75)', W * .82, 'center', motionFont);
+        // 하단 서브 안내
+        drawText(state.youtube || '별내사랑의교회', W / 2, H * 0.95, portrait ? 13 : 16, 'rgba(255,255,255,0.75)', W * 0.82, 'center', motionFont);
       } else if (code === 3) { // 콜아웃
         drawHand(W*.62,H*.22,H*.65,.10);
         drawText(lines[0], W*.08, H*.22, portrait?22:28, theme[2], W*.44, 'left');
@@ -1081,9 +1106,253 @@
         drawText(lines[1], W/2,H*.37,portrait?40:37,theme[2],W*.86);
         drawHand(W*.19,H*.49+(1-slam)*H*.35,H*.42,.12);
         drawText(lines[2], W/2,H*.79,portrait?29:27,'#fff',W*.8);
-      } else if (code === 5) { // 은혜 강조 배지
-        const r = Math.min(W,H)*.26*(.85+Math.sin(f*.08)*.04); ctx.save();ctx.translate(W*.68,H*.52);ctx.rotate(f*.008);ctx.fillStyle=theme[2];ctx.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12, rr=i%2?r*.8:r; i?ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.restore();
-        drawText(lines[1],W*.68,H*.49,portrait?25:32,theme[1],r*1.3); drawText(lines[0],W*.12,H*.30,portrait?22:28,'#fff',W*.46,'left'); drawText(lines[2],W*.12,H*.66,portrait?27:34,'#fff',W*.46,'left'); drawHand(W*.72,H*.55,H*.34,.07);
+            } else if (code === 5) { // 05 값없는 은혜 (GraceOfferScene)
+        // 1) 깊은 로열 버건디 배경
+        ctx.fillStyle = '#4a0814';
+        ctx.fillRect(0, 0, W, H);
+
+        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+
+        // 2) 상단 롤링 골드 티커
+        ctx.save();
+        ctx.fillStyle = '#111111';
+        ctx.fillRect(0, 0, W, portrait ? 28 : 36);
+        ctx.fillStyle = '#F5C042';
+        ctx.font = `900 ${portrait ? 10 : 13}px monospace`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        const tickerText = '★ 값없는 은혜 (GRACE) ★ 내 공로 0% ★ 100% 예수 그리스도의 사랑 ★ ';
+        const tickerW = ctx.measureText(tickerText).width;
+        const offset = (f * 2.2) % tickerW;
+        for (let x = -offset; x < W + tickerW; x += tickerW) {
+          ctx.fillText(tickerText, x, (portrait ? 28 : 36) / 2);
+        }
+        ctx.restore();
+
+        // 3) 모션 스프링 계산
+        const popObject = Math.min(1, Math.max(0, (f - 5) / 18));
+        const badgePop = Math.min(1, Math.max(0, (f - 25) / 16));
+        const tagDrop = Math.min(1, Math.max(0, (f - 35) / 18));
+        const tagSwing = Math.sin(Math.max(0, f - 35) * 0.18) * Math.exp(-Math.max(0, f - 35) / 25) * 12;
+        const strikeP = Math.min(1, Math.max(0, (f - 65) / 15));
+        const finalPriceScale = Math.min(1, Math.max(0, (f - 85) / 15));
+
+        if (portrait) {
+          // ── 세로(9:16) 레이아웃 ──
+          // 상단: 십자가 엠블럼
+          const cX = W / 2, cY = H * .22;
+          ctx.save();
+          ctx.translate(cX, cY);
+          ctx.scale(popObject, popObject);
+          const glow = ctx.createRadialGradient(0, 0, 10, 0, 0, 80);
+          glow.addColorStop(0, 'rgba(245, 192, 66, 0.35)');
+          glow.addColorStop(1, 'transparent');
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(0, 0, 80, 0, Math.PI * 2); ctx.fill();
+          ctx.font = '72px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('✝️', 0, 0);
+          ctx.font = `800 16px ${motionFont}`;
+          ctx.fillStyle = '#fde8ea';
+          ctx.fillText(lines[0] || '독생자를 주신 사랑', 0, 56);
+          ctx.restore();
+
+          // 중앙: 화이트 택 카드
+          const tagW = W * .82, tagH = H * .42;
+          const tagX = (W - tagW) / 2;
+          const tagY = H * .36 + (1 - tagDrop) * -80;
+          ctx.save();
+          ctx.translate(W / 2, tagY + tagH / 2);
+          ctx.rotate((tagSwing * Math.PI) / 180);
+          ctx.translate(-W / 2, -(tagY + tagH / 2));
+
+          // 매달린 줄과 고리
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fillRect(W / 2 - 2, tagY - 26, 4, 26);
+          ctx.beginPath(); ctx.arc(W / 2, tagY - 26, 6, 0, Math.PI * 2); ctx.fill();
+
+          // 카드 본체
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 24;
+          ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, tagH, 20); ctx.fill();
+          ctx.shadowColor = 'transparent';
+
+          // 제목
+          ctx.fillStyle = '#334155';
+          ctx.font = `800 17px ${motionFont}`;
+          ctx.textAlign = 'center';
+          ctx.fillText('구원과 영생의 가격', W / 2, tagY + 36);
+
+          // 이전 가격 (취소선)
+          const oldText = lines[1] || '내 착한 행위 999억';
+          ctx.font = `800 20px ${motionFont}`;
+          ctx.fillStyle = '#94a3b8';
+          const oldY = tagY + 76;
+          ctx.fillText(oldText, W / 2, oldY);
+          const oldW = ctx.measureText(oldText).width;
+          if (strikeP > 0) {
+            ctx.save();
+            ctx.strokeStyle = '#E11D48';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(W / 2 - oldW / 2 - 6, oldY + 2);
+            ctx.lineTo(W / 2 - oldW / 2 - 6 + (oldW + 12) * strikeP, oldY - 4);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 최종 확정 가격: 0원 (은혜)
+          ctx.save();
+          ctx.translate(W / 2, tagY + 145);
+          ctx.scale(finalPriceScale, finalPriceScale);
+          ctx.font = `900 46px ${motionFont}`;
+          ctx.fillStyle = '#E11D48';
+          ctx.fillText('0원', -26, 0);
+          ctx.font = `800 24px ${motionFont}`;
+          ctx.fillStyle = '#B45309';
+          ctx.fillText('(은혜)', 46, -4);
+          ctx.restore();
+
+          // 하단 뱃지
+          ctx.fillStyle = '#FACC15';
+          ctx.beginPath(); ctx.roundRect(W / 2 - 85, tagY + tagH - 42, 170, 30, 8); ctx.fill();
+          ctx.fillStyle = '#1E293B';
+          ctx.font = `900 12px ${motionFont}`;
+          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, W / 2, tagY + tagH - 22);
+
+          ctx.restore();
+
+          // 100% FREE 별 배지
+          if (badgePop > 0) {
+            ctx.save();
+            ctx.translate(tagX + 24, tagY - 14);
+            ctx.scale(badgePop, badgePop);
+            ctx.rotate(-12 * Math.PI / 180);
+            ctx.fillStyle = '#FACC15';
+            ctx.beginPath(); ctx.arc(0, 0, 34, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#B45309';
+            ctx.font = `900 16px ${motionFont}`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('100%', 0, -7);
+            ctx.font = `900 12px ${motionFont}`;
+            ctx.fillText('FREE', 0, 9);
+            ctx.restore();
+          }
+
+          // 하단 문구
+          drawText(lines[2] || '너희는 그 은혜에 의하여 믿음으로 구원을 받았으니', W / 2, H * .88, 14, '#ffffff', W * .85, 'center', motionFont);
+        } else {
+          // ── 가로(16:9) 레이아웃 ──
+          // 좌측: 황금빛 십자가 엠블럼
+          const cX = W * .26, cY = H * .52;
+          ctx.save();
+          ctx.translate(cX, cY);
+          ctx.scale(popObject, popObject);
+          const glow = ctx.createRadialGradient(0, 0, 20, 0, 0, 130);
+          glow.addColorStop(0, 'rgba(245, 192, 66, 0.35)');
+          glow.addColorStop(1, 'transparent');
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(0, 0, 130, 0, Math.PI * 2); ctx.fill();
+          ctx.font = '120px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('✝️', 0, -10);
+          ctx.font = `800 20px ${motionFont}`;
+          ctx.fillStyle = '#fde8ea';
+          ctx.fillText(lines[0] || '독생자를 주신 사랑', 0, 80);
+          ctx.restore();
+
+          // 우측: 대롱대롱 매달려 흔들리는 화이트 가격표 택
+          const tagW = W * .42, tagH = H * .65;
+          const tagX = W * .52;
+          const tagY = H * .18 + (1 - tagDrop) * -120;
+
+          ctx.save();
+          ctx.translate(tagX + tagW / 2, tagY + tagH / 2);
+          ctx.rotate((tagSwing * Math.PI) / 180);
+          ctx.translate(-(tagX + tagW / 2), -(tagY + tagH / 2));
+
+          // 매달린 줄과 고리
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fillRect(tagX + tagW / 2 - 2, tagY - 32, 4, 32);
+          ctx.beginPath(); ctx.arc(tagX + tagW / 2, tagY - 32, 7, 0, Math.PI * 2); ctx.fill();
+
+          // 화이트 택 카드 본체
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0,0,0,0.55)';
+          ctx.shadowBlur = 32;
+          ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, tagH, 24); ctx.fill();
+          ctx.shadowColor = 'transparent';
+
+          // 카드 상단 라벨
+          ctx.fillStyle = '#334155';
+          ctx.font = `800 ${Math.max(16, tagW * .065)}px ${motionFont}`;
+          ctx.textAlign = 'center';
+          ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 42);
+
+          // 이전 가격: 착한 행위 999억 (빨간 취소선)
+          const oldText = lines[1] || '내 착한 행위 999억';
+          ctx.font = `800 ${Math.max(20, tagW * .085)}px ${motionFont}`;
+          ctx.fillStyle = '#94a3b8';
+          const oldY = tagY + 95;
+          ctx.fillText(oldText, tagX + tagW / 2, oldY);
+          const oldW = ctx.measureText(oldText).width;
+          if (strikeP > 0) {
+            ctx.save();
+            ctx.strokeStyle = '#E11D48';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(tagX + tagW / 2 - oldW / 2 - 10, oldY + 3);
+            ctx.lineTo(tagX + tagW / 2 - oldW / 2 - 10 + (oldW + 20) * strikeP, oldY - 5);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 최종 확정 가격: 0원 (은혜) 쾅!
+          ctx.save();
+          ctx.translate(tagX + tagW / 2, tagY + 180);
+          ctx.scale(finalPriceScale, finalPriceScale);
+          ctx.font = `900 ${Math.max(46, tagW * .18)}px ${motionFont}`;
+          ctx.fillStyle = '#E11D48';
+          ctx.fillText('0원', -38, 0);
+          ctx.font = `800 ${Math.max(24, tagW * .095)}px ${motionFont}`;
+          ctx.fillStyle = '#B45309';
+          ctx.fillText('(은혜)', 54, -6);
+          ctx.restore();
+
+          // 하단 타임 뱃지
+          ctx.fillStyle = '#FACC15';
+          const bW = Math.min(220, tagW * .75);
+          ctx.beginPath(); ctx.roundRect(tagX + (tagW - bW) / 2, tagY + tagH - 52, bW, 36, 10); ctx.fill();
+          ctx.fillStyle = '#1E293B';
+          ctx.font = `900 14px ${motionFont}`;
+          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, tagX + tagW / 2, tagY + tagH - 28);
+
+          ctx.restore();
+
+          // 100% FREE 별 배지
+          if (badgePop > 0) {
+            ctx.save();
+            ctx.translate(tagX - 10, tagY + 10);
+            ctx.scale(badgePop, badgePop);
+            ctx.rotate(-12 * Math.PI / 180);
+            ctx.fillStyle = '#FACC15';
+            ctx.shadowColor = 'rgba(0,0,0,0.4)';
+            ctx.shadowBlur = 12;
+            ctx.beginPath(); ctx.arc(0, 0, 42, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = '#B45309';
+            ctx.font = `900 20px ${motionFont}`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('100%', 0, -8);
+            ctx.font = `900 14px ${motionFont}`;
+            ctx.fillText('FREE', 0, 11);
+            ctx.restore();
+          }
+
+          // 하단 고정 카피
+          drawText(lines[2] || '너희는 그 은혜에 의하여 믿음으로 말미암아 구원을 받았으니', W / 2, H * .94, 17, '#ffffff', W * .85, 'center', motionFont);
+        }
       } else if (code === 6) { // 기도 손과 말씀
         ctx.save();ctx.fillStyle='rgba(255,242,190,.15)';ctx.beginPath();ctx.arc(W*.72,H*.48,Math.min(W,H)*.32,0,Math.PI*2);ctx.fill();ctx.restore(); drawHand(W*.56,H*.16,H*.72,.14); drawText(lines[0],W*.08,H*.25,portrait?22:27,theme[2],W*.46,'left'); drawText(lines[1],W*.08,H*.46,portrait?29:37,'#fff',W*.47,'left'); drawText(lines[2],W*.08,H*.64,portrait?20:25,'#fff',W*.45,'left');
       } else if (code === 7) { // 면류관 쇼케이스
@@ -1571,7 +1840,7 @@ ${url}`;
 
     // Remotion 코드 생성기 (천천히 감속된 설정값 적용)
     function getRemotionCode() {
-                  if (state.motionCode === 2) {
+                        if (state.motionCode === 2) {
         return `import React from 'react';
 import {
   AbsoluteFill,
@@ -1579,27 +1848,38 @@ import {
   useVideoConfig,
 } from 'remotion';
 
-export const MotionThreeCardsScene: React.FC = () => {
+export const MotionThreeCardsScene: React.FC<{
+  verse?: string;
+  line1?: string;
+  line2?: string;
+  line3?: string;
+}> = ({
+  verse = '이사야 41:10',
+  line1 = '두려워말라',
+  line2 = '내가 너와',
+  line3 = '함께 함이라',
+}) => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
 
-  const phase = (frame % 240) / 240;
-  const ease = Math.min(1, phase / 0.28);
-  const spin = Math.min(1, phase / 0.35) * 360;
-
+  // 1. 레이아웃 크기 설정 (16:9 가로 화면)
   const panelGap = width * 0.025;
   const panelW = (width - panelGap * 4) / 3;
   const panelH = height * 0.62;
   const panelY = height * 0.20;
-  const cardW = panelW * 0.70;
-  const cardH = panelH * 0.36;
-  const cardX = -cardW + ease * (panelW + cardW * 0.6);
 
-  // 1번째 줄, 2번째 줄, 3번째 줄 각각 서로 다른 입력 단어로 매핑
+  // [수정 1] 길쭉한 세로 직사각형 카드 규격 (신용카드 비율 1 : 1.5)
+  const cardW = panelW * 0.55;
+  const cardH = cardW * 1.5;
+
+  // [수정 2] 정확한 정중앙 안착 좌표
+  const targetCenterX = (panelW - cardW) / 2; // 패널의 가로 정중앙
+  const targetCenterY = (panelH - cardH) / 2; // 패널의 세로 정중앙
+
   const cards = [
-    { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: '${state.line1 || '구원'}' },
-    { title: '부드러운 이동', sub: '천천히 중심으로', text: '${state.line2 || '믿음'}' },
-    { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: '${state.line3 || '생명'}' },
+    { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: line1, delay: 0 },
+    { title: '부드러운 이동', sub: '천천히 중심으로', text: line2, delay: 25 },
+    { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: line3, delay: 50 },
   ];
 
   return (
@@ -1622,10 +1902,10 @@ export const MotionThreeCardsScene: React.FC = () => {
           color: '#ffd166',
         }}
       >
-        ${state.verse || '말씀 묵상'}
+        {verse}
       </div>
 
-      {/* 3단 카드 패널 (입력한 각 줄이 각각의 카드에 선명하게 나타남) */}
+      {/* 3단 카드 패널 */}
       <div
         style={{
           position: 'absolute',
@@ -1637,56 +1917,208 @@ export const MotionThreeCardsScene: React.FC = () => {
           gap: panelGap,
         }}
       >
-        {cards.map((card, i) => (
-          <div
-            key={i}
-            style={{
-              flex: 1,
-              backgroundColor: '#13224d',
-              borderRadius: 14,
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* 회전하며 이동하는 노란색 말씀 카드 */}
+        {cards.map((card, i) => {
+          // [수정 3] 각 카드별 순차적 감속 및 회전 계산
+          const localFrame = Math.max(0, frame - card.delay);
+          const progress = Math.min(1, localFrame / 45); // 45프레임 동안 안착
+          const ease = 1 - Math.pow(1 - progress, 3);    // 부드러운 감속 곡선 (Ease-Out)
+          const spin = (1 - ease) * -360;                // 한 바퀴 돌면서 0도 안착
+
+          // 왼쪽 바깥(-cardW * 1.5)에서 패널 정중앙(targetCenterX)으로 정확히 안착
+          const currentX = -cardW * 1.5 + ease * (targetCenterX - (-cardW * 1.5));
+
+          return (
             <div
+              key={i}
               style={{
-                position: 'absolute',
-                left: cardX,
-                top: panelH * 0.32,
-                width: cardW,
-                height: cardH,
-                backgroundColor: '#ffc93c',
-                borderRadius: 14,
-                boxShadow: '0 0 20px rgba(255, 201, 60, 0.4)',
-                transform: \`rotate(\${spin}deg)\`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 900,
-                fontSize: 26,
-                color: '#050914',
+                flex: 1,
+                backgroundColor: '#13224d',
+                borderRadius: 20,
+                border: '1.5px solid #1e293b',
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
-              {card.text}
-            </div>
+              {/* 회전하며 정중앙에 '착!' 멈추는 노란색 세로 직사각형 카드 */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: currentX,
+                  top: targetCenterY,
+                  width: cardW,
+                  height: cardH,
+                  backgroundColor: '#ffc93c',
+                  backgroundImage: 'linear-gradient(145deg, #fde047 0%, #eab308 100%)',
+                  borderRadius: 18,
+                  border: '3px solid #fef08a',
+                  boxShadow: '0 12px 28px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 201, 60, 0.35)',
+                  transform: \`rotate(\${spin}deg)\`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: 28,
+                  color: '#050914',
+                  writingMode: 'vertical-rl', // 세로 읽기 (글자 잘림 방지)
+                  textOrientation: 'upright',
+                  letterSpacing: '6px',
+                }}
+              >
+                {card.text}
+              </div>
 
-            {/* 패널 하단 라벨 */}
-            <div style={{ position: 'absolute', bottom: 24, left: 20 }}>
-              <div style={{ color: '#ffc93c', fontSize: 17, fontWeight: 900 }}>
-                {card.title}
-              </div>
-              <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 700, marginTop: 4 }}>
-                {card.sub}
+              {/* 패널 하단 설명 라벨 */}
+              <div style={{ position: 'absolute', bottom: 24, left: 24 }}>
+                <div style={{ color: '#ffc93c', fontSize: 18, fontWeight: 900 }}>
+                  {card.title}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600, marginTop: 4 }}>
+                  {card.sub}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </AbsoluteFill>
   );
-};
-`;
+};`;
+      }
+      if (state.motionCode === 5) {
+        return `// frames=180 size=1280x720 (가로) 또는 1080x1920 (세로 변경 가능)
+import React from 'react';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { FONT } from './font';
+
+// 색상 테마: 깊은 로열 버건디 배경 + 골드 포인트
+const BG_COLOR = '#4a0814';
+const GOLD = '#F5C042';
+const WHITE = '#FFFFFF';
+
+export const GraceOfferScene: React.FC = () => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // 1) 좌측 성경/십자가 등장 스프링
+  const popObject = spring({ frame: f - 5, fps, config: { damping: 12 } });
+
+  // 2) 노란 별 배지(100% FREE) 팝업 모션
+  const badgeSpring = spring({ frame: f - 25, fps, config: { damping: 10, stiffness: 140 } });
+
+  // 3) 대롱대롱 매달려 흔들리는 은혜 택 (Hang Tag Swing)
+  const tagDrop = spring({ frame: f - 35, fps, config: { damping: 12 } });
+  const tagSwing = Math.sin((f - 35) * 0.18) * Math.exp(-(f - 35) / 25) * 15;
+
+  // 4) 빨간 취소선 긋기 모션 (프레임 65부터 쓱 그어짐)
+  const strikeProgress = interpolate(f, [65, 80], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+
+  // 5) 최종 변경된 가격(0원/은혜) 쾅! 튀어나오기
+  const finalPriceSpring = spring({ frame: f - 85, fps, config: { damping: 9, stiffness: 160 } });
+
+  return (
+    <AbsoluteFill style={{ fontFamily: FONT, background: BG_COLOR, overflow: 'hidden' }}>
+      
+      {/* ── 1. 상단 롤링 티커 띠 ── */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 44, background: '#111', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          display: 'flex', gap: 40, whiteSpace: 'nowrap', color: GOLD, fontSize: 16, fontWeight: 900,
+          transform: \\`translateX(-\\${(f * 2.5) % 400}px)\\`
+        }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <span key={i}>★ 값없는 은혜 (GRACE) ★ 내 공로 0% ★ 100% 예수 그리스도의 사랑 ★</span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 2. 좌측 메인 비주얼 (십자가 & 말씀 심볼) ── */}
+      <div style={{
+        position: 'absolute', left: 160, top: 160, width: 340, height: 340,
+        transform: \\`scale(\\${popObject})\\`, display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        {/* 황금빛 십자가 엠블럼 */}
+        <div style={{
+          width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,192,66,0.3) 0%, transparent 70%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))'
+        }}>
+          <span style={{ fontSize: 160, lineHeight: 1 }}>✝️</span>
+        </div>
+        <div style={{ position: 'absolute', bottom: -20, color: '#fde8ea', fontSize: 26, fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+          독생자를 주신 사랑
+        </div>
+      </div>
+
+      {/* ── 3. 노란 별 모양 '100% FREE' 배지 ── */}
+      <div style={{
+        position: 'absolute', left: 490, top: 140, transform: \\`scale(\\${badgeSpring}) rotate(-12deg)\\`,
+        filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.4))', zIndex: 20
+      }}>
+        <svg width="150" height="150" viewBox="0 0 100 100">
+          <polygon points="50,0 63,28 95,20 78,48 98,75 66,78 55,100 38,76 8,82 22,52 2,26 33,28" fill="#FACC15" />
+        </svg>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+          <span style={{ fontSize: 26, fontWeight: 900, color: '#B45309', lineHeight: 1 }}>100%</span>
+          <span style={{ fontSize: 18, fontWeight: 900, color: '#B45309' }}>FREE</span>
+        </div>
+      </div>
+
+      {/* ── 4. 대롱대롱 매달려 흔들리는 가격표 택 (구원 계산서) ── */}
+      <div style={{
+        position: 'absolute', left: 630, top: 110, width: 380,
+        transformOrigin: 'top center',
+        transform: \\`translateY(\\${(1 - tagDrop) * -200}px) rotate(\\${tagSwing}deg)\\`,
+        zIndex: 10
+      }}>
+        {/* 매달린 줄과 고리 */}
+        <div style={{ width: 4, height: 50, background: '#ddd', margin: '0 auto' }} />
+        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#fff', border: '3px solid #666', margin: '-7px auto 0 auto' }} />
+
+        {/* 화이트 택 카드 */}
+        <div style={{
+          background: '#FFFFFF', borderRadius: 24, padding: '36px 30px 40px 30px', textAlign: 'center',
+          boxShadow: '0 20px 45px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#334155', marginBottom: 12 }}>
+            구원과 영생의 가격
+          </div>
+
+          {/* 이전 가격: 내 행위와 공로 (빨간 줄이 그어짐) */}
+          <div style={{ position: 'relative', display: 'inline-block', fontSize: 32, fontWeight: 800, color: '#94a3b8', marginBottom: 10 }}>
+            <span>내 착한 행위 999억</span>
+            {/* 빨간 손그림 취소선 */}
+            <div style={{
+              position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
+              width: \\`\\${strikeProgress * 110}%\\`, transform: 'rotate(-4deg)'
+            }} />
+          </div>
+
+          {/* 최종 확정 가격: 0원 (은혜) 쾅! */}
+          <div style={{
+            fontSize: 68, fontWeight: 900, color: '#E11D48', lineHeight: 1.1,
+            transform: \\`scale(\\${finalPriceSpring})\\`, transformOrigin: 'center'
+          }}>
+            0원 <span style={{ fontSize: 36, color: '#B45309' }}>(은혜)</span>
+          </div>
+        </div>
+
+        {/* ── 5. 하단 타임 뱃지 ── */}
+        <div style={{
+          marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 10,
+          background: '#FACC15', color: '#1E293B', padding: '8px 24px', borderRadius: 12, fontWeight: 900, fontSize: 18,
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+        }}>
+          <span>지금 믿을 때</span>
+          <span style={{ fontFamily: 'monospace', fontSize: 20, color: '#000' }}>에베소서 2:8</span>
+        </div>
+      </div>
+
+      {/* ── 6. 하단 고정 카피 ── */}
+      <div style={{ position: 'absolute', bottom: 35, left: 60, fontSize: 26, fontWeight: 800, color: '#FFFFFF', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+        너희는 그 은혜에 의하여 믿음으로 말미암아 구원을 받았으니
+      </div>
+
+    </AbsoluteFill>
+  );
+};`;
       }
       if (state.motionCode === 1) {
         return `import React from 'react';
