@@ -48,20 +48,7 @@ export const MotionThreeCardsScene: React.FC<{
         fontFamily: "'Pretendard', sans-serif",
       }}
     >
-      {/* 상단 장절 */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '7%',
-          width: '100%',
-          textAlign: 'center',
-          fontSize: 28,
-          fontWeight: 900,
-          color: '#ffd166',
-        }}
-      >
-        {verse}
-      </div>
+      {/* 상단 장절 삭제 완료 (사용자 요청: 상단 성경귀절 삭제) */}
 
       {/* 3단 카드 패널 */}
       <div

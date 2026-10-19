@@ -931,8 +931,8 @@
         ctx.fillStyle = '#050914';
         ctx.fillRect(0, 0, W, H);
 
-        // 상단 장절
-        drawText(state.verse || '이사야 41:10', W / 2, H * 0.11, portrait ? 20 : 26, '#ffd166', W * 0.88, 'center', motionFont);
+        // 상단 장절 삭제 완료 (사용자 요청: 상단 성경귀절 삭제)
+        // (drawText state.verse 제거)
 
         const cards = [
           { text: state.line1 || '', delay: 0 },
