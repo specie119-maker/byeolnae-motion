@@ -1765,8 +1765,144 @@
         ctx.restore();
       } else if (code === 7) { // 면류관 쇼케이스
         const crown = motionCrown; if(crown?.complete&&crown.naturalWidth){const h=H*.52,w=h*crown.naturalWidth/crown.naturalHeight;ctx.save();ctx.globalAlpha=p;ctx.drawImage(crown,W*.5-w/2,H*.24,w,h);ctx.restore();} drawText(lines[0],W*.1,H*.18,portrait?20:25,theme[2],W*.8); drawText(lines[1],W*.5,H*.79,portrait?29:37,'#fff',W*.8); drawText(lines[2],W*.5,H*.89,portrait?19:23,'rgba(255,255,255,.86)',W*.8);
-      } else if (code === 8) { // 패럴랙스
-        ctx.save();ctx.globalAlpha=.25;ctx.fillStyle='#d7e6ff';for(let i=0;i<22;i++)ctx.fillRect((i*71-f*.35)%W,(i*37)%Math.max(1,H*.5),2,2);ctx.restore(); [0,.35,.8].forEach((speed,i)=>{ctx.save();ctx.fillStyle=['#2a4275','#17294e','#0a142e'][i];ctx.beginPath();ctx.moveTo(0,H*(.62+i*.1));for(let x=0;x<=W;x+=35)ctx.lineTo(x,H*(.60+i*.1)+Math.sin((x+f*speed*18)/70)*20);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();ctx.restore();}); drawHand(W*.62,H*.22,H*.55,.09);drawText(lines[0],W*.08,H*.22,portrait?22:28,'#fff',W*.48,'left');drawText(lines[1],W*.08,H*.40,portrait?31:39,theme[2],W*.5,'left');drawText(lines[2],W*.08,H*.54,portrait?21:25,'#fff',W*.48,'left');
+      } else if (code === 8) { // CODE 08 · 패럴랙스 (별무리 & 미세 섬광 별빛)
+        // 1. 깊은 밤하늘 코스믹 배경 그라데이션
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+        skyGrad.addColorStop(0, '#040714');
+        skyGrad.addColorStop(0.45, '#0a1029');
+        skyGrad.addColorStop(0.8, '#12183a');
+        skyGrad.addColorStop(1, '#070b1a');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. 부드러운 성운(Nebula) 은하수 빛 (패럴랙스 미세 이동)
+        ctx.save();
+        const nebX = (W * 0.55 + Math.sin(f * 0.008) * 40);
+        const nebY = (H * 0.45 + Math.cos(f * 0.006) * 30);
+        const nebGrad = ctx.createRadialGradient(nebX, nebY, 30, nebX, nebY, Math.max(W, H) * 0.65);
+        nebGrad.addColorStop(0, 'rgba(76, 53, 140, 0.22)');
+        nebGrad.addColorStop(0.4, 'rgba(30, 58, 120, 0.14)');
+        nebGrad.addColorStop(0.7, 'rgba(16, 26, 68, 0.08)');
+        nebGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = nebGrad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+
+        // 3. 예쁜 별무리 (3 레이어 패럴랙스 - 화면 전체 가득 채움)
+        const getStarPos = (i, layer) => {
+          const s1 = Math.sin(i * 137.5 + layer * 31.7) * 43758.5453;
+          const s2 = Math.cos(i * 93.3 + layer * 17.9) * 23421.6312;
+          const rx = s1 - Math.floor(s1);
+          const ry = s2 - Math.floor(s2);
+          return { rx, ry };
+        };
+
+        // [Layer 1: 원경 미세 별무리 - 140개, 아주 작고 은은한 별빛]
+        ctx.save();
+        for (let i = 0; i < 140; i++) {
+          const { rx, ry } = getStarPos(i, 1);
+          const speed = 0.08;
+          const sx = ((rx * W - f * speed) % W + W) % W;
+          const sy = ry * H;
+          const twinkle = 0.25 + 0.55 * Math.sin(f * 0.04 + i * 2.3);
+          ctx.fillStyle = i % 5 === 0 ? 'rgba(215, 230, 255, ' + twinkle + ')' :
+                          i % 7 === 0 ? 'rgba(255, 235, 180, ' + twinkle + ')' :
+                                        'rgba(255, 255, 255, ' + twinkle + ')';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 0.7 + (i % 3) * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // [Layer 2: 중경 영롱한 별무리 - 60개]
+        ctx.save();
+        for (let i = 0; i < 60; i++) {
+          const { rx, ry } = getStarPos(i, 2);
+          const speed = 0.22;
+          const sx = ((rx * W - f * speed) % W + W) % W;
+          const sy = ry * H;
+          const twinkle = 0.4 + 0.6 * Math.sin(f * 0.06 + i * 1.7);
+          const r = 1.2 + (i % 3) * 0.5;
+
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + (twinkle * 0.2) + ')';
+          ctx.beginPath();
+          ctx.arc(sx, sy, r * 2.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = i % 4 === 0 ? 'rgba(255, 240, 180, ' + twinkle + ')' :
+                          i % 3 === 0 ? 'rgba(180, 225, 255, ' + twinkle + ')' :
+                                        'rgba(255, 255, 255, ' + twinkle + ')';
+          ctx.beginPath();
+          ctx.arc(sx, sy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // [Layer 3: 근경 별빛 & '아주 작게 얇게 빛나는' 섬세한 십자 별빛 플레어 8개]
+        ctx.save();
+        const sparkCount = 8;
+        for (let i = 0; i < sparkCount; i++) {
+          const { rx, ry } = getStarPos(i + 10, 3);
+          const speed = 0.45;
+          const sx = ((rx * W - f * speed) % W + W) % W;
+          const sy = ry * H;
+
+          const pulse = Math.pow(Math.sin(f * 0.045 + i * 1.5), 6);
+          const baseAlpha = 0.3 + 0.7 * pulse;
+
+          // 중심 작은 별핵 (작고 영롱함)
+          ctx.fillStyle = 'rgba(255, 255, 255, ' + baseAlpha + ')';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 얇고 섬세한 4방향 십자 별빛 광선
+          if (pulse > 0.08) {
+            const rayLen = 9 + pulse * 14;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 250, 230, ' + (pulse * 0.85) + ')';
+            ctx.lineWidth = 0.9;
+            ctx.beginPath();
+            ctx.moveTo(sx - rayLen, sy);
+            ctx.lineTo(sx + rayLen, sy);
+            ctx.moveTo(sx, sy - rayLen);
+            ctx.lineTo(sx, sy + rayLen);
+            const diagLen = rayLen * 0.38;
+            ctx.moveTo(sx - diagLen, sy - diagLen);
+            ctx.lineTo(sx + diagLen, sy + diagLen);
+            ctx.moveTo(sx - diagLen, sy + diagLen);
+            ctx.lineTo(sx + diagLen, sy - diagLen);
+            ctx.stroke();
+
+            // 중심 다이아몬드 미세 코어
+            ctx.fillStyle = 'rgba(255, 255, 255, ' + pulse + ')';
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - 2.5);
+            ctx.lineTo(sx + 2.5, sy);
+            ctx.lineTo(sx, sy + 2.5);
+            ctx.lineTo(sx - 2.5, sy);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+        ctx.restore();
+
+        // 4. 말씀 텍스트 배치 (물결, 손 이미지 없음! 밤하늘에 은혜롭게 떠오르는 구성)
+        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 18;
+        if (portrait) {
+          drawText(lines[0] || '주 예수 믿으라', W / 2, H * 0.34, 24, '#e2e8f0', W * 0.85, 'center', motionFont);
+          drawText(lines[1] || '죄가 많아도', W / 2, H * 0.45, 42, '#ffd166', W * 0.88, 'center', motionFont);
+          drawText(lines[2] || '별내사랑의교회', W / 2, H * 0.58, 22, '#cbd5e1', W * 0.85, 'center', motionFont);
+        } else {
+          drawText(lines[0] || '주 예수 믿으라', W * 0.12, H * 0.30, 26, '#e2e8f0', W * 0.75, 'left', motionFont);
+          drawText(lines[1] || '죄가 많아도', W * 0.12, H * 0.48, 46, '#ffd166', W * 0.75, 'left', motionFont);
+          drawText(lines[2] || '별내사랑의교회', W * 0.12, H * 0.65, 24, '#cbd5e1', W * 0.75, 'left', motionFont);
+        }
+        ctx.restore();
       } else if (code === 9) { // 장면 전환
         const scene=Math.floor(cycle/60)%3; const sceneColors=['#5e2e78','#1c5b62','#a04b27'];ctx.fillStyle=sceneColors[scene];ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=Math.min(1,(cycle%60)/18);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);ctx.restore();drawText(lines[scene],W/2,H*.48,portrait?34:43,'#fff',W*.8);drawText(`말씀 장면 ${scene+1}`,W/2,H*.70,portrait?16:19,theme[2],W*.7);
       } else { // 방사형 광선
