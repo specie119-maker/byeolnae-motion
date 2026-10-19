@@ -57,6 +57,8 @@ const server = http.createServer((req, res) => {
           return res.end(JSON.stringify({ error: '비디오 데이터(videoBase64)가 필요합니다.' }));
         }
 
+        console.log(`[convert-video] 변환 요청 접수: ${filename}, 데이터 크기: ${Math.round(bodyStr.length / 1024)}KB`);
+
         const id = Date.now() + '_' + Math.random().toString(36).substring(2, 7);
         const tempIn = path.join(tempDir, `in_${id}.webm`);
         const tempOut = path.join(tempDir, `out_${id}.mp4`);
@@ -64,19 +66,20 @@ const server = http.createServer((req, res) => {
         const videoBuffer = Buffer.from(videoBase64.includes(';base64,') ? videoBase64.split(';base64,')[1] : videoBase64, 'base64');
         fs.writeFileSync(tempIn, videoBuffer);
 
-        const ffmpegPath = '/opt/homebrew/bin/ffmpeg';
+        const ffmpegPath = fs.existsSync('/opt/homebrew/bin/ffmpeg') ? '/opt/homebrew/bin/ffmpeg' : 'ffmpeg';
         const ffmpegArgs = [
           '-y',
           '-i', tempIn,
           '-c:v', 'libx264',
+          '-preset', 'veryfast',
           '-pix_fmt', 'yuv420p',
           '-movflags', '+faststart',
           tempOut
         ];
 
-        execFile(ffmpegPath, ffmpegArgs, (err, stdout, stderr) => {
+        execFile(ffmpegPath, ffmpegArgs, { maxBuffer: 30 * 1024 * 1024 }, (err, stdout, stderr) => {
           if (err || !fs.existsSync(tempOut)) {
-            console.error('FFmpeg convert-video error:', err, stderr);
+            console.error('[convert-video] FFmpeg 변환 에러:', err, stderr);
             if (fs.existsSync(tempIn)) fs.unlinkSync(tempIn);
             if (fs.existsSync(tempOut)) fs.unlinkSync(tempOut);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -85,6 +88,7 @@ const server = http.createServer((req, res) => {
 
           const stat = fs.statSync(tempOut);
           const safeName = encodeURIComponent(filename);
+          console.log(`[convert-video] 변환 성공! 파일 크기: ${stat.size} bytes`);
           res.writeHead(200, {
             'Content-Type': 'video/mp4',
             'Content-Disposition': `attachment; filename="${safeName}"`,
@@ -101,7 +105,7 @@ const server = http.createServer((req, res) => {
           });
         });
       } catch (err) {
-        console.error('Convert video error:', err);
+        console.error('[convert-video] 처리 중 에러:', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
       }

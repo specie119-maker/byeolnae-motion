@@ -2881,14 +2881,16 @@ ${url}`;
               console.warn('Server MP4 convert error, fallback:', serverErr);
             }
 
-            // 2) 서버 실패 시 브라우저에서 직접 MP4 파일로 다운로드
-            downloadBlob(recordedBlob, filenameMp4);
+            // 2) 서버 실패 시 브라우저에서 직접 강제 video/mp4 MIME으로 다운로드 (확장자 .webm 방지)
+            const fallbackMp4Blob = new Blob(chunks, { type: 'video/mp4' });
+            downloadBlob(fallbackMp4Blob, filenameMp4);
             showToast('🎉 MP4 말씀 영상 다운로드가 완료되었습니다!');
             resetDownloadBtn();
           };
         } catch (err) {
           console.error('Download error:', err);
-          downloadBlob(recordedBlob, filenameMp4);
+          const fallbackMp4Blob = new Blob(chunks, { type: 'video/mp4' });
+          downloadBlob(fallbackMp4Blob, filenameMp4);
           showToast('🎉 MP4 말씀 영상 다운로드가 완료되었습니다!');
           resetDownloadBtn();
         }
@@ -2916,7 +2918,11 @@ ${url}`;
     }
 
     function downloadBlob(blob, filename) {
-      const url = URL.createObjectURL(blob);
+      // 브라우저가 blob.type을 보고 .webm으로 자동 변경하는 것을 원천 차단
+      const finalBlob = (filename.endsWith('.mp4') && blob.type !== 'video/mp4')
+        ? new Blob([blob], { type: 'video/mp4' })
+        : blob;
+      const url = URL.createObjectURL(finalBlob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
