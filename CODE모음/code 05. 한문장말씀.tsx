@@ -8,12 +8,11 @@ import {
 } from 'remotion';
 import { FONT } from './font';
 
-// ── 설교 핵심 메시지 한 문장 설정 ──
+// ── 설교 핵심 메시지 3줄 설정 ──
 const SERMON_SENTENCE = {
-  line1: '하나님은 일하시고,',
-  line2: '마침내 이루십니다 ✨',
-  verse: '예레미야 33:2',
-  topic: '오늘의 설교 한 줄',
+  line1: '일을 행하시는 여호와',
+  line2: '일을 지어 성취하시는',
+  line3: '하나님',
 };
 
 // 채널 링크 정보
@@ -29,15 +28,14 @@ export const SermonShortsScene: React.FC = () => {
 
   // 1. 요소별 순차적 진행률 (Progress)
   const pCard = easeOutCubic(frame / 20);            // 중앙 카드 안착
-  const pQuote = easeOutCubic((frame - 15) / 18);    // 따옴표 등장
-  const pLine1 = easeOutCubic((frame - 25) / 22);    // 1번째 구절
-  const pLine2 = easeOutCubic((frame - 48) / 24);    // 2번째 강조 구절
-  const pBadge = easeOutCubic((frame - 70) / 20);    // 장절 뱃지
-  const pTop = easeOutCubic(frame / 18);             // 상단 유튜브
-  const pBottom = easeOutCubic((frame - 30) / 20);   // 하단 블로그
+  const pLine1 = easeOutCubic((frame - 15) / 20);   // 1번째 줄
+  const pLine2 = easeOutCubic((frame - 30) / 20);   // 2번째 줄
+  const pLine3 = easeOutCubic((frame - 45) / 22);   // 3번째 줄 (하나님)
+  const pTop = easeOutCubic(frame / 18);            // 상단 유튜브
+  const pBottom = easeOutCubic((frame - 25) / 20);  // 하단 블로그
 
   // 마지막 강조 문구 은은한 호흡 펄스 (Pulse)
-  const pulse = 1 + Math.sin(Math.max(0, frame - 70) * 0.08) * 0.02;
+  const pulse = 1 + Math.sin(Math.max(0, frame - 65) * 0.08) * 0.02;
 
   return (
     <AbsoluteFill
@@ -49,7 +47,7 @@ export const SermonShortsScene: React.FC = () => {
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '130px 60px 110px 60px',
+        padding: '110px 60px 100px 60px',
         color: '#ffffff',
       }}
     >
@@ -113,116 +111,75 @@ export const SermonShortsScene: React.FC = () => {
         </p>
       </div>
 
-      {/* ── [중앙] 대형 설교 한 문장 화이트 카드 ── */}
+      {/* ── [중앙] 대형 설교 한 문장 화이트 카드 (3줄 정중앙 완전 가운데 정렬, 동일 글씨 크기) ── */}
       <div
         style={{
           position: 'relative',
           zIndex: 20,
           width: '100%',
           maxWidth: 960,
-          minHeight: 820,
+          minHeight: 760,
           background: '#ffffff',
           borderRadius: 56,
-          padding: '80px 60px',
+          padding: '80px 50px',
           boxShadow: '0 40px 100px rgba(0, 0, 0, 0.65), 0 0 50px rgba(246, 195, 88, 0.2)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: 36,
           textAlign: 'center',
           opacity: pCard,
           transform: `scale(${0.96 + 0.04 * pCard})`,
         }}
       >
-        {/* 상단 설교 주제 라벨 */}
+        {/* 1번째 줄 */}
         <div
           style={{
-            fontSize: 26,
-            fontWeight: 800,
-            color: '#3b82f6',
-            letterSpacing: '2px',
-            marginBottom: 20,
-            opacity: pQuote,
-          }}
-        >
-          {SERMON_SENTENCE.topic}
-        </div>
-
-        {/* 여는 따옴표 */}
-        <div
-          style={{
-            fontSize: 64,
-            lineHeight: 1,
-            color: '#2563eb',
-            fontWeight: 900,
-            opacity: pQuote,
-            transform: `scale(${pQuote})`,
-            marginBottom: 24,
-          }}
-        >
-          ❝
-        </div>
-
-        {/* 1번째 구절 (하나님은 일하시고,) */}
-        <div
-          style={{
-            fontSize: 56,
+            fontSize: 54,
             fontWeight: 700,
             color: '#1e293b',
-            lineHeight: 1.35,
+            lineHeight: 1.4,
             letterSpacing: '-1.5px',
             opacity: pLine1,
             transform: `translateY(${(1 - pLine1) * 20}px)`,
-            marginBottom: 16,
+            textAlign: 'center',
           }}
         >
           {SERMON_SENTENCE.line1}
         </div>
 
-        {/* 2번째 강조 구절 (마침내 이루십니다 ✨ - 로즈골드 & 펄스) */}
+        {/* 2번째 줄 */}
         <div
           style={{
-            fontSize: 64,
-            fontWeight: 900,
-            color: '#e11d48',
-            lineHeight: 1.3,
+            fontSize: 54,
+            fontWeight: 700,
+            color: '#1e293b',
+            lineHeight: 1.4,
             letterSpacing: '-1.5px',
             opacity: pLine2,
-            transform: `translateY(${(1 - pLine2) * 25}px) scale(${pulse})`,
-            marginBottom: 40,
-            textShadow: '0 4px 15px rgba(225, 29, 72, 0.25)',
+            transform: `translateY(${(1 - pLine2) * 20}px)`,
+            textAlign: 'center',
           }}
         >
           {SERMON_SENTENCE.line2}
         </div>
 
-        {/* 성경 장절 뱃지 & 닫는 따옴표 */}
+        {/* 3번째 줄: 하나님 (동일 글씨 크기, 로즈골드 강조 & 바운스 펄스) */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            opacity: pBadge,
-            transform: `translateY(${(1 - pBadge) * 15}px)`,
+            fontSize: 54,
+            fontWeight: 900,
+            color: '#e11d48',
+            lineHeight: 1.4,
+            letterSpacing: '-1.5px',
+            opacity: pLine3,
+            transform: `translateY(${(1 - pLine3) * 25}px) scale(${pulse})`,
+            textAlign: 'center',
+            textShadow: '0 4px 15px rgba(225, 29, 72, 0.25)',
           }}
         >
-          <div
-            style={{
-              background: '#eff6ff',
-              color: '#1d4ed8',
-              fontSize: 30,
-              fontWeight: 700,
-              padding: '12px 36px',
-              borderRadius: 999,
-              border: '2px solid #bfdbfe',
-              letterSpacing: '-0.5px',
-            }}
-          >
-            {SERMON_SENTENCE.verse}
-          </div>
-          <span style={{ fontSize: 50, lineHeight: 1, color: '#2563eb', fontWeight: 900 }}>
-            ❞
-          </span>
+          {SERMON_SENTENCE.line3}
         </div>
       </div>
 
@@ -271,3 +228,9 @@ export const SermonShortsScene: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SermonShortsScene />
+  </AbsoluteFill>
+);
