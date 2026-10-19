@@ -1,441 +1,116 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>별내사랑의교회 가로 말씀 모션 스튜디오 (16:9)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
-  <style>
-    body { font-family: 'Pretendard', sans-serif; }
-    .font-gowun { font-family: 'Gowun Batang', serif; }
-  </style>
-</head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased select-none">
+import React from 'react';
+import {
+  AbsoluteFill,
+  interpolate,
+  spring,
+  useCurrentFrame,
+  useVideoConfig,
+} from 'remotion';
 
-  <!-- 헤더 -->
-  <header class="h-14 border-b border-zinc-800 bg-zinc-900/90 px-6 flex items-center justify-between sticky top-0 z-30">
-    <div class="flex items-center gap-3">
-      <span class="w-7 h-7 rounded-lg bg-rose-600 flex items-center justify-center font-black text-sm text-white">✝</span>
-      <h1 class="font-bold text-base text-white tracking-tight">별내사랑의교회 · 가로(16:9) 말씀 모션</h1>
-      <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">16:9 가로 모드</span>
-    </div>
-    <button id="btnCopyCode" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1.5">
-      <span>📋</span> Remotion 가로 코드 복사
-    </button>
-  </header>
-
-  <!-- 메인 작업창 -->
-  <main class="flex-1 flex overflow-hidden">
-    <!-- 좌측: 모니터 프리뷰 (16:9 가로 비율) -->
-    <section class="flex-1 flex flex-col items-center justify-center bg-zinc-900/50 p-6 relative">
-      <div class="relative shadow-2xl rounded-2xl overflow-hidden border border-zinc-800 bg-black" style="width: 720px; height: 405px;">
-        <canvas id="motionCanvas" width="720" height="405" class="block w-full h-full"></canvas>
-      </div>
-
-      <!-- 타임라인 컨트롤 바 (16:9에 맞추어 확대) -->
-      <div class="w-full max-w-2xl mt-4 flex flex-col gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-        <div class="flex items-center justify-between text-xs text-zinc-400">
-          <div class="flex items-center gap-2">
-            <button id="btnPlay" class="w-7 h-7 rounded-full bg-white text-zinc-950 font-bold flex items-center justify-center hover:bg-zinc-200 transition">▶</button>
-            <span class="font-mono text-zinc-300"><span id="lblFrame" class="text-white font-bold">0</span> / 180 F</span>
-          </div>
-          <div class="flex items-center gap-1 text-xs">
-            <span class="text-zinc-500 mr-1">속도:</span>
-            <button class="btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white" data-speed="0.5">0.5x</button>
-            <button class="btn-speed px-2 py-0.5 rounded bg-blue-600 text-white font-semibold" data-speed="0.75">0.75x</button>
-            <button class="btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white" data-speed="1.0">1.0x</button>
-          </div>
-        </div>
-        <input id="timeline" type="range" min="0" max="180" value="0" class="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-blue-500">
-      </div>
-    </section>
-
-    <!-- 우측: 텍스트 및 스타일 설정 패널 -->
-    <aside class="w-96 border-l border-zinc-800 bg-zinc-950 p-6 flex flex-col gap-4 overflow-y-auto">
-      <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">말씀 텍스트 설정 (16:9)</h2>
-
-      <!-- 글씨체 선택 -->
-      <div>
-        <label class="text-xs text-zinc-300 font-semibold block mb-1">🌸 글씨체</label>
-        <select id="fontSelect" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          <option value="Gowun Batang" selected>🌸 고운바탕 (따뜻한 붓터치 감성)</option>
-          <option value="Pretendard">깔끔한 고딕 (Pretendard)</option>
-        </select>
-      </div>
-
-      <!-- 1번째 줄 -->
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label class="text-xs text-blue-400 font-semibold">● 1번째 줄 (시작 구절)</label>
-          <input id="col1" type="color" value="#0f172a" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-        </div>
-        <input id="line1" type="text" value="두려워말라" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-      </div>
-
-      <!-- 2번째 줄 -->
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label class="text-xs text-emerald-400 font-semibold">● 2번째 줄 (이어지는 구절)</label>
-          <input id="col2" type="color" value="#1e293b" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-        </div>
-        <input id="line2" type="text" value="내가 너와" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-      </div>
-
-      <!-- 3번째 줄 (강조) -->
-      <div>
-        <div class="flex justify-between items-center mb-1">
-          <label class="text-xs text-rose-400 font-semibold">● 마지막 강조 줄 (포인트 색상)</label>
-          <input id="col3" type="color" value="#e11d48" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-        </div>
-        <input id="line3" type="text" value="함께 함이니라 ✨" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-rose-500">
-      </div>
-
-      <!-- 장절 -->
-      <div>
-        <label class="text-xs text-zinc-300 font-semibold block mb-1">성경 장절 (하단 뱃지)</label>
-        <input id="verse" type="text" value="이사야 41:10" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-      </div>
-
-      <!-- 링크 정보 -->
-      <div class="pt-3 border-t border-zinc-800 flex flex-col gap-3">
-        <div>
-          <label class="text-xs text-zinc-400 block mb-1">상단 유튜브 주소</label>
-          <input id="youtube" type="text" value="https://www.youtube.com/@별내사랑의교회1" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono">
-        </div>
-        <div>
-          <label class="text-xs text-zinc-400 block mb-1">하단 블로그 주소</label>
-          <input id="blog" type="text" value="https://blog.naver.com/aiyamok2015/224430812151" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono">
-        </div>
-      </div>
-    </aside>
-  </main>
-
-  <script>
-    const canvas = document.getElementById('motionCanvas');
-    const ctx = canvas.getContext('2d');
-
-    const state = {
-      frame: 0,
-      totalFrames: 180,
-      fps: 30,
-      speedRate: 0.75,
-      isPlaying: true,
-      font: 'Gowun Batang',
-      line1: '두려워말라',
-      line2: '내가 너와',
-      line3: '함께 함이니라 ✨',
-      verse: '이사야 41:10',
-      youtube: 'https://www.youtube.com/@별내사랑의교회1',
-      blog: 'https://blog.naver.com/aiyamok2015/224430812151',
-      col1: '#0f172a',
-      col2: '#1e293b',
-      col3: '#e11d48',
-      bg1: '#090e17',
-      bg2: '#111e38'
-    };
-
-    function easeOutCubic(t) {
-      return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
-    }
-
-    function render() {
-      const W = canvas.width;
-      const H = canvas.height;
-      const f = state.frame;
-      const fontFamily = state.font === 'Gowun Batang' ? "'Gowun Batang', serif" : "'Pretendard', sans-serif";
-
-      // 1. 가로배경 그라데이션 (좌우 및 상하 고른 감도)
-      const grad = ctx.createLinearGradient(0, 0, W, H);
-      grad.addColorStop(0, state.bg1);
-      grad.addColorStop(0.5, state.bg2);
-      grad.addColorStop(1, state.bg1);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-
-      // 넓은 가로 화면에 맞는 부드러운 우주/빛 후광 효과
-      const glow = ctx.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 400);
-      glow.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
-      glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, W, H);
-
-      // 2. 상단 유튜브 주소 (가로에 넓게 정돈)
-      const topP = easeOutCubic(f / 20);
-      ctx.save();
-      ctx.globalAlpha = topP;
-      ctx.textAlign = 'center';
-      const topY = 24 + (1 - topP) * -8;
-
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(W / 2 - 80, topY, 160, 22, 11);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#ef4444';
-      ctx.font = 'bold 10px Pretendard';
-      ctx.fillText('▶ 별내사랑의교회', W / 2, topY + 14);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 9px monospace';
-      ctx.fillText(state.youtube, W / 2, topY + 32);
-      ctx.restore();
-
-      // 3. 중앙 큰 단일 화이트 말씀 카드 (가로 16:9 비율 최적화: 넓고 웅장함)
-      const cardW = 460; // 가로 크기를 시원시원하게 넓힘
-      const cardH = 240; // 높이를 세로 비례 낮춰 가로 중심 컴팩트화
-      const cardX = (W - cardW) / 2;
-      const cardY = (H - cardH) / 2 + 10; // 아래쪽에 살짝 배치
-
-      const cardP = easeOutCubic(f / 18);
-      ctx.save();
-      ctx.globalAlpha = cardP;
-      ctx.translate(W / 2, H / 2 + 10);
-      ctx.scale(0.97 + 0.03 * cardP, 0.97 + 0.03 * cardP);
-      ctx.translate(-W / 2, -H / 2 - 10);
-
-      // 그림자 효과
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 32;
-      ctx.shadowOffsetY = 15;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.roundRect(cardX, cardY, cardW, cardH, 24);
-      ctx.fill();
-      ctx.shadowColor = 'transparent';
-
-      // 따옴표 아이콘
-      ctx.fillStyle = '#2563eb';
-      ctx.font = 'bold 28px serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('❝', W / 2, cardY + 34);
-
-      // --- 세 한 줄씩 차분히 떠오르는 모션 ---
-      ctx.textAlign = 'center';
-
-      // 1번째 줄 (f >= 18 시작)
-      const p1 = easeOutCubic((f - 18) / 20);
-      if (p1 > 0) {
-        ctx.save();
-        ctx.globalAlpha = p1;
-        ctx.fillStyle = state.col1;
-        ctx.font = `700 21px ${fontFamily}`;
-        const y1 = cardY + 76 + (1 - p1) * 8;
-        ctx.fillText(state.line1, W / 2, y1);
-        ctx.restore();
-      }
-
-      // 2번째 줄 (f >= 36 시작)
-      const p2 = easeOutCubic((f - 36) / 20);
-      if (p2 > 0) {
-        ctx.save();
-        ctx.globalAlpha = p2;
-        ctx.fillStyle = state.col2;
-        ctx.font = `700 22px ${fontFamily}`;
-        const y2 = cardY + 114 + (1 - p2) * 8;
-        ctx.fillText(state.line2, W / 2, y2);
-        ctx.restore();
-      }
-
-      // 3번째 줄 (강조, f >= 54 시작)
-      const p3 = easeOutCubic((f - 54) / 22);
-      if (p3 > 0) {
-        const pulse = 1 + Math.sin(Math.max(0, f - 76) * 0.08) * 0.015;
-        ctx.save();
-        ctx.globalAlpha = p3;
-        ctx.translate(W / 2, cardY + 158 + (1 - p3) * 10);
-        ctx.scale(pulse, pulse);
-        ctx.fillStyle = state.col3;
-        ctx.font = `800 24px ${fontFamily}`;
-        ctx.fillText(state.line3, 0, 0);
-        ctx.restore();
-      }
-
-      // 4번째 장절 뱃지 (f >= 72 시작)
-      const pBadge = easeOutCubic((f - 72) / 18);
-      if (pBadge > 0) {
-        ctx.save();
-        ctx.globalAlpha = pBadge;
-        const bY = cardY + cardH - 40 + (1 - pBadge) * 6;
-        ctx.fillStyle = '#eff6ff';
-        ctx.strokeStyle = '#bfdbfe';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(W / 2 - 60, bY, 120, 24, 12);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#1d4ed8';
-        ctx.font = '700 11px Pretendard';
-        ctx.fillText(state.verse, W / 2, bY + 16);
-        ctx.restore();
-      }
-
-      ctx.restore(); // 카드 restore
-
-      // 4. 하단 네이버 블로그 주소 (가로 하단 우아하게 배치)
-      const botP = easeOutCubic((f - 30) / 22);
-      ctx.save();
-      ctx.globalAlpha = botP;
-      ctx.textAlign = 'center';
-      const botY = H - 36;
-
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(W / 2 - 65, botY, 130, 20, 10);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#10b981';
-      ctx.font = 'bold 9.5px Pretendard';
-      ctx.fillText('N 블로그 공식 채널', W / 2, botY + 13);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 8.5px monospace';
-      ctx.fillText(state.blog, W / 2, botY + 31);
-      ctx.restore();
-    }
-
-    // 애니메이션 렌더 루프
-    let lastTime = performance.now();
-    function loop(time) {
-      if (state.isPlaying) {
-        const interval = 1000 / (state.fps * state.speedRate);
-        if (time - lastTime >= interval) {
-          state.frame = (state.frame + 1) % state.totalFrames;
-          document.getElementById('lblFrame').innerText = state.frame;
-          document.getElementById('timeline').value = state.frame;
-          render();
-          lastTime = time;
-        }
-      }
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-
-    // 이벤트 리스너 연동
-    const btnPlay = document.getElementById('btnPlay');
-    btnPlay.addEventListener('click', () => {
-      state.isPlaying = !state.isPlaying;
-      btnPlay.innerText = state.isPlaying ? '❚❚' : '▶';
-    });
-
-    const timeline = document.getElementById('timeline');
-    timeline.addEventListener('input', (e) => {
-      state.frame = parseInt(e.target.value);
-      state.isPlaying = false;
-      btnPlay.innerText = '▶';
-      document.getElementById('lblFrame').innerText = state.frame;
-      render();
-    });
-
-    // 인풋 데이터 실시간 바인딩
-    const bindings = [
-      { id: 'line1', key: 'line1' },
-      { id: 'line2', key: 'line2' },
-      { id: 'line3', key: 'line3' },
-      { id: 'verse', key: 'verse' },
-      { id: 'col1', key: 'col1' },
-      { id: 'col2', key: 'col2' },
-      { id: 'col3', key: 'col3' },
-      { id: 'youtube', key: 'youtube' },
-      { id: 'blog', key: 'blog' },
-      { id: 'fontSelect', key: 'font' }
-    ];
-    bindings.forEach(({ id, key }) => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', (e) => {
-        state[key] = e.target.value;
-        render();
-      });
-      el.addEventListener('change', (e) => {
-        state[key] = e.target.value;
-        render();
-      });
-    });
-
-    // 속도 컨트롤
-    document.querySelectorAll('.btn-speed').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.btn-speed').forEach(b => {
-          b.className = 'btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white';
-        });
-        btn.className = 'btn-speed px-2 py-0.5 rounded bg-blue-600 text-white font-semibold';
-        state.speedRate = parseFloat(btn.dataset.speed);
-      });
-    });
-
-    // Remotion 가로 전용 16:9 코드 생성 및 복사
-    document.getElementById('btnCopyCode').addEventListener('click', () => {
-      const code = `// Remotion Scene.tsx (16:9 가로 버전)
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-
-export const BibleLanscapeScene = () => {
+export const RollingYellowBoxScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width } = useVideoConfig();
 
-  const p1 = interpolate(frame, [18, 38], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const p2 = interpolate(frame, [36, 56], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const p3 = interpolate(frame, [54, 76], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const pBadge = interpolate(frame, [72, 90], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // 1. 구르는 물리 스프링 애니메이션 (0 -> 1 진행률)
+  // damping과 stiffness로 굴러오다가 딱 멈출 때 쫀득한 감속 구현
+  const rollProgress = spring({
+    frame: frame - 10,
+    fps,
+    config: {
+      damping: 14,   // 감속 마찰력
+      stiffness: 70, // 굴러오는 탄성력
+      mass: 1.2,     // 박스의 무게감
+    },
+  });
+
+  // 2. 이동 좌표: 화면 왼쪽 바깥(-650px)에서 화면 중앙(0px)으로 굴러옴
+  const translateX = interpolate(rollProgress, [0, 1], [-width * 0.7, 0]);
+
+  // 3. 회전 각도: 구르면서 2바퀴(-720도) 회전 후 0도에서 정확히 수평 정지
+  const rotateDeg = interpolate(rollProgress, [0, 1], [-720, 0]);
+
+  // 4. 착지 순간 바닥 충격 바운스 (Y축으로 살짝 쿵 내려앉았다가 복원)
+  const squashY = interpolate(
+    rollProgress,
+    [0.85, 0.95, 1],
+    [1, 0.92, 1],
+    { extrapolateRight: 'clamp' }
+  );
+
+  // 5. 텍스트 등장 (박스가 멈추는 시점 35프레임 이후 선명하게 페이드인)
+  const textOpacity = interpolate(frame, [38, 55], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+  const textScale = spring({
+    frame: frame - 38,
+    fps,
+    config: { damping: 12, stiffness: 150 },
+  });
 
   return (
-    <AbsoluteFill style={{
-      background: 'linear-gradient(135deg, ${state.bg1} 0%, ${state.bg2} 100%)',
-      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      alignItems: 'center', padding: '70px 60px 50px 60px',
-      fontFamily: '${state.font === 'Gowun Batang' ? 'Gowun Batang, serif' : 'Pretendard, sans-serif'}'
-    }}>
-      {/* 상단 */}
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 24, color: '#ef4444', fontWeight: 700 }}>▶ 별내사랑의교회</div>
-        <p style={{ fontSize: 20, color: '#94a3b8', margin: '4px 0 0 0' }}>${state.youtube}</p>
-      </div>
+    <AbsoluteFill
+      style={{
+        background: 'radial-gradient(ellipse at 50% 40%, #1a1e29 0%, #0d1017 60%, #06080c 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "'Pretendard', sans-serif",
+        overflow: 'hidden',
+      }}
+    >
+      {/* 바닥 그림자 (박스 위치에 맞춰 함께 따라오며 크기 조절) */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '22%',
+          width: 320,
+          height: 36,
+          borderRadius: '50%',
+          background: 'rgba(0, 0, 0, 0.6)',
+          filter: 'blur(16px)',
+          transform: `translateX(${translateX}px) scaleX(${rollProgress})`,
+        }}
+      />
 
-      {/* 가로형 대형 중앙 보드 */}
-      <div style={{
-        width: 1000, height: 520, background: '#ffffff', borderRadius: 48,
-        padding: '50px 60px', textAlign: 'center', boxShadow: '0 40px 100px rgba(0,0,0,0.5)',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
-      }}>
-        <div style={{ fontSize: 72, color: '#2563eb', marginBottom: 5 }}>❝</div>
-        <div style={{ fontSize: 44, fontWeight: 700, color: '${state.col1}', opacity: p1, transform: \`translateY(\${(1-p1)*15}px)\`, marginBottom: 20 }}>
-          ${state.line1}
+      {/* 데굴데굴 굴러오는 노란색 메인 박스 */}
+      <div
+        style={{
+          transform: `translateX(${translateX}px) rotate(${rotateDeg}deg) scaleY(${squashY})`,
+          width: 280,
+          height: 280,
+          backgroundColor: '#facc15', // 생생한 옐로우
+          backgroundImage: 'linear-gradient(135deg, #fde047 0%, #eab308 100%)',
+          borderRadius: 36,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(250, 204, 21, 0.35)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '4px solid #fef08a',
+          position: 'relative',
+        }}
+      >
+        {/* 박스 안 내용: 굴러온 후 촥 나타나는 텍스트 */}
+        <div
+          style={{
+            opacity: textOpacity,
+            transform: `scale(${Math.max(0, textScale)})`,
+            textAlign: 'center',
+            color: '#1e293b',
+          }}
+        >
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#854d0e', marginBottom: 6 }}>
+            말씀 카드
+          </div>
+          <div style={{ fontSize: 34, fontWeight: 900, lineHeight: 1.25 }}>
+            두려워<br />말라
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginTop: 10, color: '#713f12', background: 'rgba(255,255,255,0.4)', padding: '4px 14px', borderRadius: 999 }}>
+            이사야 41:10
+          </div>
         </div>
-        <div style={{ fontSize: 46, fontWeight: 700, color: '${state.col2}', opacity: p2, transform: \`translateY(\${(1-p2)*15}px)\`, marginBottom: 25 }}>
-          ${state.line2}
-        </div>
-        <div style={{ fontSize: 52, fontWeight: 800, color: '${state.col3}', opacity: p3, transform: \`translateY(\${(1-p3)*15}px)\`, marginBottom: 35 }}>
-          ${state.line3}
-        </div>
-        <div style={{ opacity: pBadge, display: 'inline-block', background: '#eff6ff', color: '#1d4ed8', fontSize: 24, fontWeight: 700, padding: '10px 32px', borderRadius: 999 }}>
-          ${state.verse}
-        </div>
-      </div>
-
-      {/* 하단 */}
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 22, color: '#10b981', fontWeight: 700 }}>N 블로그 공식 채널</div>
-        <p style={{ fontSize: 18, color: '#94a3b8', margin: '4px 0 0 0' }}>${state.blog}</p>
       </div>
     </AbsoluteFill>
   );
-};`;
-      navigator.clipboard.writeText(code).then(() => {
-        const btn = document.getElementById('btnCopyCode');
-        btn.innerHTML = '<span>✓</span> 가로 복사 완료!';
-        setTimeout(() => { btn.innerHTML = '<span>📋</span> Remotion 가로 코드 복사'; }, 1500);
-      });
-    });
-
-    render();
-  </script>
-</body>
-</html>
+};
