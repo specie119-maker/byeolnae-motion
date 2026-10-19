@@ -1,3 +1,4 @@
+// 🔒 [LOCKED / 완료 확정] CODE 02 · 모션 롤러 - 수정 금지 완료본
 import React from 'react';
 import {
   AbsoluteFill,
@@ -31,12 +32,12 @@ export const MotionThreeCardsScene: React.FC<{
 
   // [수정 2] 정확한 정중앙 안착 좌표
   const targetCenterX = (panelW - cardW) / 2; // 패널의 가로 정중앙
-  const targetCenterY = (panelH - cardH) / 2 - 20; // 패널의 세로 정중앙
+  const targetCenterY = (panelH - cardH) / 2; // 패널의 세로 정중앙
 
   const cards = [
-    { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: line1, delay: 0 },
-    { title: '부드러운 이동', sub: '천천히 중심으로', text: line2, delay: 25 },
-    { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: line3, delay: 50 },
+    { text: line1 || '일을 행하시는 여호와', delay: 0 },
+    { text: line2 || '일을 지어 성취하시는', delay: 25 },
+    { text: line3 || '하나님', delay: 50 },
   ];
 
   return (
@@ -123,16 +124,7 @@ export const MotionThreeCardsScene: React.FC<{
                 {card.text}
               </div>
 
-              {/* 패널 하단 설명 라벨 */}
-              <div style={{ position: 'absolute', bottom: 24, left: 24 }}>
-                <div style={{ color: '#ffc93c', fontSize: 18, fontWeight: 900 }}>
-                  {card.title}
-                </div>
-                <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600, marginTop: 4 }}>
-                  {card.sub}
-                </div>
               </div>
-            </div>
           );
         })}
       </div>

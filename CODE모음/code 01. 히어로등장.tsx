@@ -1,3 +1,4 @@
+// 🔒 [LOCKED / 완료 확정] CODE 01 · 히어로 등장 - 수정 금지 완료본
 import React from 'react';
 import {
   AbsoluteFill,
@@ -7,7 +8,15 @@ import {
   useVideoConfig,
 } from 'remotion';
 
-export const RedHeroScriptureScene: React.FC = () => {
+export const RedHeroScriptureScene: React.FC<{
+  line1?: string;
+  line2?: string;
+  line3?: string;
+}> = ({
+  line1 = '일을 행하시는 여호와',
+  line2 = '일을 지어 성취하시는',
+  line3 = '하나님',
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -79,7 +88,7 @@ export const RedHeroScriptureScene: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'flex-start',
           gap: 14,
-          maxWidth: 620,
+          maxWidth: 960,
         }}
       >
         {/* 상단 여는 따옴표 ❝ */}
@@ -101,8 +110,8 @@ export const RedHeroScriptureScene: React.FC = () => {
         {/* 1번째 줄 */}
         <div
           style={{
-            fontSize: 42,
-            fontWeight: 700,
+            fontSize: 64,
+            fontWeight: 800,
             color: '#fde8ea',
             letterSpacing: '-0.5px',
             lineHeight: 1.25,
@@ -111,7 +120,7 @@ export const RedHeroScriptureScene: React.FC = () => {
             textShadow: '0 3px 14px rgba(0,0,0,0.85), 0 0 20px rgba(0,0,0,0.9)',
           }}
         >
-          두려워말라
+          {line1}
         </div>
 
         {/* 2번째 줄 (메인 강조: 골드 옐로우) */}
@@ -127,14 +136,14 @@ export const RedHeroScriptureScene: React.FC = () => {
             textShadow: '0 4px 18px rgba(0,0,0,0.9), 0 0 35px rgba(255,209,102,0.35)',
           }}
         >
-          내가 너와
+          {line2}
         </div>
 
         {/* 3번째 줄 */}
         <div
           style={{
-            fontSize: 46,
-            fontWeight: 700,
+            fontSize: 64,
+            fontWeight: 800,
             color: '#ffffff',
             letterSpacing: '-0.5px',
             lineHeight: 1.25,
@@ -143,7 +152,7 @@ export const RedHeroScriptureScene: React.FC = () => {
             textShadow: '0 3px 14px rgba(0,0,0,0.85)',
           }}
         >
-          함께 함이라
+          {line3}
         </div>
 
         {/* 하단 닫는 따옴표 ❞ (우측 정렬 완결) */}
@@ -165,61 +174,6 @@ export const RedHeroScriptureScene: React.FC = () => {
         </div>
       </div>
 
-      {/* ──────────────── 우측: '뿅!' 하고 나타나는 히어로 이모티콘 ──────────────── */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          width: 420,
-          height: 420,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {/* 히어로 등장 시 퍼지는 골드 글로우 링 (Shockwave) */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 260,
-            height: 260,
-            borderRadius: '50%',
-            border: '2px solid rgba(255, 215, 0, 0.4)',
-            boxShadow: '0 0 50px rgba(255, 209, 102, 0.45)',
-            transform: `scale(${Math.max(0, heroSpring)})`,
-            opacity: Math.max(0, 1 - (frame - 45) / 40),
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* 뿅! 나타나는 메인 히어로 심볼 (비둘기/기도손/십자가 등 자유 교체 가능) */}
-        <div
-          style={{
-            transform: `scale(${heroSpring * pulseScale}) translateY(${floatY}px)`,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.75)) drop-shadow(0 0 25px rgba(255,209,102,0.5))',
-          }}
-        >
-          {/* 메인 이모티콘 (예: 평안과 임재를 뜻하는 비둘기 🕊️ 또는 기도손 🙏) */}
-          <span style={{ fontSize: 160, lineHeight: 1 }}>🕊️</span>
-
-          {/* 반짝이는 별빛 효과 ✨ */}
-          <span
-            style={{
-              position: 'absolute',
-              top: 10,
-              right: 40,
-              fontSize: 48,
-              transform: `scale(${heroSpring}) rotate(${frame * 2}deg)`,
-            }}
-          >
-            ✨
-          </span>
-        </div>
-      </div>
-    </AbsoluteFill>
+      </AbsoluteFill>
   );
 };

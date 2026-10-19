@@ -493,12 +493,12 @@
       subFrame: 0,
       isPlaying: true,
       fontFamily: "'Gowun Batang', serif", // 부드러운 붓터치의 고운바탕체 (기본)
-      line1: '두려워말라',
-      colorLine1: '#0f172a',
-      line2: '내가 너와',
-      colorLine2: '#1e293b',
-      line3: '함께 함이라',
-      colorLine3: '#e11d48',
+      line1: document.getElementById('inputLine1')?.value || '일을 행하시는 여호와',
+      colorLine1: document.getElementById('colorLine1')?.value || '#0f172a',
+      line2: document.getElementById('inputLine2')?.value || '일을 지어 성취하시는',
+      colorLine2: document.getElementById('colorLine2')?.value || '#1e293b',
+      line3: document.getElementById('inputLine3')?.value || '하나님',
+      colorLine3: document.getElementById('colorLine3')?.value || '#e11d48',
       verse: '예레미야 33:2',
       verseBg: '#eff6ff',
       verseText: '#2563eb',
@@ -779,9 +779,10 @@
       };
       const header = `CODE ${String(code).padStart(2, '0')} · ${portrait ? '세로 9:16' : '가로 16:9'}`;
 
-      if (code === 1) { // 01 히어로 등장: RedHeroScriptureScene
+      // 🔒 [LOCKED / 코드 확정] CODE 01 · 히어로 등장 (비둘기 제거 및 3줄 동일 대형 크기 확정 - 수정 금지)
+      if (code === 1) {
         // 1) 붉은 와인 방사형 배경
-        const grad = ctx.createRadialGradient(W * .75, H * .50, 0, W * .75, H * .50, W * .85);
+        const grad = ctx.createRadialGradient(W * .50, H * .50, 0, W * .50, H * .50, W * .85);
         grad.addColorStop(0, '#880c21');
         grad.addColorStop(0.55, '#44030d');
         grad.addColorStop(1, '#180004');
@@ -796,18 +797,18 @@
         for (let i = 0; i < 24; i++) {
           const a = (i * Math.PI / 12) + f * .006;
           ctx.beginPath();
-          ctx.moveTo(W * .75, H * .50);
-          ctx.lineTo(W * .75 + Math.cos(a) * W * 1.4, H * .50 + Math.sin(a) * H * 1.4);
+          ctx.moveTo(W * .50, H * .50);
+          ctx.lineTo(W * .50 + Math.cos(a) * W * 1.4, H * .50 + Math.sin(a) * H * 1.4);
           ctx.stroke();
         }
         ctx.restore();
 
         // 3) [배경] 텍스트 가독성 보호용 다크 딤
-        const dimGrad = ctx.createRadialGradient(W * .35, H * .50, 0, W * .35, H * .50, W * .55);
+        const dimGrad = ctx.createRadialGradient(W * .50, H * .50, 0, W * .50, H * .50, W * .65);
         dimGrad.addColorStop(0, 'rgba(20, 0, 4, 0.6)');
         dimGrad.addColorStop(1, 'rgba(20, 0, 4, 0)');
         ctx.fillStyle = dimGrad;
-        ctx.fillRect(0, 0, W * .65, H);
+        ctx.fillRect(0, 0, W, H);
 
         // 4) 텍스트 순차 등장 타이밍 보간
         const pQOpen = Math.min(1, Math.max(0, (f - 10) / 15));
@@ -816,136 +817,96 @@
         const p3 = Math.min(1, Math.max(0, (f - 50) / 18));
         const pQClose = Math.min(1, Math.max(0, (f - 65) / 15));
 
-        // ── 좌측: 말씀 텍스트 및 상/하 따옴표 ──
-        const textLeft = W * .10;
+        // 5) 말씀 텍스트: 전체 글씨 크기를 '일을 지어 성취' 크기로 통일
+        const textLeft = portrait ? W * .08 : W * .12;
         const fontFace = state.fontFamily || "'Gowun Batang', serif";
+        const l1 = state.line1 || '일을 행하시는 여호와';
+        const l2 = state.line2 || '일을 지어 성취하시는';
+        const l3 = state.line3 || '하나님';
+
+        // 2번째 줄(일을 지어 성취) 기준 통일 폰트 사이즈
+        let heroFontSize = portrait ? 34 : 50;
+        ctx.font = `900 ${heroFontSize}px ${fontFace}`;
+        const maxTextW = Math.max(
+          ctx.measureText(l1).width,
+          ctx.measureText(l2).width,
+          ctx.measureText(l3).width
+        );
+        const maxAllowedW = W * 0.82;
+        if (maxTextW > maxAllowedW) {
+          heroFontSize = Math.floor(heroFontSize * (maxAllowedW / maxTextW));
+        }
 
         // 상단 여는 따옴표 ❝
         if (pQOpen > 0) {
           ctx.save();
           ctx.globalAlpha = pQOpen;
           ctx.fillStyle = '#fbbf24';
-          ctx.font = `900 ${portrait ? 32 : 44}px ${fontFace}`;
+          ctx.font = `900 ${portrait ? 32 : 46}px ${fontFace}`;
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.7)';
           ctx.shadowBlur = 12;
-          ctx.fillText('❝', textLeft, H * .26);
+          ctx.fillText('❝', textLeft, H * .22);
           ctx.restore();
         }
 
-        // 1번째 줄 (두려워말라)
+        // 1번째 줄 (통일된 큰 글씨)
         if (p1 > 0) {
           ctx.save();
           ctx.globalAlpha = p1;
           ctx.fillStyle = '#fde8ea';
-          ctx.font = `700 ${portrait ? 24 : 36}px ${fontFace}`;
+          ctx.font = `900 ${heroFontSize}px ${fontFace}`;
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.85)';
-          ctx.shadowBlur = 16;
+          ctx.shadowBlur = 18;
           const y1 = H * .38 + (1 - p1) * 14;
-          ctx.fillText(lines[0] || '두려워말라', textLeft, y1);
+          ctx.fillText(l1, textLeft, y1);
           ctx.restore();
         }
 
-        // 2번째 줄 (내가 너와 - 메인 강조 골드)
+        // 2번째 줄 (통일된 큰 글씨 - 골드)
         if (p2 > 0) {
           ctx.save();
           ctx.globalAlpha = p2;
           ctx.fillStyle = '#ffd166';
-          ctx.font = `900 ${portrait ? 36 : 54}px ${fontFace}`;
+          ctx.font = `900 ${heroFontSize}px ${fontFace}`;
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.9)';
           ctx.shadowBlur = 24;
-          const y2 = H * .53 + (1 - p2) * 14;
-          ctx.fillText(lines[1] || '내가 너와', textLeft, y2);
+          const y2 = H * .54 + (1 - p2) * 14;
+          ctx.fillText(l2, textLeft, y2);
           ctx.restore();
         }
 
-        // 3번째 줄 (함께 함이라 - 화이트)
+        // 3번째 줄 (통일된 큰 글씨 - 화이트)
         if (p3 > 0) {
           ctx.save();
           ctx.globalAlpha = p3;
           ctx.fillStyle = '#ffffff';
-          ctx.font = `700 ${portrait ? 26 : 40}px ${fontFace}`;
+          ctx.font = `900 ${heroFontSize}px ${fontFace}`;
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.85)';
-          ctx.shadowBlur = 16;
-          const y3 = H * .67 + (1 - p3) * 14;
-          ctx.fillText(lines[2] || '함께 함이라', textLeft, y3);
+          ctx.shadowBlur = 18;
+          const y3 = H * .70 + (1 - p3) * 14;
+          ctx.fillText(l3, textLeft, y3);
           ctx.restore();
         }
 
-        // 하단 닫는 따옴표 ❞ (따옴표 아래도 나타나게!)
+        // 하단 닫는 따옴표 ❞
         if (pQClose > 0) {
           ctx.save();
           ctx.globalAlpha = pQClose;
           ctx.fillStyle = '#fbbf24';
-          ctx.font = `900 ${portrait ? 32 : 44}px ${fontFace}`;
+          ctx.font = `900 ${portrait ? 32 : 46}px ${fontFace}`;
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.7)';
           ctx.shadowBlur = 12;
-          ctx.fillText('❞', textLeft + (portrait ? W * .40 : W * .35), H * .77);
+          ctx.fillText('❞', textLeft + (portrait ? W * .45 : W * .38), H * .82);
           ctx.restore();
         }
-
-        // ── 우측: '뿅!' 하고 나타나는 풍성한 히어로 심볼 ──
-        const heroT = Math.max(0, (f - 45) / 25);
-        if (heroT > 0) {
-          const heroBounce = 1 - Math.exp(-heroT * 4) * Math.cos(heroT * 8);
-          const floatY = Math.sin(Math.max(0, f - 55) * 0.08) * 8;
-          const pulse = 1 + Math.sin(Math.max(0, f - 55) * 0.06) * 0.03;
-
-          const hCX = portrait ? W * .65 : W * .72;
-          const hCY = H * .50;
-
-          // 1) 등장 시 퍼지는 골드 글로우 링 (Shockwave)
-          const ringScale = Math.min(2.2, 0.4 + heroT * 1.4);
-          const ringAlpha = Math.max(0, 1 - (f - 45) / 35);
-          if (ringAlpha > 0) {
-            ctx.save();
-            ctx.globalAlpha = ringAlpha * .6;
-            ctx.strokeStyle = '#ffd166';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(hCX, hCY, 100 * ringScale, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
-          }
-
-          // 2) 메인 히어로 심볼 (비둘기/기도손/후광)
-          ctx.save();
-          ctx.translate(hCX, hCY + floatY);
-          const totalScale = Math.max(0, heroBounce) * pulse;
-          ctx.scale(totalScale, totalScale);
-
-          // 배경 은은한 골드 후광
-          const glowRad = ctx.createRadialGradient(0, 0, 10, 0, 0, 140);
-          glowRad.addColorStop(0, 'rgba(255, 209, 102, 0.35)');
-          glowRad.addColorStop(1, 'rgba(255, 209, 102, 0)');
-          ctx.fillStyle = glowRad;
-          ctx.beginPath();
-          ctx.arc(0, 0, 140, 0, Math.PI * 2);
-          ctx.fill();
-
-          // 메인 이모티콘 🕊️ / 기도 손
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.font = `${portrait ? 110 : 140}px sans-serif`;
-          ctx.shadowColor = 'rgba(0,0,0,0.8)';
-          ctx.shadowBlur = 30;
-          ctx.fillText('🕊️', 0, 0);
-
-          // 회전하는 별빛 반짝이 ✨
-          ctx.save();
-          ctx.translate(portrait ? 45 : 60, portrait ? -45 : -60);
-          ctx.rotate((f * 2 * Math.PI) / 180);
-          ctx.font = `${portrait ? 34 : 44}px sans-serif`;
-          ctx.fillText('✨', 0, 0);
-          ctx.restore();
-
-          ctx.restore();
-        }
-                  } else if (code === 2) { // 02 모션 롤러 (세로 직사각형 1:1.5 카드 + 순차적 회전 안착)
+        // (비둘기 및 쇼크웨이브 완전 삭제 완료)
+      } else if (code === 2) {
+        // 🔒 [LOCKED / 코드 확정] CODE 02 · 모션 롤러 (가로형 직사각형 카드 + 사용자 입력 글씨만 노출 확정 - 수정 금지)
         const motionFont = state.fontFamily || "'Pretendard', sans-serif";
         const panelGap = W * 0.025;
         const panelW = (W - panelGap * 4) / 3;
@@ -953,10 +914,10 @@
         const panelY = H * 0.20;
 
         // [수정 1] 가로 직사각형 카드 규격 (가로형 카드 비율)
-        const cardW = panelW * 0.80;
-        const cardH = cardW * 0.55;
+        const cardW = panelW * 0.84;
+        const cardH = cardW * 0.52;
         const targetCenterX = (panelW - cardW) / 2;
-        const targetCenterY = (panelH - cardH) / 2 - (portrait ? 10 : 20);
+        const targetCenterY = (panelH - cardH) / 2;
 
         // 배경
         ctx.fillStyle = '#050914';
@@ -966,9 +927,9 @@
         drawText(state.verse || '이사야 41:10', W / 2, H * 0.11, portrait ? 20 : 26, '#ffd166', W * 0.88, 'center', motionFont);
 
         const cards = [
-          { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: lines[0] || '두려워말라', delay: 0 },
-          { title: '부드러운 이동', sub: '천천히 중심으로', text: lines[1] || '내가 너와', delay: 25 },
-          { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: lines[2] || '함께 함이라', delay: 50 },
+          { text: state.line1 || '', delay: 0 },
+          { text: state.line2 || '', delay: 25 },
+          { text: state.line3 || '', delay: 50 },
         ];
 
         cards.forEach((card, i) => {
@@ -1016,24 +977,21 @@
           ctx.stroke();
           ctx.shadowColor = 'transparent';
 
-          // 가로 텍스트 출력 (가로형 카드 가로 쓰기)
+          // 가로 텍스트 출력 (사용자 입력 텍스트 완벽 맞춤)
+          const cardText = card.text || '';
+          let fontSize = portrait ? 16 : Math.max(16, cardH * 0.38);
+          ctx.font = `900 ${fontSize}px ${motionFont}`;
+          const maxTextW = cardW * 0.86;
+          const textMetrics = ctx.measureText(cardText).width;
+          if (textMetrics > maxTextW) {
+            fontSize = Math.max(12, Math.floor(fontSize * (maxTextW / textMetrics)));
+            ctx.font = `900 ${fontSize}px ${motionFont}`;
+          }
           ctx.fillStyle = '#050914';
-          ctx.font = `900 ${portrait ? 15 : Math.max(16, cardH * 0.38)}px ${motionFont}`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(card.text, 0, 0);
+          ctx.fillText(cardText, 0, 0);
 
-          ctx.restore();
-
-          // 패널 하단 라벨
-          ctx.save();
-          ctx.textAlign = 'left';
-          ctx.font = `900 ${portrait ? 12 : Math.max(12, panelW * 0.095)}px ${motionFont}`;
-          ctx.fillStyle = '#ffc93c';
-          ctx.fillText(card.title, panelX + 16, panelY + panelH - 42);
-          ctx.font = `600 ${portrait ? 10 : Math.max(9, panelW * 0.065)}px ${motionFont}`;
-          ctx.fillStyle = 'rgba(255,255,255,0.85)';
-          ctx.fillText(card.sub, panelX + 16, panelY + panelH - 24);
           ctx.restore();
         });
 
