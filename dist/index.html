@@ -153,7 +153,7 @@
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="4" data-title="세로 말씀 쇼츠">04 · 세로 말씀 쇼츠</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="5" data-title="은혜 배지">05 · 은혜 배지</button>
-            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="6" data-title="기도 손·말씀">06 · 기도 손·말씀</button>
+            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="6" data-title="손그림강조표시">06 · 손그림강조표시</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="7" data-title="면류관 쇼케이스">07 · 면류관 쇼케이스</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="8" data-title="패럴랙스">08 · 패럴랙스</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="9" data-title="장면 전환">09 · 장면 전환</button>
@@ -1260,8 +1260,353 @@
           // 하단 고정 카피
           drawText(lines[2] || '너희는 그 은혜에 의하여 믿음으로 말미암아 구원을 받았으니', W / 2, H * .94, 17, '#ffffff', W * .85, 'center', motionFont);
         }
-      } else if (code === 6) { // 기도 손과 말씀
-        ctx.save();ctx.fillStyle='rgba(255,242,190,.15)';ctx.beginPath();ctx.arc(W*.72,H*.48,Math.min(W,H)*.32,0,Math.PI*2);ctx.fill();ctx.restore(); drawHand(W*.56,H*.16,H*.72,.14); drawText(lines[0],W*.08,H*.25,portrait?22:27,theme[2],W*.46,'left'); drawText(lines[1],W*.08,H*.46,portrait?29:37,'#fff',W*.47,'left'); drawText(lines[2],W*.08,H*.64,portrait?20:25,'#fff',W*.45,'left');
+      } else if (code === 6) { // CODE 06 · 손그림강조표시 (@remotion/rough-notation)
+        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        // 배경: 깊은 다크 네이비 (#050914)
+        ctx.save();
+        ctx.fillStyle = '#050914';
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+
+        // 색상 정의
+        const GOLD = '#FFC93C';
+        const PINK = '#ff5d7a';
+        const MINT = '#7cf3c8';
+        const BLUE = '#5b8cff';
+
+        // interpolate helper (20 프레임 동안 0 -> 1)
+        const p = (start) => Math.min(1, Math.max(0, (f - start) / 20));
+
+        // 상단 타이틀 (@remotion/rough-notation)
+        ctx.save();
+        ctx.font = `900 ${portrait ? Math.max(16, Math.floor(W * 0.048)) : Math.max(20, Math.floor(H * 0.055))}px ${motionFont}`;
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('@remotion/rough-notation', W / 2, portrait ? 30 : 40 * (H / 720));
+        ctx.restore();
+
+        // 3줄 문구 결정 (기본 프롬프트 강조 문구 또는 사용자 커스텀 문구)
+        const isCustom = lines[0] && !lines[0].includes('프롬프트') && !lines[0].includes('여호와') && !lines[0].includes('주 예수');
+        
+        let l1SegA = '프롬프트는 ', l1SegHL = '짧고 명확하게', l1SegB = ' 쓰고,';
+        let l2SegUL = '예시', l2SegMid = '를 꼭 넣으세요. ', l2SegCirc = '핵심', l2SegEnd = '은';
+        let l3SegBox = '맥락', l3SegMid = '과 함께, ', l3SegStrike = '길게 늘어놓기', l3SegEnd = '는 금지!';
+
+        if (isCustom) {
+          const w1 = lines[0].split(' ');
+          if (w1.length >= 3) {
+            l1SegA = w1[0] + ' ';
+            l1SegHL = w1.slice(1, -1).join(' ');
+            l1SegB = ' ' + w1[w1.length - 1];
+          } else {
+            l1SegA = ''; l1SegHL = lines[0]; l1SegB = '';
+          }
+          const w2 = (lines[1] || '믿음으로 구원을').split(' ');
+          if (w2.length >= 3) {
+            l2SegUL = w2[0];
+            l2SegMid = ' ' + w2.slice(1, -1).join(' ') + ' ';
+            l2SegCirc = w2[w2.length - 1];
+            l2SegEnd = '';
+          } else {
+            l2SegUL = w2[0] || '은혜';
+            l2SegMid = ' 로 ';
+            l2SegCirc = w2[1] || '구원';
+            l2SegEnd = '을';
+          }
+          const w3 = (lines[2] || '세상의 염려는 버리라').split(' ');
+          if (w3.length >= 3) {
+            l3SegBox = w3[0];
+            l3SegMid = ' ';
+            l3SegStrike = w3.slice(1, -1).join(' ');
+            l3SegEnd = ' ' + w3[w3.length - 1];
+          } else {
+            l3SegBox = w3[0] || '영생';
+            l3SegMid = ' 얻고 ';
+            l3SegStrike = w3[1] || '심판';
+            l3SegEnd = '은 없다';
+          }
+        }
+
+        // 폰트 크기 및 줄 간격 (portrait/landscape 반응형)
+        const fontSize = portrait ? Math.max(16, Math.floor(W * 0.052)) : Math.max(22, Math.floor(W * 0.038));
+        const lineGap = portrait ? Math.floor(fontSize * 0.95) : Math.floor(fontSize * 0.82);
+        const lineH = fontSize * 1.3;
+        const totalBlockH = 3 * lineH + 2 * lineGap;
+        const centerY = H * 0.48;
+        const startBlockY = centerY - totalBlockH / 2;
+
+        ctx.font = `700 ${fontSize}px ${motionFont}`;
+        ctx.textBaseline = 'alphabetic';
+
+        // 1행 너비 측정
+        const w1A = ctx.measureText(l1SegA).width;
+        const w1HL = ctx.measureText(l1SegHL).width;
+        const w1B = ctx.measureText(l1SegB).width;
+        const totalW1 = w1A + w1HL + w1B;
+
+        // 2행 너비 측정
+        const w2UL = ctx.measureText(l2SegUL).width;
+        const w2Mid = ctx.measureText(l2SegMid).width;
+        const w2Circ = ctx.measureText(l2SegCirc).width;
+        const w2End = ctx.measureText(l2SegEnd).width;
+        const totalW2 = w2UL + w2Mid + w2Circ + w2End;
+
+        // 3행 너비 측정
+        const w3Box = ctx.measureText(l3SegBox).width;
+        const w3Mid = ctx.measureText(l3SegMid).width;
+        const w3Strike = ctx.measureText(l3SegStrike).width;
+        const w3End = ctx.measureText(l3SegEnd).width;
+        const totalW3 = w3Box + w3Mid + w3Strike + w3End;
+
+        const maxLineWidth = Math.max(totalW1, totalW2, totalW3);
+
+        // 각 행 Y좌표 (베이스라인)
+        const y1 = startBlockY + fontSize;
+        const y2 = y1 + lineH + lineGap;
+        const y3 = y2 + lineH + lineGap;
+
+        // ── 6. Bracket (progress p(165)): 문단 전체 양쪽 괄호 [ ] ──
+        const pBracket = p(165);
+        if (pBracket > 0) {
+          ctx.save();
+          ctx.strokeStyle = BLUE;
+          ctx.lineWidth = Math.max(3.5, fontSize * 0.1);
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          const bPadX = 28 * (fontSize / 52);
+          const bPadY = 14 * (fontSize / 52);
+          const brLeft = (W - maxLineWidth) / 2 - bPadX;
+          const brRight = (W + maxLineWidth) / 2 + bPadX;
+          const brTop = startBlockY - bPadY;
+          const brBottom = startBlockY + totalBlockH + bPadY;
+          const brH = brBottom - brTop;
+          const hook = 18 * (fontSize / 52);
+          const drawH = brH * pBracket;
+
+          // 왼쪽 괄호 [
+          ctx.beginPath();
+          ctx.moveTo(brLeft + hook, brTop);
+          ctx.lineTo(brLeft, brTop);
+          ctx.lineTo(brLeft, brTop + drawH);
+          if (pBracket >= 0.96) {
+            ctx.lineTo(brLeft + hook, brBottom);
+          }
+          ctx.stroke();
+
+          // 오른쪽 괄호 ]
+          ctx.beginPath();
+          ctx.moveTo(brRight - hook, brTop);
+          ctx.lineTo(brRight, brTop);
+          ctx.lineTo(brRight, brTop + drawH);
+          if (pBracket >= 0.96) {
+            ctx.lineTo(brRight - hook, brBottom);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // ── 1행 렌더링 ──
+        const x1Start = (W - totalW1) / 2;
+        const x1HL = x1Start + w1A;
+        const x1B = x1HL + w1HL;
+
+        // 1. Highlight (progress p(15)): 형광펜 (글자 뒤에 칠해짐)
+        const pHL = p(15);
+        if (pHL > 0) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 201, 60, 0.45)';
+          const hlW = (w1HL + 14) * pHL;
+          const hlH = fontSize * 1.18;
+          const hlY = y1 - fontSize * 0.88;
+          ctx.beginPath();
+          ctx.roundRect(x1HL - 7, hlY, hlW, hlH, [6, 4, 6, 4]);
+          ctx.fill();
+          if (pHL > 0.25) {
+            ctx.beginPath();
+            ctx.roundRect(x1HL - 5, hlY + 2, Math.max(0, hlW - 4), hlH * 0.92, [4, 6, 4, 6]);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // 1행 텍스트 출력
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.fillText(l1SegA, x1Start, y1);
+        ctx.fillText(l1SegHL, x1HL, y1);
+        ctx.fillText(l1SegB, x1B, y1);
+
+        // ── 2행 렌더링 ──
+        const x2Start = (W - totalW2) / 2;
+        const x2Mid = x2Start + w2UL;
+        const x2Circ = x2Mid + w2Mid;
+        const x2End = x2Circ + w2Circ;
+
+        // 2행 텍스트 출력
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(l2SegUL, x2Start, y2);
+        ctx.fillText(l2SegMid, x2Mid, y2);
+        ctx.fillText(l2SegCirc, x2Circ, y2);
+        ctx.fillText(l2SegEnd, x2End, y2);
+
+        // 2. Underline (progress p(45)): 손으로 그은 밑줄
+        const pUL = p(45);
+        if (pUL > 0) {
+          ctx.save();
+          ctx.strokeStyle = MINT;
+          ctx.lineWidth = Math.max(4, fontSize * 0.12);
+          ctx.lineCap = 'round';
+          const ulX = x2Start - 4;
+          const ulLen = (w2UL + 8) * pUL;
+          const ulY = y2 + fontSize * 0.20;
+          ctx.beginPath();
+          ctx.moveTo(ulX, ulY);
+          const midX = ulX + ulLen / 2;
+          ctx.quadraticCurveTo(midX, ulY + 3.5, ulX + ulLen, ulY - 1);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 3. Circle (progress p(75)): 동그라미
+        const pCirc = p(75);
+        if (pCirc > 0) {
+          ctx.save();
+          ctx.strokeStyle = PINK;
+          ctx.lineWidth = Math.max(3.5, fontSize * 0.1);
+          ctx.lineCap = 'round';
+          const cX = x2Circ + w2Circ / 2;
+          const cY = y2 - fontSize * 0.34;
+          const rX = w2Circ / 2 + 8 * (fontSize / 52);
+          const rY = fontSize * 0.65;
+          ctx.translate(cX, cY);
+          ctx.rotate(-0.06);
+          ctx.beginPath();
+          const startAngle = -Math.PI * 0.65;
+          const sweep = pCirc * Math.PI * 2.15;
+          for (let a = 0; a <= sweep; a += 0.12) {
+            const ang = startAngle + a;
+            const wobble = 1 + 0.035 * Math.sin(a * 4 + 2);
+            const px = Math.cos(ang) * rX * wobble;
+            const py = Math.sin(ang) * rY * wobble;
+            if (a === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // ── 3행 렌더링 ──
+        const x3Start = (W - totalW3) / 2;
+        const x3Mid = x3Start + w3Box;
+        const x3Strike = x3Mid + w3Mid;
+        const x3End = x3Strike + w3Strike;
+
+        // 4. Box (progress p(105)): 네모 박스
+        const pBox = p(105);
+        if (pBox > 0) {
+          ctx.save();
+          ctx.strokeStyle = GOLD;
+          ctx.lineWidth = Math.max(3, fontSize * 0.08);
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          const padX = 12 * (fontSize / 52);
+          const padY = 4 * (fontSize / 52);
+          const bX = x3Start - padX;
+          const bY = y3 - fontSize * 0.84 - padY;
+          const bW = w3Box + padX * 2;
+          const bH = fontSize * 1.08 + padY * 2;
+          const peri = 2 * (bW + bH);
+          const curD = peri * pBox;
+
+          ctx.beginPath();
+          const topD = Math.min(curD, bW);
+          ctx.moveTo(bX - 2, bY);
+          ctx.lineTo(bX + topD + (topD >= bW ? 3 : 0), bY);
+          if (curD > bW) {
+            const rightD = Math.min(curD - bW, bH);
+            ctx.moveTo(bX + bW, bY - 2);
+            ctx.lineTo(bX + bW, bY + rightD + (rightD >= bH ? 3 : 0));
+          }
+          if (curD > bW + bH) {
+            const botD = Math.min(curD - (bW + bH), bW);
+            ctx.moveTo(bX + bW + 2, bY + bH);
+            ctx.lineTo(bX + bW - botD - (botD >= bW ? 3 : 0), bY + bH);
+          }
+          if (curD > bW * 2 + bH) {
+            const leftD = Math.min(curD - (bW * 2 + bH), bH);
+            ctx.moveTo(bX, bY + bH + 2);
+            ctx.lineTo(bX, bY + bH - leftD - (leftD >= bH ? 3 : 0));
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 3행 텍스트 출력
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(l3SegBox, x3Start, y3);
+        ctx.fillText(l3SegMid, x3Mid, y3);
+        ctx.fillText(l3SegStrike, x3Strike, y3);
+        ctx.fillText(l3SegEnd, x3End, y3);
+
+        // 5. StrikeThrough (progress p(135)): 가운데 줄
+        const pStrike = p(135);
+        if (pStrike > 0) {
+          ctx.save();
+          ctx.strokeStyle = PINK;
+          ctx.lineWidth = Math.max(3.8, fontSize * 0.12);
+          ctx.lineCap = 'round';
+          const stX = x3Strike - 4;
+          const stW = (w3Strike + 8) * pStrike;
+          const stY = y3 - fontSize * 0.32;
+          ctx.beginPath();
+          ctx.moveTo(stX, stY + 2);
+          ctx.lineTo(stX + stW, stY - 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // ── 하단 범례 ──
+        const legend = [
+          ['Highlight', 15],
+          ['Underline', 45],
+          ['Circle', 75],
+          ['Box', 105],
+          ['StrikeThrough', 135],
+          ['Bracket', 165]
+        ];
+        const legY = H - (portrait ? 42 : 36);
+        const legFontSize = portrait ? Math.max(9, Math.floor(W * 0.024)) : Math.max(11, Math.floor(W * 0.018));
+        ctx.font = `900 ${legFontSize}px ${motionFont}`;
+        ctx.textBaseline = 'middle';
+
+        const legSpacing = portrait ? 8 : 14;
+        const legItems = legend.map(([name, start]) => ({
+          text: `<${name}>`,
+          active: p(start) > 0,
+          w: ctx.measureText(`<${name}>`).width
+        }));
+        const totalLegW = legItems.reduce((acc, it) => acc + it.w, 0) + (legItems.length - 1) * legSpacing;
+        let curLegX = (W - totalLegW) / 2;
+
+        legItems.forEach(it => {
+          ctx.fillStyle = it.active ? GOLD : '#3a4a6e';
+          ctx.textAlign = 'left';
+          ctx.fillText(it.text, curLegX, legY);
+          curLegX += it.w + legSpacing;
+        });
+
+        // ── 채널 표시: CONNECT AI LAB ──
+        const brandFontSize = Math.max(10, Math.round(W / 62));
+        ctx.save();
+        ctx.font = `800 ${brandFontSize}px ${motionFont}`;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowBlur = 6;
+        ctx.fillText('CONNECT AI LAB', W - Math.round(W * 0.02), H - Math.round(W * 0.015));
+        ctx.restore();
       } else if (code === 7) { // 면류관 쇼케이스
         const crown = motionCrown; if(crown?.complete&&crown.naturalWidth){const h=H*.52,w=h*crown.naturalWidth/crown.naturalHeight;ctx.save();ctx.globalAlpha=p;ctx.drawImage(crown,W*.5-w/2,H*.24,w,h);ctx.restore();} drawText(lines[0],W*.1,H*.18,portrait?20:25,theme[2],W*.8); drawText(lines[1],W*.5,H*.79,portrait?29:37,'#fff',W*.8); drawText(lines[2],W*.5,H*.89,portrait?19:23,'rgba(255,255,255,.86)',W*.8);
       } else if (code === 8) { // 패럴랙스
@@ -1616,6 +1961,20 @@ ${url}`;
           applyMotionCanvasSize();
         }
 
+        if (state.motionCode === 6) {
+          const l1El = document.getElementById('inputLine1');
+          if (l1El && (!state.hasCustomVerse || l1El.value === '일을 행하시는 여호와' || l1El.value === '주 예수 그리스도를 믿으라')) {
+            state.line1 = '프롬프트는 짧고 명확하게 쓰고,';
+            state.line2 = '예시를 꼭 넣으세요. 핵심은';
+            state.line3 = '맥락과 함께, 길게 늘어놓기는 금지!';
+            l1El.value = state.line1;
+            const l2El = document.getElementById('inputLine2');
+            const l3El = document.getElementById('inputLine3');
+            if (l2El) l2El.value = state.line2;
+            if (l3El) l3El.value = state.line3;
+          }
+        }
+
         const codeStr = String(codeNum).padStart(2, '0');
         const codeTitle = btn.dataset.title;
         const selLabel = document.getElementById('selectedMotionCode');
@@ -1910,6 +2269,80 @@ export const GraceOfferScene: React.FC = () => {
     </AbsoluteFill>
   );
 };`;
+      }
+      if (state.motionCode === 6) {
+        return `// frames=240 size=1280x720
+import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
+import {Box, Bracket, Circle, Highlight, StrikeThrough, Underline} from '@remotion/rough-notation';
+import {FONT} from './font';
+
+const GOLD = '#FFC93C';
+const PINK = '#ff5d7a';
+const MINT = '#7cf3c8';
+const BLUE = '#5b8cff';
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  // progress: 0 = 안 보임, 1 = 다 그려짐. 시작 프레임을 다르게 줘서 하나씩 차례로 그려요
+  const p = (start: number) => interpolate(f, [start, start + 20], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+
+  // 범례: 지금 그려진 표시는 금색으로
+  const legend: [string, number][] = [['Highlight', 15], ['Underline', 45], ['Circle', 75], ['Box', 105], ['StrikeThrough', 135], ['Bracket', 165]];
+
+  return (
+    <AbsoluteFill style={{background: '#050914', fontFamily: FONT, alignItems: 'center', justifyContent: 'center'}}>
+      <div style={{position: 'absolute', top: 40, color: '#fff', fontSize: 40, fontWeight: 900}}>@remotion/rough-notation</div>
+
+      {/* Bracket: 문단 전체를 양쪽 괄호로 묶기 */}
+      <Bracket progress={p(165)} color={BLUE} strokeWidth={5} bracketLeft bracketRight padding={{left: 30, right: 30, top: 10, bottom: 10}} seed={6}>
+        {/* 줄 간격은 lineHeight 대신 gap으로! (lineHeight가 크면 표시가 줄 높이만큼 커져요) */}
+        <div style={{color: '#fff', fontSize: 52, fontWeight: 700, lineHeight: 1.3, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 34}}>
+          <div>
+            프롬프트는{' '}
+            {/* Highlight: 형광펜 (글자 뒤에 칠해짐) */}
+            <Highlight progress={p(15)} color="rgba(255,201,60,0.45)" iterations={2} seed={1}>짧고 명확하게</Highlight> 쓰고,
+          </div>
+          <div>
+            {/* Underline: 손으로 그은 밑줄 */}
+            <Underline progress={p(45)} color={MINT} strokeWidth={6} seed={2}>예시</Underline>를 꼭 넣으세요.{' '}
+            {/* Circle: 동그라미 — progress가 0일 땐 disabled로 숨김 */}
+            <Circle progress={p(75)} disabled={p(75) === 0} color={PINK} strokeWidth={5} padding={{left: 2, right: 2, top: 0, bottom: 0}} seed={3}>핵심</Circle>은
+          </div>
+          <div>
+            {/* Box: 네모 박스 */}
+            <Box progress={p(105)} color={GOLD} strokeWidth={4} padding={{left: 12, right: 12, top: 4, bottom: 4}} seed={4}>맥락</Box>과 함께,{' '}
+            {/* StrikeThrough: 가운데 줄 */}
+            <StrikeThrough progress={p(135)} color={PINK} strokeWidth={6} seed={5}>길게 늘어놓기</StrikeThrough>는 금지!
+          </div>
+        </div>
+      </Bracket>
+
+      <div style={{position: 'absolute', bottom: 50, display: 'flex', gap: 28, fontSize: 26, fontWeight: 900}}>
+        {legend.map(([name, start]) => (
+          <div key={name} style={{color: p(start) > 0 ? GOLD : '#3a4a6e'}}>{String.fromCharCode(60) + name + String.fromCharCode(62)}</div>
+        ))}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);`;
       }
       return `// Remotion CODE ${String(state.motionCode || 1).padStart(2, '0')} 말씀 모션그래픽
 import React from 'react';
