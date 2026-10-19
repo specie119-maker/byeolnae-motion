@@ -1667,143 +1667,113 @@
         ctx.shadowBlur = 6;
         ctx.fillText('CONNECT AI LAB', W - Math.round(W * 0.02), H - Math.round(W * 0.015));
         ctx.restore();
-      } else if (code === 7) { // CODE 07 · 3칸카드 (ScriptureThreeCardsScene)
+      } else if (code === 7) { // CODE 07 · 3칸카드 (CleanThreeCardsScene - No Top Headline)
         const motionFont = state.fontFamily || "'Pretendard', sans-serif";
 
         // 배경: 깊은 다크 (#0a0a0c)
         ctx.fillStyle = '#0a0a0c';
         ctx.fillRect(0, 0, W, H);
 
-        // 부드러운 감속 & 스프링 근사 함수
-        const springV = (rel) => {
+        const springV = (rel, stiffness = 0.28, decayRate = 0.16) => {
           if (rel <= 0) return 0;
-          return 1 - Math.exp(-rel * 0.16) * Math.cos(rel * 0.28);
+          return 1 - Math.exp(-rel * decayRate) * Math.cos(rel * stiffness);
         };
         const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-        const topFade = clamp01((f - 5) / 15);
-        const card1Spr = springV(f - 15);
-        const card2Spr = springV(f - 28);
-        const card3Spr = springV(f - 41);
-        const plus1Spr = springV(f - 32);
-        const plus2Spr = springV(f - 45);
-        const bottomFade = clamp01((f - 55) / 20);
-        const strikeProg = clamp01((f - 75) / 20);
-        const priceSpr = springV(f - 90);
+        const sprCard1 = springV(f - 10);
+        const sprPlus1 = springV(f - 22, 0.32, 0.18);
+        const sprCard2 = springV(f - 26);
+        const sprPlus2 = springV(f - 38, 0.32, 0.18);
+        const sprCard3 = springV(f - 42);
+        const bottomFade = clamp01((f - 50) / 20);
 
         const orgName = (state.youtube && !state.youtube.startsWith('http') ? state.youtube : '별내사랑의교회');
-        const headline = (state.line1 && state.line1.trim()) || '조건 없이, 자격 없이';
-        const highlight = (state.line2 && state.line2.trim()) || '값없는 은혜!';
+
+        const splitTwo = (txt) => {
+          const w = (txt || '').trim().split(/\s+/);
+          if (w.length <= 1) return [txt || '', ''];
+          const mid = Math.ceil(w.length / 2);
+          return [w.slice(0, mid).join(' '), w.slice(mid).join(' ')];
+        };
+
+        const card1Text = (state.line1 && state.line1.trim()) || '일을 행하시는 여호와';
+        const card2Text = (state.line2 && state.line2.trim()) || '일을 지어 성취하시는';
+        const card3Text = (state.line3 && state.line3.trim()) || '하나님';
 
         const cards = [
-          { title: '죄 사함', value: '보혈의 공로', icon: '✝️', spr: card1Spr },
-          { title: '새 생명', value: '성령의 임재', icon: '🕊️', spr: card2Spr },
-          { title: '영원한 상급', value: '천국 소망', icon: '👑', spr: card3Spr },
+          { text: card1Text, icon: '✝️', spr: sprCard1 },
+          { text: card2Text, icon: '🕊️', spr: sprCard2 },
+          { text: card3Text, icon: '👑', spr: sprCard3 },
         ];
 
-        // ── 1. 상단: 기관명 뱃지 & 메인 헤드라인 ──
-        ctx.save();
-        ctx.globalAlpha = topFade;
-        const topY = (portrait ? H * 0.08 : H * 0.09) + (1 - topFade) * -15;
-
-        // 기관명 뱃지
-        ctx.font = `700 ${portrait ? 12 : 14}px ${motionFont}`;
-        const orgText = `⛪  ${orgName}`;
-        const orgW = ctx.measureText(orgText).width;
-        const orgPillW = orgW + 28;
-        const orgPillH = portrait ? 26 : 28;
-        const orgPillX = (W - orgPillW) / 2;
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(orgPillX, topY, orgPillW, orgPillH, 999);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#cbd5e1';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(orgText, W / 2, topY + orgPillH / 2);
-
-        // 메인 헤드라인
-        const headY = topY + orgPillH + (portrait ? 22 : 26);
-        ctx.font = `900 ${portrait ? 22 : 32}px ${motionFont}`;
-        const headW = ctx.measureText(headline + ' ').width;
-        const hlW = ctx.measureText(highlight).width;
-        const totalHeadW = headW + hlW;
-        const headStartX = (W - totalHeadW) / 2;
-
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(headline + ' ', headStartX, headY);
-
-        ctx.fillStyle = '#ff2e93';
-        ctx.shadowColor = 'rgba(255, 46, 147, 0.45)';
-        ctx.shadowBlur = 15;
-        ctx.fillText(highlight, headStartX + headW, headY);
-        ctx.shadowColor = 'transparent';
-        ctx.restore();
-
-        // ── 2. 중앙: 3단 화이트 카드 & 사이의 (+) 뱃지 ──
+        // ── 중앙 3개 화이트 박스 (이모티콘 위쪽 배치 + 박스 안 2줄 텍스트) ──
         if (portrait) {
-          // 세로 쇼츠 모드: 수직 정렬
-          const cardW = Math.min(320, W * 0.84);
-          const cardH = Math.min(135, H * 0.16);
-          const startY = H * 0.24;
-          const gap = (H * 0.48 - cardH * 3) / 2;
+          // 세로 9:16 모드: 세로 3개 배치 (완전 중앙 정렬)
+          const cardW = Math.min(330, W * 0.86);
+          const cardH = Math.min(150, H * 0.19);
+          const startY = H * 0.14;
+          const gap = (H * 0.64 - cardH * 3) / 2;
 
           cards.forEach((c, i) => {
             if (c.spr <= 0.01) return;
-            ctx.save();
+            const [lineA, lineB] = splitTwo(c.text);
             const cy = startY + i * (cardH + gap);
+
+            ctx.save();
             ctx.translate(W / 2, cy + cardH / 2);
             ctx.scale(Math.max(0, c.spr), Math.max(0, c.spr));
             ctx.translate(-W / 2, -(cy + cardH / 2));
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            ctx.shadowBlur = 25;
+            // 화이트 카드 본체
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+            ctx.shadowBlur = 30;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.roundRect((W - cardW) / 2, cy, cardW, cardH, 20);
+            ctx.roundRect((W - cardW) / 2, cy, cardW, cardH, 26);
             ctx.fill();
             ctx.shadowColor = 'transparent';
 
-            // 아이콘 (좌측)
-            ctx.font = '48px sans-serif';
+            // 좌측: 이모티콘 심볼
+            ctx.font = '54px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(c.icon, (W - cardW) / 2 + 55, cy + cardH / 2);
+            ctx.fillText(c.icon, (W - cardW) / 2 + 58, cy + cardH / 2);
 
-            // 텍스트 (우측)
+            // 우측: 텍스트 (2줄)
             ctx.textAlign = 'left';
-            ctx.fillStyle = '#64748b';
-            ctx.font = `800 13px ${motionFont}`;
-            ctx.fillText(c.title, (W - cardW) / 2 + 115, cy + cardH * 0.38);
+            const tx = (W - cardW) / 2 + 118;
+            if (lineB) {
+              ctx.fillStyle = '#0f172a';
+              ctx.font = `900 22px ${motionFont}`;
+              ctx.fillText(lineA, tx, cy + cardH * 0.38);
 
-            ctx.fillStyle = '#111827';
-            ctx.font = `900 20px ${motionFont}`;
-            ctx.fillText(c.value, (W - cardW) / 2 + 115, cy + cardH * 0.68);
+              ctx.fillStyle = i === 2 ? '#ff2e93' : '#1e293b';
+              ctx.font = `900 22px ${motionFont}`;
+              ctx.fillText(lineB, tx, cy + cardH * 0.68);
+            } else {
+              ctx.fillStyle = i === 2 ? '#ff2e93' : '#0f172a';
+              ctx.font = `900 26px ${motionFont}`;
+              ctx.fillText(lineA, tx, cy + cardH / 2);
+            }
             ctx.restore();
 
             // (+) 뱃지 (카드 사이)
             if (i < 2) {
-              const plusSpr = (i === 0 ? plus1Spr : plus2Spr);
+              const plusSpr = (i === 0 ? sprPlus1 : sprPlus2);
               if (plusSpr > 0.01) {
-                ctx.save();
                 const py = cy + cardH + gap / 2;
+                ctx.save();
                 ctx.translate(W / 2, py);
                 ctx.scale(Math.max(0, plusSpr), Math.max(0, plusSpr));
                 ctx.fillStyle = '#ff2e93';
-                ctx.shadowColor = 'rgba(255, 46, 147, 0.5)';
-                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(255, 46, 147, 0.55)';
+                ctx.shadowBlur = 12;
                 ctx.beginPath();
-                ctx.arc(0, 0, 15, 0, Math.PI * 2);
+                ctx.arc(0, 0, 16, 0, Math.PI * 2);
                 ctx.fill();
+
                 ctx.fillStyle = '#ffffff';
-                ctx.font = `900 16px ${motionFont}`;
+                ctx.font = `900 18px ${motionFont}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('+', 0, 0);
@@ -1812,67 +1782,75 @@
             }
           });
         } else {
-          // 가로 16:9 모드: 좌우 가로 3열 배치
-          const cardW = Math.min(260, W * 0.22);
-          const cardH = Math.min(270, H * 0.44);
-          const plusR = 18;
-          const plusGap = 20;
+          // 가로 16:9 모드: 3개 수평 정렬 (상단 여백 없이 정중앙에 시원하게 배치)
+          const cardW = Math.min(280, W * 0.24);
+          const cardH = Math.min(340, H * 0.55);
+          const plusR = 20;
+          const plusGap = 16;
           const totalCardsW = cardW * 3 + (plusR * 2 + plusGap * 2) * 2;
           const startX = (W - totalCardsW) / 2;
-          const cardCenterY = H * 0.50;
+          const cardCenterY = H * 0.44;
           const cardTopY = cardCenterY - cardH / 2;
 
           cards.forEach((c, i) => {
             const cx = startX + i * (cardW + plusR * 2 + plusGap * 2);
             if (c.spr > 0.01) {
+              const [lineA, lineB] = splitTwo(c.text);
+
               ctx.save();
               ctx.translate(cx + cardW / 2, cardCenterY);
               ctx.scale(Math.max(0, c.spr), Math.max(0, c.spr));
               ctx.translate(-(cx + cardW / 2), -cardCenterY);
 
-              ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-              ctx.shadowBlur = 30;
+              // 화이트 라운드 카드
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+              ctx.shadowBlur = 40;
               ctx.fillStyle = '#ffffff';
               ctx.beginPath();
-              ctx.roundRect(cx, cardTopY, cardW, cardH, 24);
+              ctx.roundRect(cx, cardTopY, cardW, cardH, 32);
               ctx.fill();
               ctx.shadowColor = 'transparent';
 
-              // 상단 라벨
-              ctx.fillStyle = '#64748b';
-              ctx.font = `800 15px ${motionFont}`;
+              // [상단] 이모티콘 심볼
+              ctx.font = '76px sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
-              ctx.fillText(c.title, cx + cardW / 2, cardTopY + 36);
+              ctx.fillText(c.icon, cx + cardW / 2, cardTopY + cardH * 0.32);
 
-              // 메인 단어
-              ctx.fillStyle = '#111827';
-              ctx.font = `900 22px ${motionFont}`;
-              ctx.fillText(c.value, cx + cardW / 2, cardTopY + 74);
+              // [하단] 2줄 텍스트
+              if (lineB) {
+                ctx.fillStyle = '#0f172a';
+                ctx.font = `900 25px ${motionFont}`;
+                ctx.fillText(lineA, cx + cardW / 2, cardTopY + cardH * 0.68);
 
-              // 이모지 아이콘
-              ctx.font = '68px sans-serif';
-              ctx.fillText(c.icon, cx + cardW / 2, cardTopY + cardH * 0.68);
+                ctx.fillStyle = i === 2 ? '#ff2e93' : '#1e293b';
+                ctx.font = `900 25px ${motionFont}`;
+                ctx.fillText(lineB, cx + cardW / 2, cardTopY + cardH * 0.84);
+              } else {
+                ctx.fillStyle = i === 2 ? '#ff2e93' : '#0f172a';
+                ctx.font = `900 30px ${motionFont}`;
+                ctx.fillText(lineA, cx + cardW / 2, cardTopY + cardH * 0.76);
+              }
               ctx.restore();
             }
 
             // (+) 뱃지 (카드 사이)
             if (i < 2) {
-              const plusSpr = (i === 0 ? plus1Spr : plus2Spr);
+              const plusSpr = (i === 0 ? sprPlus1 : sprPlus2);
               if (plusSpr > 0.01) {
                 const px = cx + cardW + plusGap + plusR;
                 ctx.save();
                 ctx.translate(px, cardCenterY);
                 ctx.scale(Math.max(0, plusSpr), Math.max(0, plusSpr));
                 ctx.fillStyle = '#ff2e93';
-                ctx.shadowColor = 'rgba(255, 46, 147, 0.5)';
-                ctx.shadowBlur = 12;
+                ctx.shadowColor = 'rgba(255, 46, 147, 0.55)';
+                ctx.shadowBlur = 14;
                 ctx.beginPath();
                 ctx.arc(0, 0, plusR, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#ffffff';
-                ctx.font = `900 22px ${motionFont}`;
+                ctx.font = `900 24px ${motionFont}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('+', 0, -1);
@@ -1882,63 +1860,31 @@
           });
         }
 
-        // ── 3. 하단: ★ 이 모든 게 ★ & 취소선 가격 / 은혜 강조 ──
+        // ── 맨 박스 밑: 기관명 (별내사랑의교회) ──
         ctx.save();
         ctx.globalAlpha = bottomFade;
-        const botY = (portrait ? H * 0.84 : H * 0.82) + (1 - bottomFade) * 15;
+        const botY = (portrait ? H * 0.88 : H * 0.86) + (1 - bottomFade) * 15;
 
-        // 별 서브라인
-        ctx.fillStyle = '#facc15';
-        ctx.font = `900 ${portrait ? 16 : 22}px ${motionFont}`;
+        ctx.font = `800 ${portrait ? 15 : 18}px ${motionFont}`;
+        const pillText = `✝  ${orgName}`;
+        const pillW = ctx.measureText(pillText).width + (portrait ? 42 : 52);
+        const pillH = portrait ? 36 : 42;
+        const pillX = (W - pillW) / 2;
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(pillX, botY - pillH / 2, pillW, pillH, 999);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fafc';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('★ ★ 예수 안에서는 이 모든 게 ★ ★', W / 2, botY);
-
-        // 이전 대가 & 0원 은혜
-        const priceY = botY + (portrait ? 32 : 44);
-        const oldText = '내 공로 999억';
-        const newText = '0원 (전액 은혜)';
-
-        ctx.font = `800 ${portrait ? 20 : 28}px ${motionFont}`;
-        const oldW = ctx.measureText(oldText).width;
-        ctx.font = `900 ${portrait ? 32 : 48}px ${motionFont}`;
-        const newW = ctx.measureText(newText).width;
-        const priceGap = portrait ? 16 : 24;
-        const totalPW = oldW + priceGap + newW;
-        const pStartX = (W - totalPW) / 2;
-
-        // 이전 대가 (회색 글씨)
-        ctx.font = `800 ${portrait ? 20 : 28}px ${motionFont}`;
-        ctx.fillStyle = '#64748b';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(oldText, pStartX, priceY);
-
-        // 빨간 취소선 애니메이션
-        if (strikeProg > 0) {
-          ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = portrait ? 3 : 4;
-          ctx.beginPath();
-          ctx.moveTo(pStartX - 6, priceY + 2);
-          ctx.lineTo(pStartX - 6 + (oldW + 12) * strikeProg, priceY - 2);
-          ctx.stroke();
-        }
-
-        // 0원 (전액 은혜)
-        if (priceSpr > 0.01) {
-          ctx.save();
-          const newX = pStartX + oldW + priceGap;
-          ctx.translate(newX, priceY);
-          ctx.scale(Math.max(0, priceSpr), Math.max(0, priceSpr));
-          ctx.fillStyle = '#ff2e93';
-          ctx.shadowColor = 'rgba(255, 46, 147, 0.55)';
-          ctx.shadowBlur = 20;
-          ctx.font = `900 ${portrait ? 32 : 48}px ${motionFont}`;
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(newText, 0, 0);
-          ctx.restore();
-        }
+        ctx.fillText(pillText, W / 2, botY);
         ctx.restore();
       } else if (code === 8) { // CODE 08 · 패럴랙스 (별무리 & 미세 섬광 별빛)
         // 1. 깊은 밤하늘 코스믹 배경 그라데이션
@@ -3309,75 +3255,53 @@ import {
 } from 'remotion';
 import { FONT } from './font';
 
-// Props 인터페이스 (기관명 및 모든 텍스트 커스텀 가능)
-export interface ScriptureThreeCardsProps {
-  organization?: string;       // 기관/교회명 (예: 별내사랑의교회)
-  topHeadline?: string;        // 상단 메인 헤드라인
-  highlightWord?: string;      // 상단 핑크색 강조 단어
-  card1Title?: string;         // 1번 카드 상단 라벨
-  card1Value?: string;         // 1번 카드 메인 단어
-  card1Icon?: string;          // 1번 카드 이모지/심볼
-  card2Title?: string;         // 2번 카드 상단 라벨
-  card2Value?: string;         // 2번 카드 메인 단어
-  card2Icon?: string;          // 2번 카드 이모지/심볼
-  card3Title?: string;         // 3번 카드 상단 라벨
-  card3Value?: string;         // 3번 카드 메인 단어
-  card3Icon?: string;          // 3번 카드 이모지/심볼
-  bottomSubline?: string;      // 하단 별 강조 문구
-  oldPriceText?: string;       // 이전 대가 (취소선 그어질 문구)
-  newPriceText?: string;       // 최종 선물/은혜 문구
+export interface CleanThreeCardsProps {
+  organization?: string;       // 맨 아래 박힐 기관명 (기본: 별내사랑의교회)
+  card1Text?: string;          // 1번 박스 텍스트 (예: 일을 행하시는 여호와)
+  card1Icon?: string;          // 1번 이모티콘
+  card2Text?: string;          // 2번 박스 텍스트 (예: 일을 지어 성취하시는)
+  card2Icon?: string;          // 2번 이모티콘
+  card3Text?: string;          // 3번 박스 텍스트 (예: 하나님)
+  card3Icon?: string;          // 3번 이모티콘
 }
 
-export const ScriptureThreeCardsScene: React.FC<ScriptureThreeCardsProps> = ({
+// 텍스트를 2줄로 보기 좋게 나누는 헬퍼 함수
+const splitIntoTwoLines = (text: string) => {
+  const words = text.trim().split(/\\s+/);
+  if (words.length <= 1) return [text, ''];
+  const mid = Math.ceil(words.length / 2);
+  return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+};
+
+export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
   organization = '별내사랑의교회',
-  topHeadline = '조건 없이, 자격 없이',
-  highlightWord = '값없는 은혜!',
-  card1Title = '죄 사함',
-  card1Value = '보혈의 공로',
+  card1Text = '일을 행하시는 여호와',
   card1Icon = '✝️',
-  card2Title = '새 생명',
-  card2Value = '성령의 임재',
+  card2Text = '일을 지어 성취하시는',
   card2Icon = '🕊️',
-  card3Title = '영원한 상급',
-  card3Value = '천국 소망',
+  card3Text = '하나님',
   card3Icon = '👑',
-  bottomSubline = '예수 안에서는 이 모든 게',
-  oldPriceText = '내 공로 999억',
-  newPriceText = '0원 (전액 은혜)',
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 1. 상단 헤드라인 및 기관명 페이드인
-  const topFade = interpolate(frame, [5, 20], [0, 1], {
+  // 1. 3개 카드 및 (+) 뱃지 순차 등장
+  const sprCard1 = spring({ frame: frame - 10, fps, config: { damping: 13, stiffness: 120 } });
+  const sprPlus1 = spring({ frame: frame - 22, fps, config: { damping: 11, stiffness: 140 } });
+  const sprCard2 = spring({ frame: frame - 26, fps, config: { damping: 13, stiffness: 120 } });
+  const sprPlus2 = spring({ frame: frame - 38, fps, config: { damping: 11, stiffness: 140 } });
+  const sprCard3 = spring({ frame: frame - 42, fps, config: { damping: 13, stiffness: 120 } });
+
+  // 2. 하단 교회명 등장
+  const bottomFade = interpolate(frame, [50, 70], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
 
-  // 2. 3개의 카드 순차 스프링 팝업
-  const card1Spring = spring({ frame: frame - 15, fps, config: { damping: 13, stiffness: 120 } });
-  const card2Spring = spring({ frame: frame - 28, fps, config: { damping: 13, stiffness: 120 } });
-  const card3Spring = spring({ frame: frame - 41, fps, config: { damping: 13, stiffness: 120 } });
-
-  // 3. 카드 사이의 (+) 뱃지 팝업
-  const plus1Spring = spring({ frame: frame - 32, fps, config: { damping: 11, stiffness: 150 } });
-  const plus2Spring = spring({ frame: frame - 45, fps, config: { damping: 11, stiffness: 150 } });
-
-  // 4. 하단 카피 및 취소선 긋기
-  const bottomFade = interpolate(frame, [55, 75], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const strikeProgress = interpolate(frame, [75, 95], [0, 100], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const priceSpring = spring({ frame: frame - 90, fps, config: { damping: 10, stiffness: 130 } });
-
-  const cardsData = [
-    { title: card1Title, value: card1Value, icon: card1Icon, spr: card1Spring },
-    { title: card2Title, value: card2Value, icon: card2Icon, spr: card2Spring },
-    { title: card3Title, value: card3Value, icon: card3Icon, spr: card3Spring },
+  const cards = [
+    { text: card1Text, icon: card1Icon, spr: sprCard1 },
+    { text: card2Text, icon: card2Icon, spr: sprCard2 },
+    { text: card3Text, icon: card3Icon, spr: sprCard3 },
   ];
 
   return (
@@ -3389,200 +3313,172 @@ export const ScriptureThreeCardsScene: React.FC<ScriptureThreeCardsProps> = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '36px 60px 42px 60px',
+        justifyContent: 'center',
+        gap: 40,
+        padding: '40px 60px',
         overflow: 'hidden',
       }}
     >
-      {/* ── 1. 상단: 기관명 뱃지 & 메인 헤드라인 ── */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 10,
-          opacity: topFade,
-          transform: \`translateY(\${(1 - topFade) * -15}px)\`,
-        }}
-      >
-        {/* 기관명 표시 뱃지 */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            padding: '4px 16px',
-            borderRadius: 999,
-            fontSize: 14,
-            fontWeight: 700,
-            color: '#cbd5e1',
-            letterSpacing: '1px',
-          }}
-        >
-          <span>⛪</span>
-          <span>{organization}</span>
-        </div>
-
-        {/* 메인 헤드라인 (32% 할인 스타일 ➔ 핑크 포인트) */}
-        <div style={{ fontSize: 38, fontWeight: 900, letterSpacing: '-0.5px' }}>
-          <span>{topHeadline} </span>
-          <span style={{ color: '#ff2e93', textShadow: '0 0 20px rgba(255, 46, 147, 0.4)' }}>
-            {highlightWord}
-          </span>
-        </div>
-      </div>
-
-      {/* ── 2. 중앙: 3단 화이트 카드 & 사이의 (+) 뱃지 ── */}
+      {/* ── 중앙 3개 화이트 박스 (이모티콘 위쪽 배치 + 박스 안 2줄 텍스트) ── */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 18,
+          gap: 20,
           position: 'relative',
           width: '100%',
         }}
       >
-        {cardsData.map((c, i) => (
-          <React.Fragment key={i}>
-            {/* 화이트 라운드 카드 (신용카드 비율) */}
-            <div
-              style={{
-                width: 280,
-                height: 300,
-                backgroundColor: '#ffffff',
-                borderRadius: 28,
-                padding: '28px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.6)',
-                transform: \`scale(\${c.spr})\`,
-                color: '#111827',
-                textAlign: 'center',
-              }}
-            >
-              {/* 상단 텍스트 영역 */}
-              <div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: '#64748b', marginBottom: 6 }}>
-                  {c.title}
+        {cards.map((c, i) => {
+          const [lineA, lineB] = splitIntoTwoLines(c.text);
+
+          return (
+            <React.Fragment key={i}>
+              {/* 카드 본체 */}
+              <div
+                style={{
+                  width: 320,
+                  height: 400,
+                  backgroundColor: '#ffffff',
+                  borderRadius: 36,
+                  padding: '38px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65)',
+                  transform: \`scale(\${c.spr})\`,
+                  color: '#0f172a',
+                  textAlign: 'center',
+                }}
+              >
+                {/* [상단] 박스 위에 놓이는 이모티콘 심볼 */}
+                <div
+                  style={{
+                    fontSize: 96,
+                    lineHeight: 1,
+                    filter: 'drop-shadow(0 12px 18px rgba(0,0,0,0.18))',
+                    marginTop: 10,
+                  }}
+                >
+                  {c.icon}
                 </div>
-                <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.5px' }}>
-                  {c.value}
+
+                {/* [하단] 흰 박스 안에 큼직하게 2줄로 출력되는 말씀 구절 */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    marginBottom: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 900,
+                      letterSpacing: '-1px',
+                      color: '#0f172a',
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {lineA}
+                  </div>
+                  {lineB && (
+                    <div
+                      style={{
+                        fontSize: 34,
+                        fontWeight: 900,
+                        letterSpacing: '-1px',
+                        color: i === 2 ? '#ff2e93' : '#1e293b', // 마지막 카드는 포인트 강조
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {lineB}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* 하단 아이콘/일러스트 */}
-              <div
-                style={{
-                  fontSize: 72,
-                  lineHeight: 1,
-                  filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))',
-                }}
-              >
-                {c.icon}
-              </div>
-            </div>
+              {/* 1번-2번 사이 분홍색 (+) 뱃지 */}
+              {i === 0 && (
+                <div
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: '50%',
+                    backgroundColor: '#ff2e93',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 30,
+                    fontWeight: 900,
+                    transform: \`scale(\${sprPlus1})\`,
+                    boxShadow: '0 6px 20px rgba(255, 46, 147, 0.55)',
+                    zIndex: 10,
+                  }}
+                >
+                  +
+                </div>
+              )}
 
-            {/* 카드 사이 분홍색 (+) 원형 뱃지 */}
-            {i === 0 && (
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  backgroundColor: '#ff2e93',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 26,
-                  fontWeight: 900,
-                  transform: \`scale(\${plus1Spring})\`,
-                  boxShadow: '0 4px 15px rgba(255, 46, 147, 0.5)',
-                  zIndex: 10,
-                }}
-              >
-                +
-              </div>
-            )}
-            {i === 1 && (
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  backgroundColor: '#ff2e93',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 26,
-                  fontWeight: 900,
-                  transform: \`scale(\${plus2Spring})\`,
-                  boxShadow: '0 4px 15px rgba(255, 46, 147, 0.5)',
-                  zIndex: 10,
-                }}
-              >
-                +
-              </div>
-            )}
-          </React.Fragment>
-        ))}
+              {/* 2번-3번 사이 분홍색 (+) 뱃지 */}
+              {i === 1 && (
+                <div
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: '50%',
+                    backgroundColor: '#ff2e93',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 30,
+                    fontWeight: 900,
+                    transform: \`scale(\${sprPlus2})\`,
+                    boxShadow: '0 6px 20px rgba(255, 46, 147, 0.55)',
+                    zIndex: 10,
+                  }}
+                >
+                  +
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
       </div>
 
-      {/* ── 3. 하단: ★ 이 모든 게 ★ & 취소선 가격 / 은혜 강조 ── */}
+      {/* ── 맨 박스 밑: 기관명 (별내사랑의교회) ── */}
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 12,
           opacity: bottomFade,
           transform: \`translateY(\${(1 - bottomFade) * 15}px)\`,
+          textAlign: 'center',
         }}
       >
-        {/* 별 모양 서브라인 */}
-        <div style={{ fontSize: 26, fontWeight: 900, color: '#facc15', letterSpacing: '1px' }}>
-          ★ ★ {bottomSubline} ★ ★
-        </div>
-
-        {/* 이전 가격 취소선 & 최종 0원(은혜) 강조 */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
-          {/* 이전 대가 (회색 글씨 + 빨간 취소선) */}
-          <div style={{ position: 'relative', fontSize: 36, fontWeight: 800, color: '#64748b' }}>
-            <span>{oldPriceText}</span>
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '-4%',
-                width: \`\${strikeProgress * 1.08}%\`,
-                height: 4,
-                backgroundColor: '#ef4444',
-                borderRadius: 2,
-                transform: 'translateY(-50%) rotate(-4deg)',
-              }}
-            />
-          </div>
-
-          {/* 최종 확정 (형광 핑크 대형 폰트) */}
-          <div
-            style={{
-              fontSize: 60,
-              fontWeight: 900,
-              color: '#ff2e93',
-              letterSpacing: '-1px',
-              textShadow: '0 0 25px rgba(255, 46, 147, 0.5)',
-              transform: \`scale(\${priceSpring})\`,
-              transformOrigin: 'left center',
-            }}
-          >
-            {newPriceText}
-          </div>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1.5px solid rgba(255, 255, 255, 0.25)',
+            padding: '10px 32px',
+            borderRadius: 999,
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#f8fafc',
+            letterSpacing: '1px',
+            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <span style={{ color: '#ff2e93', fontSize: 20 }}>✝</span>
+          <span>{organization}</span>
         </div>
       </div>
     </AbsoluteFill>
@@ -3591,7 +3487,7 @@ export const ScriptureThreeCardsScene: React.FC<ScriptureThreeCardsProps> = ({
 
 export const Scene = () => (
   <AbsoluteFill>
-    <ScriptureThreeCardsScene />
+    <CleanThreeCardsScene />
   </AbsoluteFill>
 );`;
       }
