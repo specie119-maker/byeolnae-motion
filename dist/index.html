@@ -187,6 +187,41 @@
           </div>
         </div>
 
+        <!-- 모션그래픽 코드 템플릿 선택 -->
+        <div class="bg-violet-950/25 p-3 rounded-xl border border-violet-400/35 space-y-2">
+          <div class="flex items-center gap-1.5 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
+            <button type="button" id="btnLandscape" class="btnAspect flex-1 py-2 rounded-md bg-violet-600 text-white text-xs font-bold transition">▭ 가로 16:9</button>
+            <button type="button" id="btnPortrait" class="btnAspect flex-1 py-2 rounded-md text-zinc-400 hover:text-white text-xs font-bold transition">▯ 세로 9:16</button>
+          </div>
+          <p id="selectedAspectHelp" class="text-[10px] text-zinc-400">가로 영상(유튜브·강의·교회 안내)에 맞춰 고릅니다.</p>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-violet-200">🎬 모션그래픽 코드 선택</span>
+            <span id="selectedMotionCode" class="text-[10px] text-violet-300">코드를 선택하세요</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5" id="motionCodePicker">
+            <button type="button" class="btnMotionCode" data-code="1" data-title="히어로 등장">01 · 히어로 등장</button>
+            <button type="button" class="btnMotionCode" data-code="2" data-title="제품 캐러셀">02 · 제품 캐러셀</button>
+            <button type="button" class="btnMotionCode" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
+            <button type="button" class="btnMotionCode" data-code="4" data-title="세로 쇼츠 광고">04 · 세로 쇼츠</button>
+            <button type="button" class="btnMotionCode" data-code="5" data-title="가격·할인 배지">05 · 할인 배지</button>
+            <button type="button" class="btnMotionCode" data-code="6" data-title="캐릭터 광고">06 · 캐릭터 광고</button>
+            <button type="button" class="btnMotionCode" data-code="7" data-title="라인업 3D 쇼케이스">07 · 3D 쇼케이스</button>
+            <button type="button" class="btnMotionCode" data-code="8" data-title="등장과 말풍선">08 · 등장·말풍선</button>
+            <button type="button" class="btnMotionCode" data-code="9" data-title="살아있는 대기동작">09 · 대기동작</button>
+            <button type="button" class="btnMotionCode" data-code="10" data-title="점프하며 이동">10 · 점프 이동</button>
+            <button type="button" class="btnMotionCode" data-code="11" data-title="패럴랙스 장면">11 · 패럴랙스</button>
+            <button type="button" class="btnMotionCode" data-code="12" data-title="강의 프로필 카드">12 · 프로필 카드</button>
+            <button type="button" class="btnMotionCode" data-code="13" data-title="시간 배치">13 · 시간 배치</button>
+            <button type="button" class="btnMotionCode" data-code="14" data-title="미디어 넣기">14 · 미디어 넣기</button>
+            <button type="button" class="btnMotionCode" data-code="15" data-title="장면 전환">15 · 장면 전환</button>
+            <button type="button" class="btnMotionCode" data-code="16" data-title="빛번짐">16 · 빛번짐</button>
+            <button type="button" class="btnMotionCode" data-code="17" data-title="방사형 광선 배경">17 · 광선 배경</button>
+            <button type="button" class="btnMotionCode" data-code="18" data-title="이펙트 기초">18 · 이펙트</button>
+            <button type="button" class="btnMotionCode" data-code="19" data-title="강의 영상 레시피">19 · 강의 영상</button>
+            <button type="button" class="btnMotionCode" data-code="20" data-title="모션 블러">20 · 모션 블러</button>
+          </div>
+        </div>
+
         <!-- 폰트 서체 선택 (부드러운 서체) -->
         <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-500/40 space-y-2">
           <label class="text-xs font-bold text-blue-200 flex items-center gap-1.5">
@@ -1103,6 +1138,35 @@ ${url}`;
         showToast(`'${p.verse}' 말씀이 적용되었습니다! ✨`);
       });
     });
+
+    // 모션그래픽 코드 1–20 선택 상태
+    document.querySelectorAll('.btnMotionCode').forEach(btn => {
+      btn.className += ' px-2.5 py-2 rounded-lg bg-zinc-900 hover:bg-violet-700 text-[11px] text-left text-zinc-200 border border-zinc-700 transition';
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btnMotionCode').forEach(b => {
+          b.classList.remove('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
+          b.classList.add('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
+        });
+        btn.classList.remove('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
+        btn.classList.add('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
+        const code = String(btn.dataset.code).padStart(2, '0');
+        const title = btn.dataset.title;
+        document.getElementById('selectedMotionCode').innerText = `CODE ${code} · ${title}`;
+        showToast(`🎬 CODE ${code} '${title}' 템플릿을 선택했습니다.`);
+      });
+    });
+
+    let motionAspect = 'landscape';
+    function setMotionAspect(aspect) {
+      motionAspect = aspect;
+      const landscape = aspect === 'landscape';
+      document.getElementById('btnLandscape').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
+      document.getElementById('btnPortrait').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${!landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
+      document.getElementById('selectedAspectHelp').innerText = landscape ? '가로 16:9 · 유튜브·강의·교회 안내 영상' : '세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스';
+      showToast(landscape ? '▭ 가로 16:9 영상으로 선택했습니다.' : '▯ 세로 9:16 쇼츠로 선택했습니다.');
+    }
+    document.getElementById('btnLandscape').addEventListener('click', () => setMotionAspect('landscape'));
+    document.getElementById('btnPortrait').addEventListener('click', () => setMotionAspect('portrait'));
 
 
     // 이미지 다운로드 기능 (모바일 갤러리 저장 호환)
