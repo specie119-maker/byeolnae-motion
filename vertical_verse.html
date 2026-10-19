@@ -777,7 +777,6 @@
         const w = h * hand.naturalWidth / hand.naturalHeight;
         ctx.save(); ctx.globalAlpha = alpha * p; ctx.drawImage(hand, x, y, w, h); ctx.restore();
       };
-      const header = `CODE ${String(code).padStart(2, '0')} · ${portrait ? '세로 9:16' : '가로 16:9'}`;
 
       // 🔒 [LOCKED / 코드 확정] CODE 01 · 히어로 등장 (비둘기 제거 및 3줄 동일 대형 크기 확정 - 수정 금지)
       if (code === 1) {
@@ -1085,27 +1084,59 @@
           ctx.textAlign = 'center';
           ctx.fillText('구원과 영생의 가격', W / 2, tagY + 36);
 
-          // 이전 가격 (취소선)
-          const oldText = lines[1] || '내 착한 행위 999억';
-          ctx.font = `800 30px ${motionFont}`;
-          ctx.fillStyle = '#94a3b8';
-          const oldY = tagY + 76;
-          ctx.fillText(oldText, W / 2, oldY);
-          const oldW = ctx.measureText(oldText).width;
-          if (strikeP > 0) {
-            ctx.save();
-            ctx.strokeStyle = '#E11D48';
-            ctx.lineWidth = 4.5;
-            ctx.beginPath();
-            ctx.moveTo(W / 2 - oldW / 2 - 6, oldY + 2);
-            ctx.lineTo(W / 2 - oldW / 2 - 6 + (oldW + 12) * strikeP, oldY - 4);
-            ctx.stroke();
-            ctx.restore();
+          // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
+          const oldRaw = lines[1] || '내 착한 행위 999억';
+          let subLines = [];
+          if (oldRaw.includes('\n')) {
+            subLines = oldRaw.split('\n').map(s => s.trim()).filter(Boolean);
+          } else if (oldRaw.includes('핵심')) {
+            const idx = oldRaw.indexOf('핵심');
+            const l1 = oldRaw.slice(0, idx).replace(/[.,\s]+$/, '').trim();
+            const l2 = oldRaw.slice(idx).trim();
+            subLines = [l1 || '예시를 꼭 넣으세요', l2 || '핵심은'];
+          } else if (oldRaw.includes('.') || oldRaw.includes(',')) {
+            const delim = oldRaw.includes('.') ? '.' : ',';
+            const parts = oldRaw.split(delim).map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+              subLines = [parts[0], parts.slice(1).join(' ')];
+            } else {
+              subLines = [oldRaw];
+            }
+          } else {
+            const words = oldRaw.split(' ');
+            if (words.length >= 2 && oldRaw.length > 8) {
+              const mid = Math.ceil(words.length / 2);
+              subLines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+            } else {
+              subLines = [oldRaw];
+            }
           }
+
+          const isTwoLines = subLines.length > 1;
+          const oldFontSize = isTwoLines ? 24 : 30;
+          ctx.font = `800 ${oldFontSize}px ${motionFont}`;
+          ctx.fillStyle = '#94a3b8';
+
+          subLines.forEach((subTxt, idx) => {
+            const oldY = isTwoLines ? (tagY + 68 + idx * 30) : (tagY + 76);
+            ctx.fillText(subTxt, W / 2, oldY);
+            const oldW = ctx.measureText(subTxt).width;
+            if (strikeP > 0) {
+              ctx.save();
+              ctx.strokeStyle = '#E11D48';
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.moveTo(W / 2 - oldW / 2 - 6, oldY + 2);
+              ctx.lineTo(W / 2 - oldW / 2 - 6 + (oldW + 12) * strikeP, oldY - 4);
+              ctx.stroke();
+              ctx.restore();
+            }
+          });
 
           // 최종 확정 가격: 0원 (은혜)
           ctx.save();
-          ctx.translate(W / 2, tagY + 145);
+          const finalPriceY = isTwoLines ? (tagY + 152) : (tagY + 145);
+          ctx.translate(W / 2, finalPriceY);
           ctx.scale(finalPriceScale, finalPriceScale);
           ctx.font = `900 46px ${motionFont}`;
           ctx.fillStyle = '#E11D48';
@@ -1191,33 +1222,65 @@
           ctx.textAlign = 'center';
           ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 42);
 
-          // 이전 가격 (1.5배 확대 + 빨간 취소선)
-          const oldText = lines[1] || '내 착한 행위 999억';
-          let oldFontSize = Math.max(30, Math.floor(tagW * 0.13)); // 1.5배 확대
+          // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
+          const oldRaw = lines[1] || '내 착한 행위 999억';
+          let subLines = [];
+          if (oldRaw.includes('\n')) {
+            subLines = oldRaw.split('\n').map(s => s.trim()).filter(Boolean);
+          } else if (oldRaw.includes('핵심')) {
+            const idx = oldRaw.indexOf('핵심');
+            const l1 = oldRaw.slice(0, idx).replace(/[.,\s]+$/, '').trim();
+            const l2 = oldRaw.slice(idx).trim();
+            subLines = [l1 || '예시를 꼭 넣으세요', l2 || '핵심은'];
+          } else if (oldRaw.includes('.') || oldRaw.includes(',')) {
+            const delim = oldRaw.includes('.') ? '.' : ',';
+            const parts = oldRaw.split(delim).map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+              subLines = [parts[0], parts.slice(1).join(' ')];
+            } else {
+              subLines = [oldRaw];
+            }
+          } else {
+            const words = oldRaw.split(' ');
+            if (words.length >= 2 && oldRaw.length > 8) {
+              const mid = Math.ceil(words.length / 2);
+              subLines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+            } else {
+              subLines = [oldRaw];
+            }
+          }
+
+          const isTwoLines = subLines.length > 1;
+          let oldFontSize = isTwoLines ? Math.max(26, Math.floor(tagW * 0.105)) : Math.max(30, Math.floor(tagW * 0.13));
           ctx.font = `800 ${oldFontSize}px ${motionFont}`;
-          const rawW = ctx.measureText(oldText).width;
-          if (rawW > tagW * 0.88) {
-            oldFontSize = Math.floor(oldFontSize * (tagW * 0.88 / rawW));
-            ctx.font = `800 ${oldFontSize}px ${motionFont}`;
-          }
           ctx.fillStyle = '#94a3b8';
-          const oldY = tagY + 98;
-          ctx.fillText(oldText, tagX + tagW / 2, oldY);
-          const oldW = ctx.measureText(oldText).width;
-          if (strikeP > 0) {
-            ctx.save();
-            ctx.strokeStyle = '#E11D48';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(tagX + tagW / 2 - oldW / 2 - 10, oldY + 3);
-            ctx.lineTo(tagX + tagW / 2 - oldW / 2 - 10 + (oldW + 20) * strikeP, oldY - 5);
-            ctx.stroke();
-            ctx.restore();
-          }
+
+          subLines.forEach((subTxt, idx) => {
+            const curW = ctx.measureText(subTxt).width;
+            let curFont = oldFontSize;
+            if (curW > tagW * 0.88) {
+              curFont = Math.floor(curFont * (tagW * 0.88 / curW));
+              ctx.font = `800 ${curFont}px ${motionFont}`;
+            }
+            const oldY = isTwoLines ? (tagY + 80 + idx * 36) : (tagY + 98);
+            ctx.fillText(subTxt, tagX + tagW / 2, oldY);
+            const oldW = ctx.measureText(subTxt).width;
+            if (strikeP > 0) {
+              ctx.save();
+              ctx.strokeStyle = '#E11D48';
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.moveTo(tagX + tagW / 2 - oldW / 2 - 8, oldY + 3);
+              ctx.lineTo(tagX + tagW / 2 - oldW / 2 - 8 + (oldW + 16) * strikeP, oldY - 4);
+              ctx.stroke();
+              ctx.restore();
+            }
+          });
 
           // 최종 확정 가격: 0원 (은혜) 쾅!
           ctx.save();
-          ctx.translate(tagX + tagW / 2, tagY + 180);
+          const finalPriceY = isTwoLines ? (tagY + 185) : (tagY + 180);
+          ctx.translate(tagX + tagW / 2, finalPriceY);
           ctx.scale(finalPriceScale, finalPriceScale);
           ctx.font = `900 ${Math.max(46, tagW * .18)}px ${motionFont}`;
           ctx.fillStyle = '#E11D48';
@@ -1616,7 +1679,6 @@
       } else { // 방사형 광선
         ctx.save();ctx.translate(W/2,H/2);ctx.rotate(f*.01);ctx.globalAlpha=.35;ctx.fillStyle=theme[2];for(let i=0;i<20;i++){ctx.rotate(Math.PI/10);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W, -H*.08);ctx.lineTo(W,H*.08);ctx.closePath();ctx.fill();}ctx.restore();drawText(lines[0],W/2,H*.30,portrait?23:29,'#fff',W*.8);drawText(lines[1],W/2,H*.52,portrait?36:46,theme[2],W*.85);drawText(lines[2],W/2,H*.72,portrait?22:27,'#fff',W*.8);
       }
-      ctx.save();ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,26);ctx.fillStyle=theme[2];ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(header,W/2,17);ctx.restore();
     }
 
 

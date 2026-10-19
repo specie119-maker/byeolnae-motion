@@ -94,14 +94,24 @@ export const GraceOfferScene: React.FC = () => {
             구원과 영생의 가격
           </div>
 
-          {/* 이전 가격: 내 행위와 공로 (빨간 줄이 그어짐) */}
-          <div style={{ position: 'relative', display: 'inline-block', fontSize: 48, fontWeight: 800, color: "#94a3b8", marginBottom: 10 }}>
-            <span>내 착한 행위 999억</span>
-            {/* 빨간 손그림 취소선 */}
-            <div style={{
-              position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
-              width: `${strikeProgress * 110}%`, transform: 'rotate(-4deg)'
-            }} />
+          {/* 이전 가격: 2줄 취소선 지원 (예시를 꼭 넣으세요 / 핵심은) */}
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, fontSize: 36, fontWeight: 800, color: "#94a3b8", marginBottom: 10 }}>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <span>예시를 꼭 넣으세요</span>
+              {/* 빨간 손그림 취소선 */}
+              <div style={{
+                position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
+                width: `${strikeProgress * 110}%`, transform: 'rotate(-3deg)'
+              }} />
+            </div>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <span>핵심은</span>
+              {/* 빨간 손그림 취소선 */}
+              <div style={{
+                position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
+                width: `${strikeProgress * 110}%`, transform: 'rotate(-3deg)'
+              }} />
+            </div>
           </div>
 
           {/* 최종 확정 가격: 0원 (은혜) 쾅! */}
