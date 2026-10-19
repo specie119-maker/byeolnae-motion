@@ -1,202 +1,249 @@
-// frames=180 size=1280x720 (가로 16:9)
+// frames=240 size=1280x720 (가로 16:9, 여유롭고 읽기 편한 속도)
 import React from 'react';
 import {
   AbsoluteFill,
   interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
+  Easing,
 } from 'remotion';
-import { FONT } from './font';
 
-export const ImmersiveScriptureScene: React.FC = () => {
+const FONT = "'Nanum Gothic', sans-serif";
+
+export const SceneTransitionScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { width, height } = useVideoConfig();
 
-  // 1. 전체 화면을 천천히 빨아들이는 시네마틱 줌인 (Ken Burns)
-  const cameraZoom = interpolate(frame, [0, 180], [1.0, 1.06]);
+  const totalDur = 240; // 8초 루프 (240프레임)
+  const sceneDur = 120; // 각 장면 4초 (120프레임)
+  const scene = Math.floor((frame % totalDur) / sceneDur);
+  const sf = (frame % totalDur) % sceneDur;
 
-  // 2. 메인 글자 '여호와는' 스프링 등장
-  const textSpring = spring({
-    frame: frame - 10,
-    fps,
-    config: { damping: 14, stiffness: 85, mass: 1.1 },
-  });
+  // 글씨가 여유롭고 부드럽게 2번 통통 튀는 애니메이션 (Slower Gentle Double Bounce)
+  const getDoubleBounce = (t: number) => {
+    if (t < 10) {
+      const p = Math.max(0, t / 10);
+      const ease = 1 - Math.pow(1 - p, 3);
+      return { scale: ease * 1.12, y: (1 - ease) * 32, opacity: ease };
+    } else if (t < 40) {
+      // 1번째 통! (Frame 10 ~ 40, 총 30프레임 = 1초 동안 우아한 포물선 바운스)
+      const p = (t - 10) / 30;
+      const arc = Math.sin(p * Math.PI);
+      return { scale: 1.0 + 0.16 * arc, y: -24 * arc, opacity: 1 };
+    } else if (t < 66) {
+      // 2번째 통! (Frame 40 ~ 66, 총 26프레임 = 약 0.9초 동안 작은 포물선 바운스)
+      const p = (t - 40) / 26;
+      const arc = Math.sin(p * Math.PI);
+      return { scale: 1.0 + 0.08 * arc, y: -12 * arc, opacity: 1 };
+    } else {
+      // 편안하고 정적인 말씀 묵상 시간 (흔들림 없이 또렷하게 감상)
+      const breathe = Math.sin((t - 66) * 0.05) * 0.008;
+      return { scale: 1.0 + breathe, y: 0, opacity: 1 };
+    }
+  };
 
-  // 3. 서브 말씀 구절 페이드 & 슬라이드업
-  const subProgress = interpolate(frame, [35, 60], [0, 1], {
+  // ── [장면 1] 연두색 동그란 원이 중앙에서 바깥으로 빠져나가는 장면 ──
+  if (scene === 0) {
+    const circleScale = interpolate(sf, [0, 32], [0, 3.2], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
+    });
+
+    const ringScale = interpolate(sf, [6, 38], [0, 3.6], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
+    });
+
+    const bounce = getDoubleBounce(sf - 6);
+
+    return (
+      <AbsoluteFill
+        style={{
+          background: '#06281e',
+          fontFamily: FONT,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* 외곽 보조 연두색 펄스 링 */}
+        <div
+          style={{
+            position: 'absolute',
+            width: Math.min(width, height),
+            height: Math.min(width, height),
+            borderRadius: '50%',
+            background: '#4ade80',
+            transform: `scale(${ringScale})`,
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* 메인 연두색 원 (중앙에서 바깥으로 쫘악 커지며 화면 가득 확장) */}
+        <div
+          style={{
+            position: 'absolute',
+            width: Math.min(width, height),
+            height: Math.min(width, height),
+            borderRadius: '50%',
+            background: '#86efac',
+            transform: `scale(${circleScale})`,
+            boxShadow: '0 0 80px rgba(74, 222, 128, 0.8)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* 중앙 말씀 글씨 (여유롭게 2번 통통 튐) */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            transform: `scale(${bounce.scale}) translateY(${bounce.y}px)`,
+            opacity: bounce.opacity,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 900,
+              color: '#064e3b',
+              letterSpacing: '-1.5px',
+              textShadow: '0 2px 14px rgba(255, 255, 255, 0.6)',
+              marginBottom: 16,
+            }}
+          >
+            일을 행하시는 여호와
+          </div>
+          <div
+            style={{
+              fontSize: 38,
+              fontWeight: 800,
+              color: '#047857',
+              letterSpacing: '-0.5px',
+            }}
+          >
+            그의 이름을 여호와라 하는 이가
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
+
+  // ── [장면 2] 연보라 배경색이 슬라이딩으로 오른쪽으로 사라지는 장면 ──
+  // 프레임 92부터 120까지 부드럽게 오른쪽으로 슬라이드 아웃 (충분한 묵상 시간 확보)
+  const slideX = interpolate(sf, [92, 120], [0, width * 1.25], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.4, 0, 0.2, 1),
   });
 
-  // 4. 글자 위를 스치고 지나가는 빛 줄기 (프레임 50~85)
-  const lightSweep = interpolate(frame, [50, 85], [-150, 250], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-
-  // 5. 호흡하듯 잔잔한 골드 글로우 맥박 (Breathing Pulse)
-  const glowPulse = 20 + Math.sin(frame * 0.08) * 12;
+  const bounce = getDoubleBounce(sf - 4);
 
   return (
     <AbsoluteFill
       style={{
-        background: '#07050d',
+        background: '#06281e',
         fontFamily: FONT,
         overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
       }}
     >
-      {/* ── [레이어 1] 심도 깊은 오로라 퍼플 배경 + 미세 줌인 ── */}
+      {/* 슬라이딩으로 오른쪽으로 사라지는 연보라 배경 패널 */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          transform: `scale(${cameraZoom})`,
-          background:
-            'radial-gradient(ellipse at 50% 45%, #3b1459 0%, #1a082b 55%, #080310 100%)',
-        }}
-      />
-
-      {/* ── [레이어 2] 회전하는 은은한 빛줄기 (God Rays) ── */}
-      <div
-        style={{
-          position: 'absolute',
-          width: 1400,
-          height: 1400,
-          backgroundImage:
-            'repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 215, 0, 0.04) 0deg 10deg, transparent 10deg 20deg)',
-          transform: `rotate(${frame * 0.15}deg)`,
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* ── [레이어 3] 배경 거대 타이포 실루엣 (공간 입체감 부여) ── */}
-      <div
-        style={{
-          position: 'absolute',
-          fontSize: 220,
-          fontWeight: 900,
-          color: 'rgba(255, 255, 255, 0.025)',
-          letterSpacing: '12px',
-          userSelect: 'none',
-          transform: `scale(${1 + frame * 0.0005})`,
-        }}
-      >
-        JEHOVAH
-      </div>
-
-      {/* ── [레이어 4] 메인 콘텐츠 블록 ── */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 10,
+          background: 'linear-gradient(135deg, #c4b5fd 0%, #ddd6fe 100%)',
+          transform: `translateX(${slideX}px)`,
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          textAlign: 'center',
-          transform: `scale(${cameraZoom})`,
+          justifyContent: 'center',
+          boxShadow: '-20px 0 60px rgba(0, 0, 0, 0.25)',
         }}
       >
-        {/* 상단 은혜로운 인용 심볼 */}
+        {/* 소프트 글로우 장식 */}
         <div
           style={{
-            fontSize: 40,
-            color: '#fbbf24',
-            opacity: textSpring,
-            transform: `scale(${textSpring})`,
-            marginBottom: -10,
-            textShadow: '0 0 20px rgba(251, 191, 36, 0.6)',
+            position: 'absolute',
+            width: '120%',
+            height: '40%',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* 중앙 말씀 글씨 (여유롭게 2번 통통 튐) */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            transform: `scale(${bounce.scale}) translateY(${bounce.y}px)`,
+            opacity: bounce.opacity,
           }}
         >
-          ❝
-        </div>
-
-        {/* 핵심 단어: '여호와는' (대형 폰트 + 골드/화이트 그라데이션 + 골드 후광) */}
-        <div style={{ position: 'relative', overflow: 'hidden', padding: '10px 40px' }}>
           <div
             style={{
-              fontSize: 88,
+              fontSize: 72,
               fontWeight: 900,
-              letterSpacing: '4px',
-              color: '#ffffff',
-              opacity: textSpring,
-              transform: `scale(${textSpring}) translateY(${(1 - textSpring) * 30}px)`,
-              textShadow: `0 4px 30px rgba(0, 0, 0, 0.9), 0 0 ${glowPulse}px rgba(251, 191, 36, 0.55)`,
+              color: '#2e1065',
+              letterSpacing: '-1.5px',
+              textShadow: '0 2px 16px rgba(255, 255, 255, 0.7)',
+              marginBottom: 16,
             }}
           >
-            여호와는
+            일을 지어 성취하시는
           </div>
-
-          {/* 빛이 쓱 지나가는 라이트 스위프 (Light Sweep) */}
           <div
             style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              width: 80,
-              background:
-                'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%)',
-              transform: `skewX(-25deg) translateX(${lightSweep}%)`,
-              pointerEvents: 'none',
-              opacity: frame >= 50 && frame <= 85 ? 1 : 0,
+              fontSize: 54,
+              fontWeight: 900,
+              color: '#581c87',
+              letterSpacing: '-1px',
             }}
-          />
+          >
+            하나님
+          </div>
         </div>
-
-        {/* 이어지는 말씀 구절 (시편 23:1 나의 목자시니) */}
-        <div
-          style={{
-            fontSize: 34,
-            fontWeight: 700,
-            color: '#f8fafc',
-            opacity: subProgress,
-            transform: `translateY(${(1 - subProgress) * 20}px)`,
-            marginTop: 14,
-            letterSpacing: '1px',
-            textShadow: '0 2px 16px rgba(0,0,0,0.8)',
-          }}
-        >
-          나의 목자시니 내게 부족함이 없으리로다
-        </div>
-
-        {/* 성경 장절 뱃지 */}
-        <div
-          style={{
-            marginTop: 28,
-            opacity: subProgress,
-            transform: `translateY(${(1 - subProgress) * 15}px)`,
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(12px)',
-            border: '1.5px solid rgba(251, 191, 36, 0.4)',
-            color: '#fbbf24',
-            fontSize: 18,
-            fontWeight: 800,
-            padding: '8px 28px',
-            borderRadius: 999,
-            letterSpacing: '1px',
-            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.2)',
-          }}
-        >
-          시편 23:1
-        </div>
-      </div>
-
-      {/* ── [레이어 5] 하단 채널 브랜딩 ── */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 30,
-          fontSize: 16,
-          fontWeight: 700,
-          color: 'rgba(255, 255, 255, 0.55)',
-          letterSpacing: '2px',
-        }}
-      >
-        별내사랑의교회 · 말씀 묵상
       </div>
     </AbsoluteFill>
   );
 };
+
+// ── 채널 표시: CONNECT AI LAB ──
+const BrandMark = () => {
+  const { width } = useVideoConfig();
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        right: Math.round(width * 0.02),
+        bottom: Math.round(width * 0.015),
+        fontFamily: FONT,
+        fontWeight: 800,
+        fontSize: Math.round(width / 60),
+        letterSpacing: '0.16em',
+        color: 'rgba(255,255,255,0.85)',
+        textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+      }}
+    >
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneTransitionScene />
+    <BrandMark />
+  </AbsoluteFill>
+);

@@ -1926,65 +1926,157 @@
           drawText(l3, W * 0.12, startY + lineGap * 2, uniformSize, '#cbd5e1', W * 0.78, 'left', motionFont);
         }
         ctx.restore();
-      } else if (code === 9) { // CODE 09 · 장면 전환 (시네마틱 페이드 트랜지션)
-        const sceneDur = 80;
-        const scene = Math.floor(cycle / sceneDur) % 3;
-        const sceneFrame = cycle % sceneDur;
+      } else if (code === 9) { // CODE 09 · 장면 전환 (연두색 원형 확장 + 연보라 우측 슬라이드 + 글씨 통통 바운스)
+        const totalDur = 240; // 8초 루프 (240프레임)
+        const sceneDur = 120; // 장면당 4초 (120프레임) - 충분히 여유롭고 읽기 편한 속도
+        const scene = Math.floor((f % totalDur) / sceneDur);
+        const sf = (f % totalDur) % sceneDur; // 0 ~ 119
 
-        // 부드러운 페이드 인/아웃 계산
-        const fadeIn = Math.min(1, sceneFrame / 16);
-        const fadeOut = Math.max(0, (sceneDur - sceneFrame) / 16);
-        const alpha = Math.min(fadeIn, fadeOut);
+        // 글씨가 여유롭고 부드럽게 2번 통통 튀는 애니메이션 (Slower Gentle Double Bounce)
+        const getDoubleBounce = (t) => {
+          if (t < 10) {
+            // 부드러운 등장 (Frame 0 ~ 10)
+            const p = Math.max(0, t / 10);
+            const ease = 1 - Math.pow(1 - p, 3);
+            return { scale: ease * 1.12, y: (1 - ease) * 32, alpha: ease };
+          } else if (t < 40) {
+            // 1번째 통! (Frame 10 ~ 40, 총 30프레임 = 1초 동안 우아한 포물선 바운스, 정점 25)
+            const p = (t - 10) / 30;
+            const arc = Math.sin(p * Math.PI);
+            return { scale: 1.0 + 0.16 * arc, y: -24 * arc, alpha: 1 };
+          } else if (t < 66) {
+            // 2번째 통! (Frame 40 ~ 66, 총 26프레임 = 약 0.9초 동안 작은 포물선 바운스, 정점 53)
+            const p = (t - 40) / 26;
+            const arc = Math.sin(p * Math.PI);
+            return { scale: 1.0 + 0.08 * arc, y: -12 * arc, alpha: 1 };
+          } else {
+            // 편안하고 정적인 말씀 묵상 시간 (흔들림 없이 또렷하게 감상)
+            const breathe = Math.sin((t - 66) * 0.05) * 0.008;
+            return { scale: 1.0 + breathe, y: 0, alpha: 1 };
+          }
+        };
 
-        // 시네마틱 줌인 (Ken Burns)
-        const zoom = 0.98 + (sceneFrame / sceneDur) * 0.05;
+        const cx = W / 2, cy = H / 2;
+        const maxR = Math.hypot(W, H);
+        const motionFont = "'Nanum Gothic', sans-serif";
 
-        // 장면별 딥 프리미엄 그라데이션
-        const sceneGradients = [
-          ['#1e1b4b', '#0f172a', '#020617'], // 1. 미드나잇 인디고
-          ['#3b0764', '#1e0538', '#090212'], // 2. 딥 퍼플 오로라
-          ['#4c0519', '#1f040b', '#090104']  // 3. 루비 와인
-        ];
-        const curColors = sceneGradients[scene];
+        if (scene === 0) {
+          // ── [장면 1] 연두색 동그란 원이 중앙에서 바깥으로 빠져나가는 장면 ──
+          // 베이스 배경
+          ctx.fillStyle = '#06281e';
+          ctx.fillRect(0, 0, W, H);
 
-        const bg = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, Math.max(W, H) * 0.7);
-        bg.addColorStop(0, curColors[0]);
-        bg.addColorStop(0.55, curColors[1]);
-        bg.addColorStop(1, curColors[2]);
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, W, H);
+          // 중앙에서 바깥으로 여유롭게 퍼지는 연두색 메인 원 (0 ~ 32 프레임 = 약 1.1초)
+          const pOpen = Math.min(1, Math.max(0, sf / 32));
+          const easeR = 1 - Math.pow(1 - pOpen, 3);
+          const currentR = easeR * maxR * 1.25;
 
-        // 은은한 회전 빛줄기
-        ctx.save();
-        ctx.translate(W / 2, H / 2);
-        ctx.rotate(f * 0.005);
-        ctx.globalAlpha = 0.12 * alpha;
-        ctx.fillStyle = '#ffffff';
-        for (let i = 0; i < 16; i++) {
-          ctx.rotate(Math.PI / 8);
+          // 보조 파동 링들 (중앙에서 바깥으로 퍼져나가는 동심원 펄스)
+          ctx.save();
+          for (let i = 2; i >= 0; i--) {
+            const ringDelay = i * 6;
+            if (sf >= ringDelay) {
+              const ringP = Math.min(1, (sf - ringDelay) / 40);
+              const ringR = ringP * maxR * 1.35;
+              ctx.beginPath();
+              ctx.arc(cx, cy, Math.max(0, ringR), 0, Math.PI * 2);
+              ctx.fillStyle = i === 0 ? '#4ade80' : i === 1 ? '#86efac' : '#bbf7d0';
+              ctx.fill();
+            }
+          }
+
+          // 최종 메인 연두색 원
           ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(W, -H * 0.06);
-          ctx.lineTo(W, H * 0.06);
+          ctx.arc(cx, cy, Math.max(0, currentR), 0, Math.PI * 2);
+          ctx.fillStyle = '#86efac'; // 산뜻한 연두색
+          ctx.fill();
+          ctx.restore();
+
+          // 글씨 (여유롭게 두 번 통통 튐)
+          const bounce = getDoubleBounce(Math.max(0, sf - 6));
+          ctx.save();
+          ctx.translate(cx, cy + bounce.y);
+          ctx.scale(bounce.scale, bounce.scale);
+          ctx.globalAlpha = bounce.alpha;
+
+          const l1 = lines[0] || '일을 행하시는 여호와';
+          const l2 = lines[1] || '그의 이름을 여호와라 하는 이가';
+          const fontSize = portrait ? 36 : 46;
+
+          // 딥 에메랄드 텍스트로 연두색 위에서 최고 가독성
+          ctx.fillStyle = '#064e3b';
+          ctx.textAlign = 'center';
+          ctx.font = `900 ${fontSize}px ${motionFont}`;
+          ctx.shadowColor = 'rgba(255,255,255,0.6)';
+          ctx.shadowBlur = 10;
+          ctx.fillText(l1, 0, -fontSize * 0.4);
+
+          ctx.fillStyle = '#047857';
+          ctx.font = `800 ${Math.round(fontSize * 0.65)}px ${motionFont}`;
+          ctx.fillText(l2, 0, fontSize * 0.85);
+
+          ctx.restore();
+
+        } else {
+          // ── [장면 2] 연보라 배경색이 슬라이딩으로 오른쪽으로 사라지는 장면 ──
+          // 베이스 배경
+          ctx.fillStyle = '#06281e';
+          ctx.fillRect(0, 0, W, H);
+
+          // 오른쪽 슬라이드 아웃 (충분히 읽은 뒤 프레임 92부터 120까지 부드럽게 퇴장)
+          let slideX = 0;
+          if (sf > 92) {
+            const slideP = Math.min(1, (sf - 92) / 28);
+            slideX = Math.pow(slideP, 2.2) * (W * 1.25);
+          }
+
+          ctx.save();
+          ctx.translate(slideX, 0);
+
+          // 연보라 메인 배경 그라데이션
+          const lavGrad = ctx.createLinearGradient(0, 0, W, H);
+          lavGrad.addColorStop(0, '#c4b5fd'); // 우아한 연보라 (Lavender)
+          lavGrad.addColorStop(1, '#ddd6fe');
+          ctx.fillStyle = lavGrad;
+          ctx.fillRect(0, 0, W, H);
+
+          // 은은한 장식 하이라이트
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.beginPath();
+          ctx.moveTo(W * 0.15, 0);
+          ctx.lineTo(W * 0.55, 0);
+          ctx.lineTo(W * 0.35, H);
+          ctx.lineTo(0, H);
           ctx.closePath();
           ctx.fill();
+
+          // 글씨 (여유롭게 두 번 통통 튐)
+          const bounce = getDoubleBounce(Math.max(0, sf - 4));
+          ctx.save();
+          ctx.translate(cx, cy + bounce.y);
+          ctx.scale(bounce.scale, bounce.scale);
+          ctx.globalAlpha = bounce.alpha;
+
+          const l2 = lines[1] || '일을 지어 성취하시는';
+          const l3 = lines[2] || '하나님';
+          const fontSize = portrait ? 36 : 46;
+
+          // 딥 바이올렛 텍스트로 연보라 위에서 선명한 가독성
+          ctx.fillStyle = '#2e1065';
+          ctx.textAlign = 'center';
+          ctx.font = `900 ${fontSize}px ${motionFont}`;
+          ctx.shadowColor = 'rgba(255,255,255,0.7)';
+          ctx.shadowBlur = 10;
+          ctx.fillText(l2, 0, -fontSize * 0.4);
+
+          ctx.fillStyle = '#581c87';
+          ctx.font = `900 ${Math.round(fontSize * 1.15)}px ${motionFont}`;
+          ctx.fillText(l3, 0, fontSize * 0.95);
+
+          ctx.restore();
+
+          ctx.restore(); // 슬라이드 translate 복원
         }
-        ctx.restore();
-
-        // 메인 말씀 구절 (상단 작은글씨 & 말씀장면 1,2,3 모두 삭제! 오직 본문만 중앙 집중)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
-        ctx.save();
-        ctx.translate(W / 2, H / 2);
-        ctx.scale(zoom, zoom);
-        ctx.translate(-W / 2, -H / 2);
-        ctx.globalAlpha = alpha;
-        ctx.shadowColor = 'rgba(0,0,0,0.85)';
-        ctx.shadowBlur = 24;
-
-        const currentLine = lines[scene] || (scene === 0 ? '주 예수 믿으라' : scene === 1 ? '죄가 많아도' : '별내사랑의교회');
-        const mainSize = portrait ? Math.max(34, Math.floor(W * 0.092)) : Math.max(42, Math.floor(H * 0.09));
-        drawText(currentLine, W / 2, H * 0.50, mainSize, '#ffffff', W * 0.85, 'center', motionFont);
-        ctx.restore();
       } else { // CODE 10 · 방사형 광선 배경 (repeating-conic-gradient: #FFD633 / #F0A51A)
         const cx = W / 2, cy = H / 2;
         const R = Math.hypot(W, H);
@@ -3167,6 +3259,240 @@ const BrandMark = () => {
 export const Scene = () => (
   <AbsoluteFill>
     <ParallaxStarsScene />
+    <BrandMark />
+  </AbsoluteFill>
+);`;
+      }
+      if (state.motionCode === 9) {
+        return `// Remotion CODE 09 · 장면 전환 (연두색 원형 확장 + 연보라 우측 슬라이드 + 글씨 통통 바운스)
+import React from 'react';
+import {
+  AbsoluteFill,
+  interpolate,
+  useCurrentFrame,
+  useVideoConfig,
+  Easing,
+} from 'remotion';
+
+const FONT = "'Nanum Gothic', sans-serif";
+
+export const SceneTransitionScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+
+  const totalDur = 240;
+  const sceneDur = 120;
+  const scene = Math.floor((frame % totalDur) / sceneDur);
+  const sf = (frame % totalDur) % sceneDur;
+
+  const getDoubleBounce = (t: number) => {
+    if (t < 10) {
+      const p = Math.max(0, t / 10);
+      const ease = 1 - Math.pow(1 - p, 3);
+      return { scale: ease * 1.12, y: (1 - ease) * 32, opacity: ease };
+    } else if (t < 40) {
+      const p = (t - 10) / 30;
+      const arc = Math.sin(p * Math.PI);
+      return { scale: 1.0 + 0.16 * arc, y: -24 * arc, opacity: 1 };
+    } else if (t < 66) {
+      const p = (t - 40) / 26;
+      const arc = Math.sin(p * Math.PI);
+      return { scale: 1.0 + 0.08 * arc, y: -12 * arc, opacity: 1 };
+    } else {
+      const breathe = Math.sin((t - 66) * 0.05) * 0.008;
+      return { scale: 1.0 + breathe, y: 0, opacity: 1 };
+    }
+  };
+
+  if (scene === 0) {
+    const circleScale = interpolate(sf, [0, 32], [0, 3.2], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
+    });
+
+    const ringScale = interpolate(sf, [6, 38], [0, 3.6], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
+    });
+
+    const bounce = getDoubleBounce(sf - 6);
+
+    return (
+      <AbsoluteFill
+        style={{
+          background: '#06281e',
+          fontFamily: FONT,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            width: Math.min(width, height),
+            height: Math.min(width, height),
+            borderRadius: '50%',
+            background: '#4ade80',
+            transform: \`scale(\${ringScale})\`,
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            width: Math.min(width, height),
+            height: Math.min(width, height),
+            borderRadius: '50%',
+            background: '#86efac',
+            transform: \`scale(\${circleScale})\`,
+            boxShadow: '0 0 80px rgba(74, 222, 128, 0.8)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            transform: \`scale(\${bounce.scale}) translateY(\${bounce.y}px)\`,
+            opacity: bounce.opacity,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 900,
+              color: '#064e3b',
+              letterSpacing: '-1.5px',
+              textShadow: '0 2px 14px rgba(255, 255, 255, 0.6)',
+              marginBottom: 16,
+            }}
+          >
+            \${state.line1 || '일을 행하시는 여호와'}
+          </div>
+          <div
+            style={{
+              fontSize: 38,
+              fontWeight: 800,
+              color: '#047857',
+              letterSpacing: '-0.5px',
+            }}
+          >
+            \${state.line2 || '그의 이름을 여호와라 하는 이가'}
+          </div>
+        </div>
+      </AbsoluteFill>
+    );
+  }
+
+  const slideX = interpolate(sf, [92, 120], [0, width * 1.25], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.4, 0, 0.2, 1),
+  });
+
+  const bounce = getDoubleBounce(sf - 4);
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: '#06281e',
+        fontFamily: FONT,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(135deg, #c4b5fd 0%, #ddd6fe 100%)',
+          transform: \`translateX(\${slideX}px)\`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '-20px 0 60px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            width: '120%',
+            height: '40%',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            transform: \`scale(\${bounce.scale}) translateY(\${bounce.y}px)\`,
+            opacity: bounce.opacity,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 900,
+              color: '#2e1065',
+              letterSpacing: '-1.5px',
+              textShadow: '0 2px 16px rgba(255, 255, 255, 0.7)',
+              marginBottom: 16,
+            }}
+          >
+            \${state.line2 || '일을 지어 성취하시는'}
+          </div>
+          <div
+            style={{
+              fontSize: 54,
+              fontWeight: 900,
+              color: '#581c87',
+              letterSpacing: '-1px',
+            }}
+          >
+            \${state.line3 || '하나님'}
+          </div>
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const BrandMark = () => {
+  const { width } = useVideoConfig();
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        right: Math.round(width * 0.02),
+        bottom: Math.round(width * 0.015),
+        fontFamily: FONT,
+        fontWeight: 800,
+        fontSize: Math.round(width / 60),
+        letterSpacing: '0.16em',
+        color: 'rgba(255,255,255,0.85)',
+        textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+      }}
+    >
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneTransitionScene />
     <BrandMark />
   </AbsoluteFill>
 );`;
