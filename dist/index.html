@@ -16,7 +16,7 @@
   <!-- 구글 폰트: 고운바탕, 고운돋움, 나눔명조 (부드럽고 감성적인 은혜 서체) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Gothic:wght@700;800&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
@@ -817,8 +817,8 @@
       const bg = ctx.createLinearGradient(0, 0, W, H);
       bg.addColorStop(0, theme[0]); bg.addColorStop(1, theme[1]); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
       const font = state.fontFamily || 'sans-serif';
-      const drawText = (text, x, y, size, color, maxWidth = W * .82, align = 'center') => {
-        ctx.save(); ctx.textAlign = align; ctx.fillStyle = color; ctx.font = `900 ${size}px ${font}`;
+      const drawText = (text, x, y, size, color, maxWidth = W * .82, align = 'center', fontFace = font) => {
+        ctx.save(); ctx.textAlign = align; ctx.fillStyle = color; ctx.font = `900 ${size}px ${fontFace}`;
         const chars = Array.from(text); let row = '', rows = [];
         chars.forEach(ch => { if (ctx.measureText(row + ch).width > maxWidth && row) { rows.push(row); row = ch; } else row += ch; });
         if (row) rows.push(row); rows.slice(0, 2).forEach((r, i) => ctx.fillText(r, x, y + i * size * 1.18)); ctx.restore();
@@ -838,41 +838,38 @@
         drawText(lines[1], W*.29, H*.51, portrait ? 31 : 42, theme[2], W*.52);
         drawText(lines[2], W*.31, H*.66, portrait ? 21 : 27, '#fff', W*.52);
       } else if (code === 2) { // 모션 블러 비교: 원본 code 02 모션블러 구성
+        const motionFont = "'Nanum Gothic', sans-serif";
         const cardText = lines[1];
         const panelGap = W * .025, panelW = (W - panelGap * 4) / 3;
         const panelH = H * .62, panelY = H * .20;
         // 한 사이클을 240프레임(약 8초)으로: 눈이 편안하게 비교할 수 있도록 느리게 이동합니다.
         const phase = (f % 240) / 240;
         const cardW = panelW * .70, cardH = panelH * .36;
-        const ease = phase < .35 ? phase / .35 : phase < .68 ? 1 : Math.max(0, 1 - (phase - .68) / .32);
+        // 처음에만 천천히 들어온 뒤, 끝까지 중앙에 선명하게 머뭅니다.
+        const ease = Math.min(1, phase / .28);
         const cardX = -cardW + ease * (panelW + cardW * .6);
         const spin = Math.min(1, phase / .35) * Math.PI * 2;
         const drawCard = (x, y, alpha = 1, blur = 0, showText = true) => {
           ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x + cardW/2, y + cardH/2); ctx.rotate(spin); ctx.filter = blur ? `blur(${blur}px)` : 'none';
           ctx.fillStyle = '#ffc93c'; ctx.beginPath(); ctx.roundRect(-cardW/2, -cardH/2, cardW, cardH, 13); ctx.fill();
-          ctx.restore(); if (showText) drawText(cardText, x + cardW/2, y + cardH*.60, portrait ? 14 : Math.max(15, panelW*.105), '#050914', cardW*.76);
+          ctx.restore(); if (showText) drawText(cardText, x + cardW/2, y + cardH*.60, portrait ? 17 : Math.max(19, panelW*.13), '#050914', cardW*.78, 'center', motionFont);
         };
         ctx.fillStyle = '#050914'; ctx.fillRect(0,0,W,H);
-        drawText(lines[0], W/2, H*.11, portrait ? 21 : 25, '#fff', W*.88);
+        drawText(lines[0], W/2, H*.11, portrait ? 24 : 30, '#fff', W*.88, 'center', motionFont);
         const panels = [
-          ['효과 없음', '뚝뚝 끊겨 보임'],
-          ['<Trail>', '잔상이 따라옴'],
-          ['<CameraMotionBlur>', '자연스러운 번짐']
+          ['깔끔한 등장', '선명한 말씀 상자'],
+          ['부드러운 이동', '천천히 중심으로'],
+          ['또렷한 강조', '그림자 없이 선명하게']
         ];
         panels.forEach(([name, sub], i) => {
           const x = panelGap + i * (panelW + panelGap);
           ctx.save(); ctx.fillStyle = '#13224d'; ctx.beginPath(); ctx.roundRect(x,panelY,panelW,panelH,12);ctx.fill();ctx.restore();
           const cardY = panelY + panelH*.32;
-          if (i === 1) { // Trail: 앞선 카드 위치를 얇게 겹쳐 잔상 만들기
-            for (let trail=7; trail>0; trail--) drawCard(x + cardX - trail * panelW*.05, cardY, .08 + (7-trail)*.045, 0, false);
-          }
-          if (i === 2) { // CameraMotionBlur: 이동 경로를 겹쳐 부드러운 블러로 표현
-            for (let blur=8; blur>0; blur--) drawCard(x + cardX - blur * panelW*.022, cardY, .045, 2.2, false);
-          }
+          // 세 패널 모두 잔상·블러·그림자 없이 선명한 상자 한 개만 표시합니다.
           drawCard(x + cardX, cardY);
-          ctx.save(); ctx.textAlign='left';ctx.font=`900 ${portrait?11:Math.max(11,panelW*.085)}px ${font}`;ctx.fillStyle='#ffc93c';ctx.fillText(name,x,panelY+panelH+22);ctx.font=`600 ${portrait?9:Math.max(8,panelW*.055)}px ${font}`;ctx.fillStyle='rgba(255,255,255,.78)';ctx.fillText(sub,x,panelY+panelH+38);ctx.restore();
+          ctx.save(); ctx.textAlign='left';ctx.font=`900 ${portrait?14:Math.max(14,panelW*.108)}px ${motionFont}`;ctx.fillStyle='#ffc93c';ctx.fillText(name,x,panelY+panelH+25);ctx.font=`800 ${portrait?11:Math.max(11,panelW*.074)}px ${motionFont}`;ctx.fillStyle='rgba(255,255,255,.88)';ctx.fillText(sub,x,panelY+panelH+45);ctx.restore();
         });
-        drawText(lines[2],W/2,H*.95,portrait?14:16,'rgba(255,255,255,.80)',W*.82);
+        drawText(lines[2],W/2,H*.95,portrait?16:19,'rgba(255,255,255,.88)',W*.82,'center',motionFont);
       } else if (code === 3) { // 콜아웃
         drawHand(W*.62,H*.22,H*.65,.10);
         drawText(lines[0], W*.08, H*.22, portrait?22:28, theme[2], W*.44, 'left');
