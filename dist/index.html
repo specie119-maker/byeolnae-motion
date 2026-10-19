@@ -203,25 +203,15 @@
           </div>
           <div class="grid grid-cols-2 gap-1.5" id="motionCodePicker">
             <button type="button" class="btnMotionCode" data-code="1" data-title="히어로 등장">01 · 히어로 등장</button>
-            <button type="button" class="btnMotionCode" data-code="2" data-title="제품 캐러셀">02 · 제품 캐러셀</button>
+            <button type="button" class="btnMotionCode" data-code="2" data-title="말씀 캐러셀">02 · 말씀 캐러셀</button>
             <button type="button" class="btnMotionCode" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
-            <button type="button" class="btnMotionCode" data-code="4" data-title="세로 쇼츠 광고">04 · 세로 쇼츠</button>
-            <button type="button" class="btnMotionCode" data-code="5" data-title="가격·할인 배지">05 · 할인 배지</button>
-            <button type="button" class="btnMotionCode" data-code="6" data-title="캐릭터 광고">06 · 캐릭터 광고</button>
-            <button type="button" class="btnMotionCode" data-code="7" data-title="라인업 3D 쇼케이스">07 · 3D 쇼케이스</button>
-            <button type="button" class="btnMotionCode" data-code="8" data-title="등장과 말풍선">08 · 등장·말풍선</button>
-            <button type="button" class="btnMotionCode" data-code="9" data-title="살아있는 대기동작">09 · 대기동작</button>
-            <button type="button" class="btnMotionCode" data-code="10" data-title="점프하며 이동">10 · 점프 이동</button>
-            <button type="button" class="btnMotionCode" data-code="11" data-title="패럴랙스 장면">11 · 패럴랙스</button>
-            <button type="button" class="btnMotionCode" data-code="12" data-title="강의 프로필 카드">12 · 프로필 카드</button>
-            <button type="button" class="btnMotionCode" data-code="13" data-title="시간 배치">13 · 시간 배치</button>
-            <button type="button" class="btnMotionCode" data-code="14" data-title="미디어 넣기">14 · 미디어 넣기</button>
-            <button type="button" class="btnMotionCode" data-code="15" data-title="장면 전환">15 · 장면 전환</button>
-            <button type="button" class="btnMotionCode" data-code="16" data-title="빛번짐">16 · 빛번짐</button>
-            <button type="button" class="btnMotionCode" data-code="17" data-title="방사형 광선 배경">17 · 광선 배경</button>
-            <button type="button" class="btnMotionCode" data-code="18" data-title="이펙트 기초">18 · 이펙트</button>
-            <button type="button" class="btnMotionCode" data-code="19" data-title="강의 영상 레시피">19 · 강의 영상</button>
-            <button type="button" class="btnMotionCode" data-code="20" data-title="모션 블러">20 · 모션 블러</button>
+            <button type="button" class="btnMotionCode" data-code="4" data-title="세로 말씀 쇼츠">04 · 세로 말씀 쇼츠</button>
+            <button type="button" class="btnMotionCode" data-code="5" data-title="은혜 강조 배지">05 · 은혜 배지</button>
+            <button type="button" class="btnMotionCode" data-code="6" data-title="기도 손과 말씀">06 · 기도 손·말씀</button>
+            <button type="button" class="btnMotionCode" data-code="7" data-title="면류관 쇼케이스">07 · 면류관 쇼케이스</button>
+            <button type="button" class="btnMotionCode" data-code="8" data-title="패럴랙스 장면">08 · 패럴랙스</button>
+            <button type="button" class="btnMotionCode" data-code="9" data-title="말씀 장면 전환">09 · 장면 전환</button>
+            <button type="button" class="btnMotionCode" data-code="10" data-title="방사형 광선 배경">10 · 광선 배경</button>
           </div>
           <button type="button" id="btnRunMotionCode" class="w-full py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-sm font-black shadow-lg transition active:scale-[.99]">
             ▶ 선택한 코드로 미리보기 실행하기
@@ -573,6 +563,10 @@
     [[1, 'images/prayer_hands_cutout.png'], [5, 'images/prayer_hands_cutout.png']].forEach(([id, src]) => {
       const image = new Image(); image.crossOrigin = 'anonymous'; image.src = src; image.onload = () => render(); motionProducts[id] = image;
     });
+    const motionCrown = new Image();
+    motionCrown.crossOrigin = 'anonymous';
+    motionCrown.src = 'images/crown_of_life.png';
+    motionCrown.onload = () => render();
 
     // 속도를 매우 부드럽고 천천히 늦춘 Remotion 감쇠 조화 진동(Spring) 수식
     // stiffness: 55, damping: 18로 급격한 튕김 없이 부드럽게 안착
@@ -805,24 +799,73 @@
     }
 
     function renderMotionCodePreview(W, H, f, code) {
+      // CODE 01–10은 원본 TSX의 모션 성격에 맞춰 각각 별도로 미리보기 합니다.
+      // 제품 자리는 기도 손 이미지를 12%로만 사용해 말씀보다 앞서지 않게 했습니다.
       const portrait = motionAspect === 'portrait';
-      const theme = code === 5 ? ['#b91c3a', '#5e0a1d', '#fde68a'] : ['#a20d27', '#3a0008', '#fff7d6'];
-      const bg = ctx.createRadialGradient(W * .5, H * .5, 12, W * .5, H * .5, H * .8);
+      const p = Math.min(1, Math.max(0, f / 24));
+      const cycle = f % 180;
+      const lines = [state.line1 || '오늘의 말씀', state.line2 || '주님 안에서', state.line3 || '새 힘을 얻습니다'];
+      const hand = motionProducts[1];
+      const colors = {
+        1: ['#a20d27', '#3a0008', '#fff7d6'], 2: ['#153d87', '#07142f', '#dbeafe'],
+        3: ['#175548', '#08251f', '#dcfce7'], 4: ['#4b1d6b', '#17051f', '#fce7f3'],
+        5: ['#b91c3a', '#5e0a1d', '#fde68a'], 6: ['#523b18', '#191007', '#fff1b8'],
+        7: ['#182a62', '#050917', '#f8d77d'], 8: ['#25365f', '#080d23', '#d9e8ff'],
+        9: ['#4c2567', '#160720', '#f6d8ff'], 10: ['#5c3510', '#160b02', '#ffe6a6']
+      };
+      const theme = colors[code] || colors[1];
+      const bg = ctx.createLinearGradient(0, 0, W, H);
       bg.addColorStop(0, theme[0]); bg.addColorStop(1, theme[1]); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-      ctx.save(); ctx.globalAlpha = .16; ctx.strokeStyle = theme[2]; ctx.lineWidth = 1;
-      for (let i = 0; i < 18; i++) { const a = i * Math.PI / 9 + f * .01; ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.lineTo(W/2 + Math.cos(a)*H, H/2 + Math.sin(a)*H); ctx.stroke(); } ctx.restore();
-      const product = motionProducts[code] || motionProducts[1];
-      const enter = Math.min(1, Math.max(0, f / 22));
-      if (product?.complete && product.naturalWidth) {
-        const ph = portrait ? H * .36 : H * .50, pw = ph * product.naturalWidth / product.naturalHeight;
-        const x = portrait ? W * .58 : W * .65;
-        const y = portrait ? H * .42 : H * .34;
-        ctx.save(); ctx.globalAlpha = .12 * enter; ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=14;ctx.drawImage(product,x,y,pw,ph);ctx.restore();
+      const font = state.fontFamily || 'sans-serif';
+      const drawText = (text, x, y, size, color, maxWidth = W * .82, align = 'center') => {
+        ctx.save(); ctx.textAlign = align; ctx.fillStyle = color; ctx.font = `900 ${size}px ${font}`;
+        const chars = Array.from(text); let row = '', rows = [];
+        chars.forEach(ch => { if (ctx.measureText(row + ch).width > maxWidth && row) { rows.push(row); row = ch; } else row += ch; });
+        if (row) rows.push(row); rows.slice(0, 2).forEach((r, i) => ctx.fillText(r, x, y + i * size * 1.18)); ctx.restore();
+      };
+      const drawHand = (x, y, h, alpha = .12) => {
+        if (!hand?.complete || !hand.naturalWidth) return;
+        const w = h * hand.naturalWidth / hand.naturalHeight;
+        ctx.save(); ctx.globalAlpha = alpha * p; ctx.drawImage(hand, x, y, w, h); ctx.restore();
+      };
+      const header = `CODE ${String(code).padStart(2, '0')} · ${portrait ? '세로 9:16' : '가로 16:9'}`;
+
+      if (code === 1) { // 히어로 등장
+        ctx.save(); ctx.globalAlpha = .18; ctx.strokeStyle = theme[2];
+        for (let i = 0; i < 18; i++) { const a = i * Math.PI / 9 + f * .012; ctx.beginPath(); ctx.moveTo(W*.56,H*.57); ctx.lineTo(W*.56 + Math.cos(a)*H, H*.57 + Math.sin(a)*H); ctx.stroke(); } ctx.restore();
+        drawHand(W * .61, H * .23 + (1-p)*H*.4, H * .62, .12);
+        drawText(lines[0], W*.28, H*.37, portrait ? 23 : 29, '#fff', W*.48);
+        drawText(lines[1], W*.29, H*.51, portrait ? 31 : 42, theme[2], W*.52);
+        drawText(lines[2], W*.31, H*.66, portrait ? 21 : 27, '#fff', W*.52);
+      } else if (code === 2) { // 캐러셀
+        const cards = [lines[0], lines[1], lines[2]];
+        cards.forEach((text, i) => { const offset = ((cycle * 1.6 + i * W/3) % (W*1.12)) - W*.38; ctx.save(); ctx.translate(offset, H*.35 + (i%2)*18); ctx.fillStyle = i === 1 ? theme[2] : 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.roundRect(-W*.15,0,W*.30,H*.30,18); ctx.fill(); drawText(text, 0,H*.13, portrait?20:26,i===1?theme[1]:'#fff',W*.24); ctx.restore(); });
+        drawHand(W*.68,H*.44,H*.45,.10);
+      } else if (code === 3) { // 콜아웃
+        drawHand(W*.62,H*.22,H*.65,.10);
+        drawText(lines[0], W*.08, H*.22, portrait?22:28, theme[2], W*.44, 'left');
+        [lines[1], lines[2]].forEach((text, i) => { const y = H*(.45+i*.20); ctx.save(); ctx.strokeStyle=theme[2];ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*.12,y);ctx.lineTo(W*.38,y);ctx.stroke();ctx.beginPath();ctx.arc(W*.42,y,7,0,Math.PI*2);ctx.fillStyle=theme[2];ctx.fill();ctx.restore(); drawText(text,W*.47,y+9,portrait?20:27,'#fff',W*.42,'left'); });
+      } else if (code === 4) { // 원본 세로 쇼츠
+        const slam = Math.min(1, Math.max(0,(f-12)/22));
+        drawText(lines[0], W/2,H*.18,portrait?28:26,'#fff',W*.8);
+        drawText(lines[1], W/2,H*.37,portrait?40:37,theme[2],W*.86);
+        drawHand(W*.19,H*.49+(1-slam)*H*.35,H*.42,.12);
+        drawText(lines[2], W/2,H*.79,portrait?29:27,'#fff',W*.8);
+      } else if (code === 5) { // 은혜 강조 배지
+        const r = Math.min(W,H)*.26*(.85+Math.sin(f*.08)*.04); ctx.save();ctx.translate(W*.68,H*.52);ctx.rotate(f*.008);ctx.fillStyle=theme[2];ctx.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12, rr=i%2?r*.8:r; i?ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.restore();
+        drawText(lines[1],W*.68,H*.49,portrait?25:32,theme[1],r*1.3); drawText(lines[0],W*.12,H*.30,portrait?22:28,'#fff',W*.46,'left'); drawText(lines[2],W*.12,H*.66,portrait?27:34,'#fff',W*.46,'left'); drawHand(W*.72,H*.55,H*.34,.07);
+      } else if (code === 6) { // 기도 손과 말씀
+        ctx.save();ctx.fillStyle='rgba(255,242,190,.15)';ctx.beginPath();ctx.arc(W*.72,H*.48,Math.min(W,H)*.32,0,Math.PI*2);ctx.fill();ctx.restore(); drawHand(W*.56,H*.16,H*.72,.14); drawText(lines[0],W*.08,H*.25,portrait?22:27,theme[2],W*.46,'left'); drawText(lines[1],W*.08,H*.46,portrait?29:37,'#fff',W*.47,'left'); drawText(lines[2],W*.08,H*.64,portrait?20:25,'#fff',W*.45,'left');
+      } else if (code === 7) { // 면류관 쇼케이스
+        const crown = motionCrown; if(crown?.complete&&crown.naturalWidth){const h=H*.52,w=h*crown.naturalWidth/crown.naturalHeight;ctx.save();ctx.globalAlpha=p;ctx.drawImage(crown,W*.5-w/2,H*.24,w,h);ctx.restore();} drawText(lines[0],W*.1,H*.18,portrait?20:25,theme[2],W*.8); drawText(lines[1],W*.5,H*.79,portrait?29:37,'#fff',W*.8); drawText(lines[2],W*.5,H*.89,portrait?19:23,'rgba(255,255,255,.86)',W*.8);
+      } else if (code === 8) { // 패럴랙스
+        ctx.save();ctx.globalAlpha=.25;ctx.fillStyle='#d7e6ff';for(let i=0;i<22;i++)ctx.fillRect((i*71-f*.35)%W,(i*37)%Math.max(1,H*.5),2,2);ctx.restore(); [0,.35,.8].forEach((speed,i)=>{ctx.save();ctx.fillStyle=['#2a4275','#17294e','#0a142e'][i];ctx.beginPath();ctx.moveTo(0,H*(.62+i*.1));for(let x=0;x<=W;x+=35)ctx.lineTo(x,H*(.60+i*.1)+Math.sin((x+f*speed*18)/70)*20);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();ctx.restore();}); drawHand(W*.62,H*.22,H*.55,.09);drawText(lines[0],W*.08,H*.22,portrait?22:28,'#fff',W*.48,'left');drawText(lines[1],W*.08,H*.40,portrait?31:39,theme[2],W*.5,'left');drawText(lines[2],W*.08,H*.54,portrait?21:25,'#fff',W*.48,'left');
+      } else if (code === 9) { // 장면 전환
+        const scene=Math.floor(cycle/60)%3; const sceneColors=['#5e2e78','#1c5b62','#a04b27'];ctx.fillStyle=sceneColors[scene];ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=Math.min(1,(cycle%60)/18);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);ctx.restore();drawText(lines[scene],W/2,H*.48,portrait?34:43,'#fff',W*.8);drawText(`말씀 장면 ${scene+1}`,W/2,H*.70,portrait?16:19,theme[2],W*.7);
+      } else { // 방사형 광선
+        ctx.save();ctx.translate(W/2,H/2);ctx.rotate(f*.01);ctx.globalAlpha=.35;ctx.fillStyle=theme[2];for(let i=0;i<20;i++){ctx.rotate(Math.PI/10);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W, -H*.08);ctx.lineTo(W,H*.08);ctx.closePath();ctx.fill();}ctx.restore();drawText(lines[0],W/2,H*.30,portrait?23:29,'#fff',W*.8);drawText(lines[1],W/2,H*.52,portrait?36:46,theme[2],W*.85);drawText(lines[2],W/2,H*.72,portrait?22:27,'#fff',W*.8);
       }
-      ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`800 ${portrait ? 25 : 30}px sans-serif`;ctx.fillText(state.line1 || '오늘의 말씀',W/2,portrait?H*.14:H*.18);
-      ctx.font=`900 ${portrait ? 37 : 46}px sans-serif`;ctx.fillStyle=theme[2];ctx.fillText(state.line2 || '주님 안에서',W/2,portrait?H*.22:H*.28);
-      ctx.fillStyle='rgba(255,255,255,.92)';ctx.font=`800 ${portrait ? 24 : 30}px sans-serif`;ctx.fillText(state.line3 || '새 힘을 얻습니다',W/2,portrait?H*.30:H*.36);
-      ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,portrait?25:28);ctx.fillStyle=theme[2];ctx.font='bold 11px sans-serif';ctx.fillText(`CODE ${String(code).padStart(2,'0')} · ${portrait ? '세로 9:16 쇼츠' : '가로 16:9 영상'}`,W/2,18);
+      ctx.save();ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,26);ctx.fillStyle=theme[2];ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(header,W/2,17);ctx.restore();
     }
 
 
@@ -1178,7 +1221,7 @@ ${url}`;
       });
     });
 
-    // 모션그래픽 코드 1–20 선택 상태
+    // 원본 템플릿 01–10 선택 상태
     document.querySelectorAll('.btnMotionCode').forEach(btn => {
       btn.className += ' px-2.5 py-2 rounded-lg bg-zinc-900 hover:bg-violet-700 text-[11px] text-left text-zinc-200 border border-zinc-700 transition';
       btn.addEventListener('click', () => {
@@ -1191,15 +1234,28 @@ ${url}`;
         const code = String(btn.dataset.code).padStart(2, '0');
         const title = btn.dataset.title;
         state.motionCodeSelection = Number(btn.dataset.code);
+        if (state.motionCodeSelection === 4 && motionAspect !== 'portrait') {
+          setMotionAspect('portrait');
+          showToast('CODE 04는 원본이 세로 쇼츠라 9:16으로 맞췄습니다.');
+        }
         document.getElementById('selectedMotionCode').innerText = `CODE ${code} · ${title}`;
         showToast(`🎬 CODE ${code} 선택 완료! 위 문구를 입력한 뒤 [미리보기 실행]을 누르세요.`);
       });
     });
 
     let motionAspect = 'landscape';
+    function applyMotionCanvasSize() {
+      const landscape = motionAspect === 'landscape';
+      canvas.width = landscape ? 640 : 360;
+      canvas.height = landscape ? 360 : 640;
+      const frame = canvas.parentElement;
+      frame.classList.remove('aspect-[9/16]', 'aspect-video');
+      frame.classList.add(landscape ? 'aspect-video' : 'aspect-[9/16]');
+    }
     function setMotionAspect(aspect) {
       motionAspect = aspect;
       const landscape = aspect === 'landscape';
+      applyMotionCanvasSize();
       document.getElementById('btnLandscape').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
       document.getElementById('btnPortrait').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${!landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
       document.getElementById('selectedAspectHelp').innerText = landscape ? '가로 16:9 · 유튜브·강의·교회 안내 영상' : '세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스';
@@ -1211,10 +1267,11 @@ ${url}`;
 
     document.getElementById('btnRunMotionCode').addEventListener('click', () => {
       if (!state.motionCodeSelection) {
-        showToast('먼저 가로·세로와 CODE 01~20 중 하나를 선택하세요.');
+        showToast('먼저 가로·세로와 CODE 01~10 중 하나를 선택하세요.');
         return;
       }
       state.motionCode = state.motionCodeSelection;
+      applyMotionCanvasSize();
       state.frame = 0;
       state.isPlaying = true;
       btnPlay.innerText = '❚❚';
