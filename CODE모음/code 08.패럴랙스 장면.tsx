@@ -1,8 +1,8 @@
 // frames=180 size=1280x720
 import {AbsoluteFill, interpolate, random, useCurrentFrame, useVideoConfig} from 'remotion';
 import type {ReactNode} from 'react';
-import {FONT} from './font';
 
+const FONT = "'Nanum Gothic', sans-serif";
 const GOLD = '#ffd166';
 const W = 1280;
 const H = 720;
@@ -100,18 +100,19 @@ const SceneBody = () => {
         })}
       </Layer>
 
-      {/* 6) 말씀 본문 타이포그래피 (물결/손 제거, 밤하늘에 은혜롭게 떠오름) */}
+      {/* 6) 말씀 본문 타이포그래피 (모든 글씨를 동일 사이즈로: 나눔고딕 굵고 크게) */}
       <div style={{
-        position: 'absolute', left: 140, top: '28%', display: 'flex', flexDirection: 'column', gap: 18,
-        textShadow: '0 4px 20px rgba(0,0,0,0.9)'
+        position: 'absolute', left: 140, top: '26%', display: 'flex', flexDirection: 'column', gap: 24,
+        fontFamily: FONT,
+        textShadow: '0 4px 24px rgba(0,0,0,0.95)'
       }}>
-        <div style={{fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.5px'}}>
+        <div style={{fontSize: 50, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.5px'}}>
           주 예수 믿으라
         </div>
-        <div style={{fontSize: 54, fontWeight: 900, color: GOLD, letterSpacing: '-1px'}}>
+        <div style={{fontSize: 50, fontWeight: 800, color: GOLD, letterSpacing: '-0.5px'}}>
           죄가 많아도
         </div>
-        <div style={{fontSize: 28, fontWeight: 700, color: '#94a3b8'}}>
+        <div style={{fontSize: 50, fontWeight: 800, color: '#cbd5e1', letterSpacing: '-0.5px'}}>
           별내사랑의교회
         </div>
       </div>

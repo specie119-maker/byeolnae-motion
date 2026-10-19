@@ -174,6 +174,7 @@
           </label>
           <select id="selectFont" class="w-full bg-zinc-950 border border-blue-500/50 rounded-xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-blue-400 font-semibold cursor-pointer">
             <option value="'Gowun Batang', serif" selected>🌸 고운바탕 (따뜻하고 부드러운 붓터치 - 추천)</option>
+            <option value="'Nanum Gothic', sans-serif">✨ 나눔고딕 (굵고 또렷한 고딕)</option>
             <option value="'Gowun Dodum', sans-serif">🌿 고운돋움 (둥글둥글 부드러운 고딕)</option>
             <option value="'Nanum Myeongjo', serif">📖 나눔명조 (은혜롭고 경건한 서체)</option>
             <option value="'Pretendard', sans-serif">🏢 프리텐다드 (기본 고딕)</option>
@@ -1888,19 +1889,41 @@
         }
         ctx.restore();
 
-        // 4. 말씀 텍스트 배치 (물결, 손 이미지 없음! 밤하늘에 은혜롭게 떠오르는 구성)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        // 4. 말씀 텍스트 배치 (모든 글씨를 동일 사이즈로: 나눔고딕 굵고 크게)
+        const motionFont = "'Nanum Gothic', sans-serif";
         ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)';
         ctx.shadowBlur = 18;
+
+        const l1 = lines[0] || '주 예수 믿으라';
+        const l2 = lines[1] || '죄가 많아도';
+        const l3 = lines[2] || '별내사랑의교회';
+
+        // 모든 글씨를 동일 사이즈로: 나눔고딕 굵고 크게
+        let uniformSize = portrait ? 34 : 38;
+        ctx.font = `800 ${uniformSize}px ${motionFont}`;
+        const maxTextW = Math.max(
+          ctx.measureText(l1).width,
+          ctx.measureText(l2).width,
+          ctx.measureText(l3).width
+        );
+        const limitW = portrait ? W * 0.86 : W * 0.76;
+        if (maxTextW > limitW) {
+          uniformSize = Math.max(18, Math.floor(uniformSize * (limitW / maxTextW)));
+        }
+
+        const lineGap = uniformSize * 1.55;
+
         if (portrait) {
-          drawText(lines[0] || '주 예수 믿으라', W / 2, H * 0.34, 24, '#e2e8f0', W * 0.85, 'center', motionFont);
-          drawText(lines[1] || '죄가 많아도', W / 2, H * 0.45, 42, '#ffd166', W * 0.88, 'center', motionFont);
-          drawText(lines[2] || '별내사랑의교회', W / 2, H * 0.58, 22, '#cbd5e1', W * 0.85, 'center', motionFont);
+          const startY = H * 0.50 - lineGap;
+          drawText(l1, W / 2, startY, uniformSize, '#f8fafc', W * 0.88, 'center', motionFont);
+          drawText(l2, W / 2, startY + lineGap, uniformSize, '#ffd166', W * 0.88, 'center', motionFont);
+          drawText(l3, W / 2, startY + lineGap * 2, uniformSize, '#cbd5e1', W * 0.88, 'center', motionFont);
         } else {
-          drawText(lines[0] || '주 예수 믿으라', W * 0.12, H * 0.30, 26, '#e2e8f0', W * 0.75, 'left', motionFont);
-          drawText(lines[1] || '죄가 많아도', W * 0.12, H * 0.48, 46, '#ffd166', W * 0.75, 'left', motionFont);
-          drawText(lines[2] || '별내사랑의교회', W * 0.12, H * 0.65, 24, '#cbd5e1', W * 0.75, 'left', motionFont);
+          const startY = H * 0.50 - lineGap;
+          drawText(l1, W * 0.12, startY, uniformSize, '#f8fafc', W * 0.78, 'left', motionFont);
+          drawText(l2, W * 0.12, startY + lineGap, uniformSize, '#ffd166', W * 0.78, 'left', motionFont);
+          drawText(l3, W * 0.12, startY + lineGap * 2, uniformSize, '#cbd5e1', W * 0.78, 'left', motionFont);
         }
         ctx.restore();
       } else if (code === 9) { // CODE 09 · 장면 전환 (시네마틱 페이드 트랜지션)
@@ -3003,6 +3026,147 @@ const BrandMark = () => {
 export const Scene = () => (
   <AbsoluteFill>
     <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);`;
+      }
+      if (state.motionCode === 8) {
+        return `// Remotion CODE 08 · 패럴랙스 (별무리 & 미세 섬광 별빛)
+import React from 'react';
+import { AbsoluteFill, random, useCurrentFrame, useVideoConfig } from 'remotion';
+
+const GOLD = '#ffd166';
+const W = 1280;
+const H = 720;
+const FONT = "'Nanum Gothic', sans-serif";
+
+const STARS_LAYER_1 = Array.from({ length: 120 }, (_, i) => ({
+  x: random(\`s1_x_\${i}\`) * W,
+  y: random(\`s1_y_\${i}\`) * H,
+  r: 0.6 + random(\`s1_r_\${i}\`) * 0.8,
+  baseAlpha: 0.3 + random(\`s1_a_\${i}\`) * 0.5,
+}));
+
+const STARS_LAYER_2 = Array.from({ length: 50 }, (_, i) => ({
+  x: random(\`s2_x_\${i}\`) * W,
+  y: random(\`s2_y_\${i}\`) * H,
+  r: 1.2 + random(\`s2_r_\${i}\`) * 1.0,
+  baseAlpha: 0.5 + random(\`s2_a_\${i}\`) * 0.5,
+}));
+
+const SPARKS = Array.from({ length: 8 }, (_, i) => ({
+  x: 100 + random(\`sp_x_\${i}\`) * (W - 200),
+  y: 60 + random(\`sp_y_\${i}\`) * (H - 120),
+  phase: random(\`sp_ph_\${i}\`) * Math.PI * 2,
+}));
+
+const Layer: React.FC<{ speed: number; children: React.ReactNode }> = ({ speed, children }) => {
+  const f = useCurrentFrame();
+  const x = -((f * speed) % W);
+  return (
+    <AbsoluteFill style={{ transform: \`translateX(\${x}px)\` }}>
+      {[0, W].map((dx) => (
+        <svg key={dx} width={W} height={H} style={{ position: 'absolute', left: dx }}>
+          {children}
+        </svg>
+      ))}
+    </AbsoluteFill>
+  );
+};
+
+export const ParallaxStarsScene: React.FC = () => {
+  const f = useCurrentFrame();
+
+  return (
+    <AbsoluteFill style={{ fontFamily: FONT, color: '#fff', overflow: 'hidden', background: '#040714' }}>
+      {/* 1) 깊은 밤하늘 그라데이션 */}
+      <AbsoluteFill style={{ background: 'linear-gradient(180deg, #040714 0%, #0a1029 45%, #12183a 80%, #070b1a 100%)' }} />
+
+      {/* 2) 신비로운 은하수 성운 (Nebula) */}
+      <div style={{
+        position: 'absolute', left: '20%', top: '15%', width: '60%', height: '70%',
+        background: 'radial-gradient(circle, rgba(76, 53, 140, 0.22) 0%, rgba(30, 58, 120, 0.12) 45%, transparent 75%)',
+        filter: 'blur(30px)', pointerEvents: 'none'
+      }} />
+
+      {/* 3) 원경 별무리 */}
+      <Layer speed={0.1}>
+        {STARS_LAYER_1.map((s, i) => {
+          const tw = 0.3 + 0.7 * Math.sin(f * 0.05 + i * 2.1);
+          return <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="#e2e8f0" opacity={s.baseAlpha * tw} />;
+        })}
+      </Layer>
+
+      {/* 4) 중경 별무리 */}
+      <Layer speed={0.25}>
+        {STARS_LAYER_2.map((s, i) => {
+          const tw = 0.4 + 0.6 * Math.sin(f * 0.07 + i * 1.7);
+          return (
+            <g key={i}>
+              <circle cx={s.x} cy={s.y} r={s.r * 2} fill="#93c5fd" opacity={0.15 * tw} />
+              <circle cx={s.x} cy={s.y} r={s.r} fill={i % 3 === 0 ? '#ffeaa7' : '#ffffff'} opacity={s.baseAlpha * tw} />
+            </g>
+          );
+        })}
+      </Layer>
+
+      {/* 5) 근경 섬세한 십자 별빛 플레어 */}
+      <Layer speed={0.45}>
+        {SPARKS.map((sp, i) => {
+          const pulse = Math.pow(Math.sin(f * 0.05 + sp.phase), 6);
+          const ray = 10 + pulse * 14;
+          return (
+            <g key={i}>
+              <circle cx={sp.x} cy={sp.y} r={1.6} fill="#ffffff" opacity={0.4 + 0.6 * pulse} />
+              {pulse > 0.08 && (
+                <>
+                  <line x1={sp.x - ray} y1={sp.y} x2={sp.x + ray} y2={sp.y} stroke="#fffdf0" strokeWidth={0.9} opacity={pulse * 0.9} />
+                  <line x1={sp.x} y1={sp.y - ray} x2={sp.x + ray} y2={sp.y} stroke="#fffdf0" strokeWidth={0.9} opacity={pulse * 0.9} />
+                  <line x1={sp.x - ray * 0.38} y1={sp.y - ray * 0.38} x2={sp.x + ray * 0.38} y2={sp.y + ray * 0.38} stroke="#fffdf0" strokeWidth={0.7} opacity={pulse * 0.6} />
+                  <line x1={sp.x - ray * 0.38} y1={sp.y + ray * 0.38} x2={sp.x + ray * 0.38} y2={sp.y - ray * 0.38} stroke="#fffdf0" strokeWidth={0.7} opacity={pulse * 0.6} />
+                </>
+              )}
+            </g>
+          );
+        })}
+      </Layer>
+
+      {/* 6) 말씀 본문 타이포그래피 (모든 글씨를 동일 사이즈로: 나눔고딕 굵고 크게) */}
+      <div style={{
+        position: 'absolute', left: 140, top: '26%', display: 'flex', flexDirection: 'column', gap: 24,
+        fontFamily: FONT,
+        textShadow: '0 4px 24px rgba(0,0,0,0.95)'
+      }}>
+        <div style={{ fontSize: 50, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.5px' }}>
+          \${state.line1 || '주 예수 믿으라'}
+        </div>
+        <div style={{ fontSize: 50, fontWeight: 800, color: GOLD, letterSpacing: '-0.5px' }}>
+          \${state.line2 || '죄가 많아도'}
+        </div>
+        <div style={{ fontSize: 50, fontWeight: 800, color: '#cbd5e1', letterSpacing: '-0.5px' }}>
+          \${state.line3 || '별내사랑의교회'}
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const BrandMark = () => {
+  const { width } = useVideoConfig();
+  return (
+    <div style={{
+      position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015),
+      fontFamily: FONT, fontWeight: 800, fontSize: Math.round(width / 60), letterSpacing: '0.16em',
+      color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'
+    }}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <ParallaxStarsScene />
     <BrandMark />
   </AbsoluteFill>
 );`;
