@@ -1707,12 +1707,12 @@
         const card3Text = (state.line3 && state.line3.trim()) || '하나님';
 
         const cards = [
-          { text: card1Text, icon: '✝️', spr: sprCard1 },
-          { text: card2Text, icon: '🕊️', spr: sprCard2 },
-          { text: card3Text, icon: '👑', spr: sprCard3 },
+          { text: card1Text, spr: sprCard1 },
+          { text: card2Text, spr: sprCard2 },
+          { text: card3Text, spr: sprCard3 },
         ];
 
-        // ── 중앙 3개 화이트 박스 (이모티콘 위쪽 배치 + 박스 안 2줄 텍스트) ──
+        // ── 중앙 3개 화이트 박스 (이미지 없이 텍스트 정중앙 배치) ──
         if (portrait) {
           // 세로 9:16 모드: 세로 3개 배치 (완전 중앙 정렬)
           const cardW = Math.min(330, W * 0.86);
@@ -1739,27 +1739,30 @@
             ctx.fill();
             ctx.shadowColor = 'transparent';
 
-            // 좌측: 이모티콘 심볼
-            ctx.font = '54px sans-serif';
+            // 텍스트 정중앙 배치 (카드 크기에 맞춤)
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(c.icon, (W - cardW) / 2 + 58, cy + cardH / 2);
+            const tx = W / 2;
+            const maxTargetW = cardW * 0.84;
+            let fs = Math.round(cardH * 0.17);
+            ctx.font = `900 ${fs}px ${motionFont}`;
+            while (fs > 12 && (ctx.measureText(lineA).width > maxTargetW || (lineB && ctx.measureText(lineB).width > maxTargetW))) {
+              fs--;
+              ctx.font = `900 ${fs}px ${motionFont}`;
+            }
 
-            // 우측: 텍스트 (2줄)
-            ctx.textAlign = 'left';
-            const tx = (W - cardW) / 2 + 118;
             if (lineB) {
+              const lineGap = fs * 1.35;
               ctx.fillStyle = '#0f172a';
-              ctx.font = `900 22px ${motionFont}`;
-              ctx.fillText(lineA, tx, cy + cardH * 0.38);
+              ctx.font = `900 ${fs}px ${motionFont}`;
+              ctx.fillText(lineA, tx, cy + cardH / 2 - lineGap * 0.45);
 
               ctx.fillStyle = i === 2 ? '#ff2e93' : '#1e293b';
-              ctx.font = `900 22px ${motionFont}`;
-              ctx.fillText(lineB, tx, cy + cardH * 0.68);
+              ctx.font = `900 ${fs}px ${motionFont}`;
+              ctx.fillText(lineB, tx, cy + cardH / 2 + lineGap * 0.65);
             } else {
               ctx.fillStyle = i === 2 ? '#ff2e93' : '#0f172a';
-              ctx.font = `900 26px ${motionFont}`;
-              ctx.fillText(lineA, tx, cy + cardH / 2);
+              ctx.font = `900 ${Math.round(fs * 1.15)}px ${motionFont}`;
+              ctx.fillText(lineA, tx, cy + cardH / 2 + 2);
             }
             ctx.restore();
 
@@ -1817,25 +1820,29 @@
               ctx.fill();
               ctx.shadowColor = 'transparent';
 
-              // [상단] 이모티콘 심볼
-              ctx.font = '76px sans-serif';
+              // 텍스트 카드 정중앙 배치 (이미지 없음, 너비에 맞춰 자동 피팅)
               ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(c.icon, cx + cardW / 2, cardTopY + cardH * 0.32);
+              const maxTargetW = cardW * 0.72;
+              let fs = Math.round(cardW * 0.14);
+              ctx.font = `900 ${fs}px ${motionFont}`;
+              while (fs > 10 && (ctx.measureText(lineA).width > maxTargetW || (lineB && ctx.measureText(lineB).width > maxTargetW))) {
+                fs--;
+                ctx.font = `900 ${fs}px ${motionFont}`;
+              }
 
-              // [하단] 2줄 텍스트
               if (lineB) {
+                const lineGap = fs * 1.35;
                 ctx.fillStyle = '#0f172a';
-                ctx.font = `900 25px ${motionFont}`;
-                ctx.fillText(lineA, cx + cardW / 2, cardTopY + cardH * 0.68);
+                ctx.font = `900 ${fs}px ${motionFont}`;
+                ctx.fillText(lineA, cx + cardW / 2, cardCenterY - lineGap * 0.45);
 
                 ctx.fillStyle = i === 2 ? '#ff2e93' : '#1e293b';
-                ctx.font = `900 25px ${motionFont}`;
-                ctx.fillText(lineB, cx + cardW / 2, cardTopY + cardH * 0.84);
+                ctx.font = `900 ${fs}px ${motionFont}`;
+                ctx.fillText(lineB, cx + cardW / 2, cardCenterY + lineGap * 0.65);
               } else {
                 ctx.fillStyle = i === 2 ? '#ff2e93' : '#0f172a';
-                ctx.font = `900 30px ${motionFont}`;
-                ctx.fillText(lineA, cx + cardW / 2, cardTopY + cardH * 0.76);
+                ctx.font = `900 ${Math.round(fs * 1.25)}px ${motionFont}`;
+                ctx.fillText(lineA, cx + cardW / 2, cardCenterY + 4);
               }
               ctx.restore();
             }
@@ -3312,9 +3319,9 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
   });
 
   const cards = [
-    { text: card1Text, icon: card1Icon, spr: sprCard1 },
-    { text: card2Text, icon: card2Icon, spr: sprCard2 },
-    { text: card3Text, icon: card3Icon, spr: sprCard3 },
+    { text: card1Text, spr: sprCard1 },
+    { text: card2Text, spr: sprCard2 },
+    { text: card3Text, spr: sprCard3 },
   ];
 
   return (
@@ -3332,7 +3339,7 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* ── 중앙 3개 화이트 박스 (이모티콘 위쪽 배치 + 박스 안 2줄 텍스트) ── */}
+      {/* ── 중앙 3개 화이트 박스 (이미지 없이 텍스트 정중앙 배치) ── */}
       <div
         style={{
           display: 'flex',
@@ -3359,26 +3366,14 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
+                  justifyContent: 'center',
                   boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65)',
                   transform: \`scale(\${c.spr})\`,
                   color: '#0f172a',
                   textAlign: 'center',
                 }}
               >
-                {/* [상단] 박스 위에 놓이는 이모티콘 심볼 */}
-                <div
-                  style={{
-                    fontSize: 96,
-                    lineHeight: 1,
-                    filter: 'drop-shadow(0 12px 18px rgba(0,0,0,0.18))',
-                    marginTop: 10,
-                  }}
-                >
-                  {c.icon}
-                </div>
-
-                {/* [하단] 흰 박스 안에 큼직하게 2줄로 출력되는 말씀 구절 */}
+                {/* [중앙] 흰 박스 안에 큼직하게 출력되는 말씀 구절 */}
                 <div
                   style={{
                     display: 'flex',

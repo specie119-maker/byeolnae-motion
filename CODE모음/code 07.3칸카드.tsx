@@ -53,9 +53,9 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
   });
 
   const cards = [
-    { text: card1Text, icon: card1Icon, spr: sprCard1 },
-    { text: card2Text, icon: card2Icon, spr: sprCard2 },
-    { text: card3Text, icon: card3Icon, spr: sprCard3 },
+    { text: card1Text, spr: sprCard1 },
+    { text: card2Text, spr: sprCard2 },
+    { text: card3Text, spr: sprCard3 },
   ];
 
   return (
@@ -73,7 +73,7 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* ── 중앙 3개 화이트 박스 (이모티콘 위쪽 배치 + 박스 안 2줄 텍스트) ── */}
+      {/* ── 중앙 3개 화이트 박스 (이미지 없이 텍스트 정중앙 배치) ── */}
       <div
         style={{
           display: 'flex',
@@ -100,26 +100,14 @@ export const CleanThreeCardsScene: React.FC<CleanThreeCardsProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
+                  justifyContent: 'center',
                   boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65)',
                   transform: `scale(${c.spr})`,
                   color: '#0f172a',
                   textAlign: 'center',
                 }}
               >
-                {/* [상단] 박스 위에 놓이는 이모티콘 심볼 */}
-                <div
-                  style={{
-                    fontSize: 96,
-                    lineHeight: 1,
-                    filter: 'drop-shadow(0 12px 18px rgba(0,0,0,0.18))',
-                    marginTop: 10,
-                  }}
-                >
-                  {c.icon}
-                </div>
-
-                {/* [하단] 흰 박스 안에 큼직하게 2줄로 출력되는 말씀 구절 */}
+                {/* [중앙] 흰 박스 안에 큼직하게 출력되는 말씀 구절 */}
                 <div
                   style={{
                     display: 'flex',
