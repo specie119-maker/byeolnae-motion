@@ -1,79 +1,118 @@
 // frames=180 size=1280x720
-import {AbsoluteFill, Sequence, Solid, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {Starburst} from '@remotion/starburst';
-import {starburst} from '@remotion/effects/starburst';
-import {FONT} from './font';
+import React from 'react';
+import { AbsoluteFill, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { FONT } from './font';
 
-const GOLD = '#FFC93C';
-const W = 570;
-const H = 400;
-
-// 가운데 튀어나오는 강조 문구
-const Pop = ({text, color}: {text: string; color: string}) => {
+export const RadiantBurstScene: React.FC = () => {
   const f = useCurrentFrame();
-  const {fps} = useVideoConfig();
-  const s = spring({frame: f - 10, fps, config: {damping: 9}});
+  const { fps } = useVideoConfig();
+
+  // 부드러운 회전 애니메이션
+  const rotation = f * 0.4;
+  const scale = spring({ frame: f - 10, fps, config: { damping: 10, stiffness: 100 } });
+
   return (
-    <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
-      <div style={{transform: `scale(${s})`, fontSize: 76, fontWeight: 900, color, textShadow: '0 6px 24px rgba(0,0,0,0.5)'}}>{text}</div>
+    <AbsoluteFill style={{ background: '#0a0d14', fontFamily: FONT, overflow: 'hidden', padding: 40 }}>
+      {/* 10. 광선배경 (repeating-conic-gradient: #FFD633, #F0A51A) */}
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          borderRadius: 24,
+          overflow: 'hidden',
+          boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: '-50%',
+            left: '-50%',
+            width: '200%',
+            height: '200%',
+            background: 'repeating-conic-gradient(from 0deg at 50% 50%, #FFD633 0deg 10deg, #F0A51A 10deg 20deg)',
+            transform: `rotate(${rotation}deg)`,
+            transformOrigin: '50% 50%',
+          }}
+        />
+
+        {/* 중앙 말씀 콘텐츠 */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: `scale(${scale})`,
+            textAlign: 'center',
+            padding: 40,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 34,
+              fontWeight: 800,
+              color: '#1e293b',
+              letterSpacing: '-0.5px',
+              marginBottom: 16,
+              textShadow: '0 2px 10px rgba(255,255,255,0.4)',
+            }}
+          >
+            일을 행하시는 여호와
+          </div>
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 900,
+              color: '#0f172a',
+              letterSpacing: '-1.5px',
+              marginBottom: 20,
+              textShadow: '0 4px 20px rgba(255,255,255,0.5)',
+            }}
+          >
+            일을 지어 성취하시는
+          </div>
+          <div
+            style={{
+              background: '#0f172a',
+              color: '#FFD633',
+              fontSize: 22,
+              fontWeight: 900,
+              padding: '10px 32px',
+              borderRadius: 999,
+              boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            }}
+          >
+            하나님 · 예레미야 33:2
+          </div>
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
 
-const Label = ({code, ko}: {code: string; ko: string}) => (
-  <div style={{marginTop: 14}}>
-    <div style={{fontSize: 26, fontWeight: 900, color: GOLD}}>{code}</div>
-    <div style={{fontSize: 24, opacity: 0.85}}>{ko}</div>
-  </div>
-);
-
-const SceneBody = () => {
-  const f = useCurrentFrame();
-  const rotation = f * 0.6; // 매 프레임 0.6도씩 천천히 회전
-  const rays = Math.round(12 + 12 * Math.min(1, f / 90)); // 0~3초 동안 광선 12 → 24개
-
-  return (
-    <AbsoluteFill style={{background: '#050914', fontFamily: FONT, color: '#fff'}}>
-      <div style={{position: 'absolute', top: 36, width: '100%', textAlign: 'center', fontSize: 44, fontWeight: 900}}>
-        방사형 광선 배경 (스타버스트)
-      </div>
-
-      <div style={{position: 'absolute', top: 130, left: 50, right: 50, display: 'flex', justifyContent: 'space-between'}}>
-        {/* 방법 1: <Starburst> 컴포넌트. 영상 크기로 그려지므로 Sequence에 width/height를 줘서 칸 크기에 맞춤 */}
-        <div style={{width: W}}>
-          <div style={{position: 'relative', width: W, height: H, borderRadius: 18, overflow: 'hidden'}}>
-            <Sequence width={W} height={H}>
-              <Starburst rays={rays} colors={[GOLD, '#f2a91b']} rotation={rotation} smoothness={0.2} vignette={0.5} />
-            </Sequence>
-            <Pop text="핵심 포인트!" color="#050914" />
-          </div>
-          <Label code={`<Starburst rays={${rays}} rotation={…} />`} ko="@remotion/starburst · 컴포넌트 방식" />
-        </div>
-
-        {/* 방법 2 (권장): <Solid>(단색 사각형)에 starburst() 이펙트 → 중심(origin)도 움직일 수 있음 */}
-        <div style={{width: W}}>
-          <div style={{position: 'relative', width: W, height: H, borderRadius: 18, overflow: 'hidden'}}>
-            <Solid
-              width={W}
-              height={H}
-              color="#050914"
-              effects={[starburst({rays: 18, colors: ['#5B8CFF', '#13224d'], rotation: -rotation, smoothness: 0.4, origin: [0.5 + 0.2 * Math.sin(f / 25), 0.5]})]}
-            />
-            <Pop text="오늘의 정리" color={GOLD} />
-          </div>
-          <Label code="<Solid effects={[starburst({…})]} />" ko="@remotion/effects/starburst · 이펙트 방식 (권장)" />
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
-};
-
-// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+// ── 채널 표시: CONNECT AI LAB ──
 const BrandMark = () => {
-  const {width} = useVideoConfig();
+  const { width } = useVideoConfig();
   return (
-    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
-      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+    <div
+      style={{
+        position: 'absolute',
+        right: Math.round(width * 0.02),
+        bottom: Math.round(width * 0.015),
+        fontFamily: FONT,
+        fontWeight: 800,
+        fontSize: Math.round(width / 60),
+        letterSpacing: '0.16em',
+        color: 'rgba(255,255,255,0.88)',
+        textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+      }}
+    >
       CONNECT AI LAB
     </div>
   );
@@ -81,7 +120,7 @@ const BrandMark = () => {
 
 export const Scene = () => (
   <AbsoluteFill>
-    <SceneBody />
+    <RadiantBurstScene />
     <BrandMark />
   </AbsoluteFill>
 );
