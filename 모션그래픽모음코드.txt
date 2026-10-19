@@ -1,0 +1,725 @@
+코드1: 히어로등장
+// frames=180 size=1280x720
+import {AbsoluteFill, Img, interpolate, random, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 내 제품 광고가 돼요 ──
+const PRODUCT = 'https://www.aicitybuilders.com/video/remotion/assets/product_coke.png'; // 배경이 투명한 PNG
+const RATIO = 369 / 900; // 제품 이미지 가로 ÷ 세로
+const MAIN = '#E4002B'; // 제품 대표색 (배경)
+const DEEP = '#3a0008'; // 바깥쪽 어두운 색
+const COPY_L = '시원하게'; // 제품 왼쪽 문구
+const COPY_R = '한 캔'; // 제품 오른쪽 문구
+const BACK_WORD = 'REFRESH'; // 제품 뒤 큰 글자
+const NOTE = '교육용 예시 · 해당 브랜드와 관계없음'; // 실제 브랜드를 쓸 때 꼭 넣기
+
+const H = 560; // 제품 높이(px)
+const W = H * RATIO;
+
+// 반짝이(물방울 빛) 위치: random(seed)로 고정 → 렌더할 때마다 같은 자리
+const SPARKS = new Array(14).fill(0).map((_, i) => ({
+  x: 0.15 + random(`sx${i}`) * 0.7, // 제품 안쪽 비율(0~1)
+  y: 0.08 + random(`sy${i}`) * 0.84,
+  size: 10 + random(`ss${i}`) * 16,
+  delay: random(`sd${i}`) * 60,
+}));
+
+// 4갈래 반짝이 모양
+const Sparkle = ({size, opacity}: {size: number; opacity: number}) => (
+  <svg width={size} height={size} viewBox="-10 -10 20 20" style={{opacity, filter: 'drop-shadow(0 0 4px #fff)'}}>
+    <path d="M0 -10 Q1 -1 10 0 Q1 1 0 10 Q-1 1 -10 0 Q-1 -1 0 -10Z" fill="#fff" />
+  </svg>
+);
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+
+  // 1) 제품 등장: 아래에서 스프링으로 솟아오르며 살짝 기울어짐
+  const rise = spring({frame: f - 8, fps, config: {damping: 13, mass: 1.1}});
+  const y = interpolate(rise, [0, 1], [620, 0]);
+  const tilt = interpolate(rise, [0, 1], [-18, -6]) + Math.sin(f / 22) * 1.2; // 등장 후엔 아주 천천히 흔들
+  const float = Math.sin(f / 18) * 6; // 둥실둥실
+
+  // 2) 빛줄기 회전 + 빛 쓸기(사선 하이라이트) 위치
+  const rays = interpolate(f, [0, 30], [0, 1], clamp);
+  const sweep = interpolate(f, [55, 90], [-60, 160], clamp); // % 단위로 왼→오 이동
+
+  // 3) 문구: 양옆에서 미끄러져 들어오기
+  const txt = (d: number) => spring({frame: f - d, fps, config: {damping: 16}});
+  const flash = interpolate(f, [40, 44, 60], [0, 0.55, 0], clamp); // 착지 순간 번쩍
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: `radial-gradient(circle at 50% 55%, ${MAIN} 0%, #9c0018 45%, ${DEEP} 100%)`}}>
+      {/* 회전하는 빛줄기: conic-gradient를 반복해서 부채꼴 줄무늬 → 가운데만 보이게 radial 마스크 */}
+      <AbsoluteFill style={{opacity: rays * 0.5, transform: `rotate(${f * 0.35}deg) scale(1.8)`,
+        background: 'repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.22) 0deg 6deg, transparent 6deg 18deg)',
+        WebkitMaskImage: 'radial-gradient(circle at 50% 50%, #000 0%, transparent 45%)'}} />
+
+      {/* 제품 뒤 큰 글자 */}
+      <AbsoluteFill style={{alignItems: 'center', top: 70}}>
+        <div style={{fontSize: 230, fontWeight: 900, letterSpacing: '0.04em', color: 'transparent', WebkitTextStroke: '3px rgba(255,255,255,0.28)',
+          transform: `scale(${interpolate(f, [20, 180], [1.15, 1])})`, opacity: interpolate(f, [20, 45], [0, 1], clamp)}}>{BACK_WORD}</div>
+      </AbsoluteFill>
+
+      {/* 바닥 그림자 */}
+      <div style={{position: 'absolute', left: 640 - 150, top: 650, width: 300, height: 40, borderRadius: '50%',
+        background: 'radial-gradient(closest-side, rgba(0,0,0,0.55), transparent)', opacity: rise}} />
+
+      {/* 제품 + 빛 쓸기 + 반짝이를 한 묶음으로 움직이기 */}
+      <div style={{position: 'absolute', left: 640 - W / 2, top: 360 - H / 2 + 10, width: W, height: H,
+        transform: `translateY(${y + float}px) rotate(${tilt}deg)`}}>
+        <Img src={PRODUCT} style={{width: W, height: H, filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.5))'}} />
+        {/* 빛 쓸기: 제품 모양으로 마스크한 사선 그라데이션을 옆으로 이동 */}
+        <div style={{position: 'absolute', inset: 0, mixBlendMode: 'screen',
+          WebkitMaskImage: `url(${PRODUCT})`, WebkitMaskSize: '100% 100%',
+          background: `linear-gradient(110deg, transparent ${sweep - 18}%, rgba(255,255,255,0.85) ${sweep}%, transparent ${sweep + 18}%)`}} />
+        {SPARKS.map((s, i) => {
+          const t = (f - 50 - s.delay) / 30; // 반짝: 0→1→0
+          const o = t > 0 ? Math.max(0, Math.sin(t * Math.PI)) * (t < 3 ? 1 : 0) : 0;
+          return <div key={i} style={{position: 'absolute', left: s.x * W - s.size / 2, top: s.y * H - s.size / 2, transform: `scale(${0.4 + o})`}}>
+            <Sparkle size={s.size} opacity={o} /></div>;
+        })}
+      </div>
+
+      {/* 양옆 문구 */}
+      <div style={{position: 'absolute', right: 640 + W / 2 + 36, top: 400, textAlign: 'right', color: '#fff',
+        transform: `translateX(${(1 - txt(70)) * -120}px)`, opacity: txt(70)}}>
+        <div style={{fontSize: 22, fontWeight: 800, letterSpacing: '0.3em', opacity: 0.85}}>NEW</div>
+        <div style={{fontSize: 84, fontWeight: 900, lineHeight: 1.05, textShadow: '0 6px 30px rgba(0,0,0,0.35)'}}>{COPY_L}</div>
+      </div>
+      <div style={{position: 'absolute', left: 640 + W / 2 + 36, top: 426, color: '#fff',
+        transform: `translateX(${(1 - txt(80)) * 120}px)`, opacity: txt(80)}}>
+        <div style={{fontSize: 84, fontWeight: 900, lineHeight: 1.05, textShadow: '0 6px 30px rgba(0,0,0,0.35)'}}>{COPY_R}</div>
+        <div style={{width: interpolate(f, [95, 120], [0, 180], clamp), height: 6, background: '#fff', borderRadius: 3, marginTop: 14}} />
+      </div>
+
+      <AbsoluteFill style={{background: '#fff', opacity: flash}} />
+      {/* 실제 브랜드 고지 문구 (왼쪽 아래) */}
+      <div style={{position: 'absolute', left: 26, bottom: 20, fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.8)'}}>{NOTE}</div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+
+코드2: 캐러셀
+// frames=240 size=1280x720
+import {AbsoluteFill, Img, interpolate, interpolateColors, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 내 제품 라인업이 돼요 (제품 수는 늘리거나 줄여도 OK) ──
+const BASE = 'https://www.aicitybuilders.com/video/remotion/assets/';
+const PRODUCTS = [
+  {src: BASE + 'product_can.png', w: 409, h: 900, show: 400, name: '스파클링 캔', tag: 'NEW', price: '1,900원', bg: '#2A4FD6'},
+  {src: BASE + 'product_juice.png', w: 400, h: 900, show: 420, name: '생오렌지 주스', tag: 'BEST', price: '3,500원', bg: '#F26B1D'},
+  {src: BASE + 'product_chips_bag.png', w: 900, h: 540, show: 320, name: '포테이토 칩', tag: 'HOT', price: '2,800원', bg: '#D7263D'},
+];
+const TITLE = '이번 주 라인업'; // 왼쪽 위 작은 제목
+const STEP = 80; // 제품 하나가 주인공인 시간(프레임)
+const GAP = 440; // 제품 사이 간격(px)
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+
+  // 1) p = 지금 가운데 있는 제품 번호(소수). 0 → 1 → 2 로 스프링처럼 넘어가요
+  let p = interpolate(spring({frame: f, fps, config: {damping: 15}}), [0, 1], [-1.6, 0]);
+  for (let i = 1; i < PRODUCTS.length; i++) p += spring({frame: f - i * STEP, fps, config: {damping: 15}});
+  const cur = Math.min(PRODUCTS.length - 1, Math.max(0, Math.round(p)));
+
+  // 2) 배경색: p 값에 맞춰 제품 색끼리 부드럽게 섞기 (interpolateColors)
+  const idx = PRODUCTS.map((_, i) => i);
+  const bg = interpolateColors(Math.max(0, p), idx, PRODUCTS.map((x) => x.bg));
+
+  // 3) 문구는 제품이 바뀔 때마다 아래에서 올라오기
+  const textIn = spring({frame: f - cur * STEP - 10, fps, config: {damping: 14}});
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: bg}}>
+      {/* 가운데 밝은 빛 + 바깥 어둡게 → 입체감 */}
+      <AbsoluteFill style={{background: 'radial-gradient(circle at 50% 42%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 38%, rgba(0,0,0,0.38) 100%)'}} />
+      {/* 뒤쪽 큰 번호 01 / 02 / 03 */}
+      <div style={{position: 'absolute', width: '100%', top: 10, textAlign: 'center', fontSize: 420, fontWeight: 900, lineHeight: 1,
+        color: 'rgba(255,255,255,0.12)', letterSpacing: '-0.04em'}}>{String(cur + 1).padStart(2, '0')}</div>
+
+      {/* 제품 줄: 가운데에서 멀수록 작고 흐리게 (포커스 효과) */}
+      {PRODUCTS.map((it, i) => {
+        const d = Math.min(1.5, Math.abs(i - p)); // 가운데와의 거리
+        const scale = interpolate(d, [0, 1], [1, 0.62], {extrapolateRight: 'clamp'});
+        const w = (it.show * it.w) / it.h;
+        return (
+          <div key={i} style={{position: 'absolute', left: 640 + (i - p) * GAP - w / 2, top: 300 - it.show / 2, width: w, height: it.show,
+            transform: `scale(${scale}) rotate(${(i - p) * 6}deg)`, opacity: interpolate(d, [0, 1, 1.5], [1, 0.55, 0]),
+            filter: `blur(${d * 3}px) drop-shadow(0 28px 30px rgba(0,0,0,0.35))`}}>
+            {/* 바닥 그림자 */}
+            <div style={{position: 'absolute', left: '5%', right: '5%', bottom: -26, height: 30, borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(0,0,0,0.4), transparent)'}} />
+            <Img src={it.src} style={{width: '100%', height: '100%', transform: `translateY(${Math.sin((f + i * 20) / 16) * 6}px)`}} />
+          </div>
+        );
+      })}
+
+      {/* 아래 문구: 태그 + 제품명 + 가격 */}
+      <div style={{position: 'absolute', top: 500, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#fff',
+        opacity: textIn, transform: `translateY(${(1 - textIn) * 40}px)`}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 14}}>
+          <div style={{fontSize: 18, fontWeight: 900, letterSpacing: '0.2em', padding: '4px 12px', borderRadius: 6, background: '#fff', color: PRODUCTS[cur].bg}}>
+            {PRODUCTS[cur].tag}</div>
+          <div style={{fontSize: 60, fontWeight: 900, textShadow: '0 4px 20px rgba(0,0,0,0.25)'}}>{PRODUCTS[cur].name}</div>
+        </div>
+        <div style={{marginTop: 12, fontSize: 40, fontWeight: 800, padding: '6px 30px', borderRadius: 40, background: 'rgba(0,0,0,0.25)',
+          border: '2px solid rgba(255,255,255,0.6)'}}>{PRODUCTS[cur].price}</div>
+      </div>
+
+      {/* 왼쪽 위 제목 + 오른쪽 위 페이지 점 */}
+      <div style={{position: 'absolute', left: 40, top: 34, color: '#fff', fontSize: 26, fontWeight: 800, letterSpacing: '0.04em'}}>{TITLE}</div>
+      <div style={{position: 'absolute', right: 40, top: 44, display: 'flex', gap: 10}}>
+        {PRODUCTS.map((_, i) => (
+          <div key={i} style={{height: 10, borderRadius: 5, background: '#fff', opacity: i === cur ? 1 : 0.4, width: i === cur ? 34 : 10}} />
+        ))}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+
+코드3: 특징콜아웃
+// frames=180 size=1280x720
+import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {evolvePath} from '@remotion/paths';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 내 제품 특징 광고가 돼요 ──
+const PRODUCT = 'https://www.aicitybuilders.com/video/remotion/assets/product_chips_bag.png'; // 배경이 투명한 PNG
+const PW = 700; // 화면에 보일 제품 너비(px)
+const PH = PW * (540 / 900); // 원본 비율(세로/가로)로 높이 계산
+const CX = 640; // 제품 가운데 x
+const CY = 375; // 제품 가운데 y
+const BG1 = '#FFD54A'; // 배경 위쪽 색
+const BG2 = '#FF9F1C'; // 배경 아래쪽 색
+const INK = '#1E1300'; // 선·글자 색
+const EYEBROW = 'NEW ARRIVAL';
+const HEADLINE = '오늘의 간식, 바삭하게';
+
+// 콜아웃: u·v = 제품 이미지 안의 위치(0~1 비율, 제품 크기를 바꿔도 점이 따라가요)
+//        x·y = 글자 쪽 선 끝(화면 좌표), side = 글자가 선의 왼쪽/오른쪽 중 어디에 붙는지, at = 시작 프레임
+const CALLOUTS = [
+  {title: '바삭한 식감', sub: 'CRUNCHY', u: 0.367, v: 0.26, x: 300, y: 190, side: 'left', at: 35},
+  {title: '한 봉지 60g', sub: 'NET WT.', u: 0.6, v: 0.17, x: 980, y: 160, side: 'right', at: 55},
+  {title: '국산 감자', sub: 'LOCAL POTATO', u: 0.167, v: 0.8, x: 270, y: 575, side: 'left', at: 75},
+] as const;
+
+// 점 → 45도 사선 → 수평선으로 꺾이는 SVG 경로 만들기
+const calloutPath = (c: (typeof CALLOUTS)[number]) => {
+  const dx = CX - PW / 2 + c.u * PW;
+  const dy = CY - PH / 2 + c.v * PH;
+  const elbowX = dx + (c.side === 'left' ? -1 : 1) * Math.abs(dy - c.y);
+  return {dx, dy, d: `M ${dx} ${dy} L ${elbowX} ${c.y} L ${c.x} ${c.y}`};
+};
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+
+  // 1) 제품 등장: 작게 → 크게 (스프링) + 살짝 회전 (콜아웃 점이 맞도록 그 뒤엔 고정)
+  const pop = spring({frame: f - 4, fps, config: {damping: 12}});
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: `linear-gradient(160deg, ${BG1}, ${BG2})`}}>
+      {/* 제품 뒤 하얀 원광 */}
+      <div style={{position: 'absolute', left: CX - 360, top: CY - 360, width: 720, height: 720, borderRadius: '50%',
+        background: 'radial-gradient(closest-side, rgba(255,255,255,0.75), rgba(255,255,255,0))', transform: `scale(${pop})`}} />
+      <div style={{position: 'absolute', top: 44, width: '100%', textAlign: 'center', fontSize: 22, fontWeight: 900, letterSpacing: '0.4em', color: INK,
+        opacity: interpolate(f, [10, 25], [0, 1], clamp)}}>{EYEBROW}</div>
+
+      {/* 제품 */}
+      <Img src={PRODUCT} style={{position: 'absolute', left: CX - PW / 2, top: CY - PH / 2, width: PW, height: PH,
+        transform: `scale(${pop}) rotate(${(1 - pop) * -10}deg)`, filter: 'drop-shadow(0 24px 30px rgba(120,60,0,0.35))'}} />
+
+      {/* 2) 콜아웃 선: evolvePath(진행률, 경로) → 선이 점점 그려지는 효과 */}
+      <svg width={1280} height={720} style={{position: 'absolute'}}>
+        {CALLOUTS.map((c, i) => {
+          const p = interpolate(f, [c.at, c.at + 18], [0, 1], clamp);
+          const {dx: x, dy: y, d} = calloutPath(c);
+          const {strokeDasharray, strokeDashoffset} = evolvePath(p, d);
+          const ring = ((f - c.at) % 40) / 40; // 0→1 반복: 퍼지는 고리
+          return (
+            <g key={i} opacity={p > 0 ? 1 : 0}>
+              <path d={d} fill="none" stroke={INK} strokeWidth={3} strokeLinecap="round" strokeDasharray={strokeDasharray} strokeDashoffset={strokeDashoffset} />
+              <circle cx={x} cy={y} r={8 + ring * 22} fill="none" stroke="#fff" strokeWidth={3} opacity={1 - ring} />
+              <circle cx={x} cy={y} r={9} fill={INK} stroke="#fff" strokeWidth={3} />
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* 3) 콜아웃 글자: 선이 다 그려진 뒤 옆으로 미끄러져 나타나기 */}
+      {CALLOUTS.map((c, i) => {
+        const t = spring({frame: f - c.at - 14, fps, config: {damping: 16}});
+        const dir = c.side === 'left' ? 1 : -1;
+        return (
+          <div key={i} style={{position: 'absolute', top: c.y - 44, textAlign: c.side === 'left' ? 'right' : 'left', color: INK, opacity: t,
+            ...(c.side === 'left' ? {right: 1280 - c.x + 10} : {left: c.x + 10}), transform: `translateX(${(1 - t) * 30 * dir}px)`}}>
+            <div style={{fontSize: 46, fontWeight: 900, lineHeight: 1.1}}>{c.title}</div>
+            <div style={{fontSize: 17, fontWeight: 800, letterSpacing: '0.25em', opacity: 0.7, marginTop: 4}}>{c.sub}</div>
+          </div>
+        );
+      })}
+
+      {/* 4) 마지막 헤드라인: 아래에서 올라오는 검은 띠 */}
+      {(() => {
+        const t = spring({frame: f - 110, fps, config: {damping: 15}});
+        return (
+          <div style={{position: 'absolute', bottom: 40, width: '100%', display: 'flex', justifyContent: 'center', transform: `translateY(${(1 - t) * 120}px)`}}>
+            <div style={{background: INK, color: '#FFD54A', fontSize: 40, fontWeight: 900, padding: '10px 34px', borderRadius: 14}}>{HEADLINE}</div>
+          </div>
+        );
+      })()}
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+
+코드4: 세로쇼츠광고
+// frames=200 size=1080x1920
+import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {ding, whoosh} from '@remotion/sfx';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 내 제품 쇼츠 광고가 돼요 ──
+const PRODUCT = 'https://www.aicitybuilders.com/video/remotion/assets/product_dew.png'; // 배경이 투명한 PNG
+const RATIO = 490 / 900; // 가로 ÷ 세로
+const GREEN = '#17A43B';
+const DARK = '#0A5A21';
+const YELLOW = '#EEF53A';
+// 박자마다 하나씩 쾅! (frame = 등장 프레임, bg = 그때 배경색, color = 글자색)
+const WORDS = [
+  {text: '오늘', frame: 0, bg: GREEN, color: YELLOW},
+  {text: '기분', frame: 30, bg: YELLOW, color: DARK},
+  {text: '리프레시', frame: 60, bg: DARK, color: YELLOW},
+];
+const DROP = 92; // 제품이 떨어지는 프레임
+const NOTE = '교육용 예시 · 해당 브랜드와 관계없음';
+
+const CH = 1000; // 제품 높이(px)
+const CW = CH * RATIO;
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+
+  // 1) 지금 박자의 단어 (마지막 단어 이후엔 제품 장면)
+  const cur = [...WORDS].reverse().find((w) => f >= w.frame) ?? WORDS[0];
+  const slam = spring({frame: f - cur.frame, fps, config: {damping: 11, mass: 0.6}}); // 크게 → 제자리
+  const scene2 = f >= DROP;
+
+  // 2) 제품 낙하: 낮은 damping = 통통 튀는 바운스, 착지 순간 흔들림(점점 줄어듦)
+  const drop = spring({frame: f - DROP, fps, config: {damping: 7, mass: 0.9}});
+  const land = DROP + 7;
+  const shake = f > land ? Math.sin((f - land) * 2.6) * 26 * Math.exp(-(f - land) / 7) : 0;
+  const beat = scene2 ? interpolate((f - DROP) % 15, [0, 4, 15], [1.04, 1, 1]) : 1; // 15프레임(=120BPM)마다 쿵
+
+  // 3) 2장면: 배경이 박자마다 진한 초록 ↔ 초록으로 깜빡
+  const bg = scene2 ? (Math.floor((f - DROP) / 15) % 2 ? GREEN : DARK) : cur.bg;
+  const title = spring({frame: f - DROP - 14, fps, config: {damping: 13}});
+  const bottomY = interpolate(spring({frame: f - DROP, fps, config: {damping: 16}}), [0, 1], [0, 640]); // '리프레시'가 아래로 이동
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: bg}}>
+      {/* 효과음: 단어마다 휙, 착지 때 띵 */}
+      {WORDS.map((w) => (
+        <Sequence key={w.text} from={w.frame}><Audio src={whoosh} volume={0.5} /></Sequence>
+      ))}
+      <Sequence from={DROP - 4}><Audio src={whoosh} volume={0.7} /></Sequence>
+      <Sequence from={land}><Audio src={ding} volume={0.6} /></Sequence>
+
+      {/* 회전하는 줄무늬 빛 (2장면) */}
+      <AbsoluteFill style={{opacity: scene2 ? 0.35 : 0, transform: `rotate(${f * 0.5}deg) scale(2.4)`,
+        background: `repeating-conic-gradient(from 0deg at 50% 50%, ${YELLOW}55 0deg 8deg, transparent 8deg 22deg)`,
+        WebkitMaskImage: 'radial-gradient(circle, #000 0%, transparent 50%)'}} />
+
+      {/* 단어 잔상: 테두리만 있는 큰 글자가 뒤에서 퍼져 나가기 (1장면) */}
+      {!scene2 && (
+        <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+          <div style={{fontSize: cur.text.length > 2 ? 250 : 360, fontWeight: 900, color: 'transparent', WebkitTextStroke: `4px ${cur.color}`,
+            transform: `scale(${1 + slam * 0.9})`, opacity: 0.5 * (1 - slam * 0.7)}}>{cur.text}</div>
+        </AbsoluteFill>
+      )}
+      {/* 1장면: 화면 가득 단어 쾅 / 2장면: '리프레시'가 아래로 내려가 자리 잡기 */}
+      <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center'}}>
+        <div style={{fontSize: cur.text.length > 2 ? 250 : 360, fontWeight: 900, letterSpacing: '-0.03em', color: cur.color,
+          transform: `translateY(${bottomY}px) scale(${scene2 ? 0.86 : 2.2 - slam * 1.2}) rotate(${(1 - slam) * -8}deg)`,
+          textShadow: '0 14px 40px rgba(0,0,0,0.3)'}}>{cur.text}</div>
+      </AbsoluteFill>
+
+      {scene2 && (
+        <>
+          {/* 위쪽 문구 */}
+          <div style={{position: 'absolute', top: 150, width: '100%', textAlign: 'center', color: '#fff', opacity: title,
+            transform: `translateY(${(1 - title) * -80}px)`}}>
+            <div style={{fontSize: 40, fontWeight: 900, letterSpacing: '0.4em', color: YELLOW}}>NEW</div>
+            <div style={{fontSize: 150, fontWeight: 900, lineHeight: 1.1, textShadow: '0 10px 30px rgba(0,0,0,0.3)'}}>오늘 기분</div>
+          </div>
+          {/* 바닥 그림자 */}
+          <div style={{position: 'absolute', left: 540 - 220, top: 1460, width: 440, height: 60, borderRadius: '50%',
+            background: 'radial-gradient(closest-side, rgba(0,0,0,0.45), transparent)', opacity: drop}} />
+          {/* 제품: 위에서 떨어져 통통 + 흔들 + 박자마다 쿵 */}
+          <Img src={PRODUCT} style={{position: 'absolute', left: 540 - CW / 2, top: 1000 - CH / 2, width: CW, height: CH,
+            transform: `translate(${shake}px, ${(1 - drop) * -1500}px) rotate(${shake * 0.25 + 4}deg) scale(${beat})`,
+            filter: 'drop-shadow(0 40px 50px rgba(0,0,0,0.45))'}} />
+        </>
+      )}
+
+      {/* 착지 순간 하얀 번쩍 */}
+      <AbsoluteFill style={{background: '#fff', opacity: interpolate(f, [land, land + 2, land + 10], [0, 0.6, 0], clamp)}} />
+      <div style={{position: 'absolute', left: 36, bottom: 30, fontSize: 26, fontWeight: 600, color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 6px rgba(0,0,0,0.5)'}}>{NOTE}</div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+코드5 : 가격할인배지
+// frames=180 size=1280x720
+import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {StrikeThrough} from '@remotion/rough-notation';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 내 제품 할인 광고가 돼요 (브랜드 없는 내 제품에만 가격·할인 표시!) ──
+const PRODUCT = 'https://www.aicitybuilders.com/video/remotion/assets/product_chips_bowl.png'; // 배경이 투명한 PNG
+const RATIO = 713 / 900; // 세로 ÷ 가로
+const NAME = '바삭 포테이토 칩';
+const OLD_PRICE = '4,500원';
+const NEW_PRICE = '3,150원';
+const OFF = '30%';
+const RED = '#D3122F';
+const YELLOW = '#FFD400';
+const TICKER = ['오늘만 특가', 'TODAY ONLY']; // 위쪽 띠에 흐르는 문구
+const CELL = 260; // 띠 문구 한 칸 너비(px) → 칸 너비가 같아야 끊김 없이 반복돼요
+
+const PW = 560;
+const PH = PW * RATIO;
+
+// 별 모양 배지 꼭짓점 만들기 (뾰족 22개)
+const STAR = new Array(44).fill(0).map((_, i) => {
+  const r = i % 2 ? 84 : 100;
+  const a = (i / 44) * Math.PI * 2;
+  return `${100 + r * Math.cos(a)},${100 + r * Math.sin(a)}`;
+}).join(' ');
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+
+  // 1) 제품: 왼쪽에서 들어오기
+  const inP = spring({frame: f, fps, config: {damping: 14}});
+  // 2) 가격표: 위에서 툭 떨어진 뒤, 점점 줄어드는 진자 운동 (exp로 감쇠 × cos로 왕복)
+  const drop = spring({frame: f - 10, fps, config: {damping: 16}});
+  const t = Math.max(0, f - 10);
+  const swing = 28 * Math.exp(-t / 24) * Math.sin(t * 0.2);
+  // 3) 별 배지: 튀어나오며 커졌다가 제자리 + 천천히 회전
+  const badge = spring({frame: f - 50, fps, config: {damping: 8, mass: 0.7}});
+  // 4) 옛 가격 줄긋기 → 새 가격 쾅
+  const strike = interpolate(f, [75, 92], [0, 1], clamp);
+  const newP = spring({frame: f - 92, fps, config: {damping: 10}});
+  // 5) 카운트다운: 1초(30프레임)마다 1초씩 줄어듦
+  const left = 23 * 3600 + 59 * 60 + 59 - Math.floor(f / 30);
+  const hms = [Math.floor(left / 3600), Math.floor(left / 60) % 60, left % 60].map((n) => String(n).padStart(2, '0')).join(':');
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: `radial-gradient(circle at 30% 55%, #F0283F 0%, ${RED} 40%, #6E0616 100%)`}}>
+      {/* 제품 + 바닥 그림자 */}
+      <div style={{position: 'absolute', left: 390 - 200, top: 590, width: 400, height: 50, borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(0,0,0,0.45), transparent)'}} />
+      <Img src={PRODUCT} style={{position: 'absolute', left: 390 - PW / 2, top: 375 - PH / 2, width: PW, height: PH,
+        transform: `translateX(${(1 - inP) * -700}px) rotate(${(1 - inP) * -20}deg)`, filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.4))'}} />
+
+      {/* 별 배지 30% OFF */}
+      <div style={{position: 'absolute', left: 540, top: 120, width: 200, height: 200, transform: `scale(${badge}) rotate(${-12 + Math.sin(f / 10) * 4}deg)`}}>
+        <svg width={200} height={200} style={{position: 'absolute', transform: `rotate(${f * 0.8}deg)`}}>
+          <polygon points={STAR} fill={YELLOW} stroke="#fff" strokeWidth={4} />
+        </svg>
+        <div style={{position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: RED}}>
+          <div style={{fontSize: 58, fontWeight: 900, lineHeight: 1}}>{OFF}</div>
+          <div style={{fontSize: 30, fontWeight: 900, letterSpacing: '0.1em'}}>OFF</div>
+        </div>
+      </div>
+
+      {/* 가격표: 핀(실 끝)을 기준점(transformOrigin)으로 흔들기 */}
+      <div style={{position: 'absolute', left: 930 - 180, top: 92, width: 360, transformOrigin: '180px 0px', transform: `translateY(${(1 - drop) * -520}px) rotate(${swing}deg)`}}>
+        <div style={{position: 'absolute', left: 178, top: 0, width: 4, height: 70, background: '#f4e3c3'}} />
+        <div style={{position: 'absolute', left: 168, top: -10, width: 24, height: 24, borderRadius: 12, background: '#222', border: '4px solid #f4e3c3'}} />
+        <div style={{marginTop: 66, background: '#FFF8EC', borderRadius: 26, padding: '42px 30px 30px', textAlign: 'center', boxShadow: '0 30px 50px rgba(0,0,0,0.35)',
+          clipPath: 'polygon(30% 0, 70% 0, 100% 14%, 100% 100%, 0 100%, 0 14%)'}}>
+          <div style={{width: 22, height: 22, borderRadius: 11, background: '#6E0616', margin: '-24px auto 14px'}} />
+          <div style={{fontSize: 30, fontWeight: 800, color: '#333'}}>{NAME}</div>
+          <div style={{fontSize: 34, fontWeight: 700, color: '#888', marginTop: 10, display: 'inline-block'}}>
+            {/* rough-notation 줄긋기: progress에 0~1 */}
+            <StrikeThrough progress={strike} color={RED} strokeWidth={4} iterations={2} seed={3}>{OLD_PRICE}</StrikeThrough>
+          </div>
+          <div style={{fontSize: 84, fontWeight: 900, color: RED, lineHeight: 1.1, transform: `scale(${newP})`}}>{NEW_PRICE}</div>
+        </div>
+      </div>
+
+      {/* 오늘만 카운트다운 */}
+      <div style={{position: 'absolute', left: 930 - 170, top: 480, width: 340, display: 'flex', justifyContent: 'center', gap: 12, alignItems: 'center',
+        opacity: interpolate(f, [100, 115], [0, 1], clamp), color: '#fff'}}>
+        <div style={{background: YELLOW, color: '#111', fontWeight: 900, fontSize: 24, padding: '4px 12px', borderRadius: 8}}>오늘만</div>
+        <div style={{fontSize: 34, fontWeight: 800, fontVariantNumeric: 'tabular-nums', letterSpacing: '0.04em'}}>{hms}</div>
+      </div>
+      {/* 위쪽 흐르는 띠 (마퀴) — 맨 마지막에 그려서 가격표보다 위에 보이게 */}
+      <div style={{position: 'absolute', top: 0, height: 52, width: '100%', background: '#111', overflow: 'hidden'}}>
+        <div style={{display: 'flex', color: YELLOW, fontSize: 26, fontWeight: 900, lineHeight: '52px', transform: `translateX(${-((f * 4) % (CELL * 2))}px)`}}>
+          {new Array(12).fill(0).map((_, i) => <div key={i} style={{width: CELL, flexShrink: 0, textAlign: 'center'}}>{TICKER[i % 2]}  ★</div>)}</div>
+      </div>
+
+      <div style={{position: 'absolute', left: 60, bottom: 46, color: '#fff', fontSize: 44, fontWeight: 900, opacity: inP}}>지금이 제일 쌀 때</div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+
+코드6 :캐릭터가 소개라는 광고
+// frames=210 size=1280x720
+import {AbsoluteFill, Img, interpolate, random, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {FONT} from './font';
+
+// ── 여기만 바꾸면 "캐릭터가 소개하는 내 제품 광고"가 돼요 ──
+const BASE = 'https://www.aicitybuilders.com/video/remotion/assets/';
+const CHARACTER = BASE + 'jay_char.png'; // 캐릭터 (400×694, 허리에서 잘린 이미지 → 화면 아래에 붙이기)
+const PRODUCT = BASE + 'product_juice.png'; // 제품 (배경이 투명한 PNG, 400×900)
+const BUBBLE = '이거 진짜 상큼해요!';
+const PRODUCT_NAME = '생오렌지 주스';
+const LOWER_THIRD = ['제이의 추천', 'CONNECT AI LAB'];
+const ORANGE = '#FF8A00';
+const BG = ['#FFF4DC', '#FFC56B']; // 배경 그라데이션 (밝은 → 제품색)
+
+const CH = 600; // 캐릭터 높이
+const CW = CH * (400 / 694);
+const PH = 500; // 제품 높이
+const PW = PH * (400 / 900);
+const PX = 930; // 제품 가운데 x
+const PY = 330; // 제품 가운데 y
+
+// 과즙 방울: random(seed)로 방향·거리·크기 고정
+const DROPS = new Array(16).fill(0).map((_, i) => ({
+  angle: (i / 16) * Math.PI * 2 + random(`a${i}`) * 0.4,
+  dist: 290 + random(`d${i}`) * 170,
+  size: 14 + random(`s${i}`) * 30,
+  color: ['#FFC400', '#ffffff', '#FF6A00'][i % 3],
+}));
+
+const SceneBody = () => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+
+  // 1) 캐릭터: 아래에서 뿅 (발밑 기준으로 커지기) + 숨쉬듯 살짝 움직임
+  const charIn = spring({frame: f, fps, config: {damping: 10}});
+  const breathe = 1 + Math.sin(f / 14) * 0.012;
+  // 2) 말풍선: 캐릭터 다음에 톡
+  const bubble = spring({frame: f - 22, fps, config: {damping: 9}});
+  // 3) 제품: 오른쪽에서 미끄러져 들어오며 회전 → 착지 순간(62) 과즙 튀기
+  const prod = spring({frame: f - 45, fps, config: {damping: 12}});
+  const splash = interpolate(f, [60, 90], [0, 1], clamp);
+  // 4) 하단 자막바(로어서드)
+  const lower = spring({frame: f - 140, fps, config: {damping: 15}});
+
+  return (
+    <AbsoluteFill style={{fontFamily: FONT, overflow: 'hidden', background: `linear-gradient(135deg, ${BG[0]} 20%, ${BG[1]} 100%)`}}>
+      {/* 제품 뒤 큰 원 (무대) */}
+      <div style={{position: 'absolute', left: PX - 270, top: PY - 270, width: 540, height: 540, borderRadius: '50%', background: ORANGE,
+        transform: `scale(${prod})`, boxShadow: 'inset 0 -30px 60px rgba(0,0,0,0.12)'}} />
+
+      {/* 과즙 고리 3개: 제품 뒤에서 퍼지기 */}
+      {[0, 1, 2].map((i) => {
+        const p = interpolate(f, [60 + i * 6, 100 + i * 6], [0, 1], clamp);
+        return <div key={i} style={{position: 'absolute', left: PX - 150, top: PY - 150, width: 300, height: 300, borderRadius: '50%',
+          border: `${10 - i * 3}px solid #fff`, transform: `scale(${0.6 + p * 1.6})`, opacity: p > 0 ? 1 - p : 0}} />;
+      })}
+      {/* 제품 */}
+      <Img src={PRODUCT} style={{position: 'absolute', left: PX - PW / 2, top: PY - PH / 2, width: PW, height: PH,
+        transform: `translateX(${(1 - prod) * 700}px) rotate(${(1 - prod) * 40 + Math.sin(f / 20) * 2}deg)`,
+        filter: 'drop-shadow(0 26px 30px rgba(120,50,0,0.35))'}} />
+      {/* 과즙 방울: 제품 앞에서 바깥으로 튀기 */}
+      {DROPS.map((d, i) => {
+        const r = d.dist * Math.sqrt(splash); // 처음엔 빠르게, 나중엔 천천히
+        return <div key={i} style={{position: 'absolute', left: PX + Math.cos(d.angle) * r - d.size / 2, top: PY + Math.sin(d.angle) * r - d.size / 2,
+          width: d.size, height: d.size, borderRadius: '50%', background: d.color, opacity: splash > 0 ? interpolate(splash, [0, 0.6, 1], [1, 1, 0]) : 0, boxShadow: '0 4px 10px rgba(150,60,0,0.25)',
+          transform: `scale(${1 - splash * 0.5})`}} />;
+      })}
+
+      <div style={{position: 'absolute', left: PX - 200, width: 400, top: PY + PH / 2 + 18, textAlign: 'center', fontSize: 40, fontWeight: 900,
+        color: '#3B1E00', opacity: interpolate(f, [75, 90], [0, 1], clamp)}}>{PRODUCT_NAME}</div>
+
+      {/* 캐릭터: 화면 아래에 붙여서 잘린 허리가 안 보이게 */}
+      <Img src={CHARACTER} style={{position: 'absolute', left: 120, bottom: 0, width: CW, height: CH, transformOrigin: '50% 100%',
+        transform: `scale(${charIn}) scaleY(${breathe})`, filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.2))'}} />
+
+      {/* 말풍선 (꼬리는 회전한 네모) */}
+      <div style={{position: 'absolute', left: 310, top: 56, transformOrigin: '0% 100%', transform: `scale(${bubble})`}}>
+        <div style={{position: 'relative', background: '#fff', borderRadius: 28, padding: '18px 30px', fontSize: 38, fontWeight: 900, color: '#222',
+          boxShadow: '0 12px 30px rgba(150,70,0,0.25)', whiteSpace: 'nowrap'}}>
+          {BUBBLE}
+          <div style={{position: 'absolute', left: 34, bottom: -12, width: 28, height: 28, background: '#fff', transform: 'rotate(45deg)'}} />
+        </div>
+      </div>
+
+      {/* 로어서드: 색 띠가 왼쪽에서 늘어나며 글자 등장 */}
+      <div style={{position: 'absolute', left: 40, bottom: 44, display: 'flex', alignItems: 'stretch', clipPath: `inset(0 ${(1 - lower) * 100}% 0 0)`}}>
+        <div style={{background: ORANGE, color: '#fff', fontSize: 30, fontWeight: 900, padding: '10px 22px'}}>{LOWER_THIRD[0]}</div>
+        <div style={{background: '#1B1B1B', color: '#fff', fontSize: 24, fontWeight: 800, letterSpacing: '0.16em', padding: '10px 22px',
+          display: 'flex', alignItems: 'center'}}>{LOWER_THIRD[1]}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
+const BrandMark = () => {
+  const {width} = useVideoConfig();
+  return (
+    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
+      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+      CONNECT AI LAB
+    </div>
+  );
+};
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <SceneBody />
+    <BrandMark />
+  </AbsoluteFill>
+);
+
+
+
+코드7 :
+코드8 :
+코드9 :
+코드10 :
+코드11 :
+코드12 :
+코드13 :
+코드14 :
+코드15 :
+코드16 :
+코드17 :
+코드18 : 장면전환
+코드19 :
+코드20 :
+코드21 :
+코드22 :
+코드23 :
+코드24 :
+코드25 :
+코드26 :
+코드27 :
+코드28 :
+코드29 :
+코드30 :
+코드31 :
+코드32 :
+코드33 :
+코드34 :
+코드35 :
+코드36 :
+코드37 :
+코드38 :
+코드39 :
+코드40 :
+코드41 :
+코드42 :
+코드43 :
+코드44 :
