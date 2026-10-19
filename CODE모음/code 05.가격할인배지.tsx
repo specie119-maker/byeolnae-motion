@@ -1,144 +1,252 @@
-// frames=180 size=1280x720 (가로) 또는 1080x1920 (세로 변경 가능)
+// frames=180 size=1280x720
 import React from 'react';
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { FONT } from './font';
 
-// 색상 테마: 깊은 로열 버건디 배경 + 골드 포인트
-const BG_COLOR = '#4a0814';
-const GOLD = '#F5C042';
-const WHITE = '#FFFFFF';
-
-export const GraceOfferScene: React.FC = () => {
+export const GraceOfferCleanScene: React.FC = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 1) 좌측 성경/십자가 등장 스프링
-  const popObject = spring({ frame: f - 5, fps, config: { damping: 12 } });
+  // 1) 좌측 십자가 스프링
+  const popObject = spring({ frame: f - 5, fps, config: { damping: 14 } });
 
-  // 2) 노란 별 배지(100% FREE) 팝업 모션
-  const badgeSpring = spring({ frame: f - 25, fps, config: { damping: 10, stiffness: 140 } });
+  // 2) 우측 흰색 카드 매달려 안착
+  const cardDrop = spring({ frame: f - 20, fps, config: { damping: 13, stiffness: 90 } });
+  const cardSwing = Math.sin(Math.max(0, f - 20) * 0.15) * Math.exp(-(f - 20) / 25) * 6;
 
-  // 3) 대롱대롱 매달려 흔들리는 은혜 택 (Hang Tag Swing)
-  const tagDrop = spring({ frame: f - 35, fps, config: { damping: 12 } });
-  const tagSwing = Math.sin((f - 35) * 0.18) * Math.exp(-(f - 35) / 25) * 15;
+  // 3) 100% FREE 원형 배지
+  const badgePop = spring({ frame: f - 35, fps, config: { damping: 11, stiffness: 130 } });
 
-  // 4) 빨간 취소선 긋기 모션 (프레임 65부터 쓱 그어짐)
-  const strikeProgress = interpolate(f, [65, 80], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // 4) 빨간 취소선 긋기 (프레임 55~70)
+  const strikeProgress = interpolate(f, [55, 70], [0, 100], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
 
-  // 5) 최종 변경된 가격(0원/은혜) 쾅! 튀어나오기
-  const finalPriceSpring = spring({ frame: f - 85, fps, config: { damping: 9, stiffness: 160 } });
+  // 5) 최종 0원 (은혜) 강조 팝업
+  const pricePop = spring({ frame: f - 75, fps, config: { damping: 10, stiffness: 140 } });
 
   return (
-    <AbsoluteFill style={{ fontFamily: FONT, background: BG_COLOR, overflow: 'hidden' }}>
-      
-      {/* ── 1. 상단 롤링 티커 띠 ── */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 44, background: '#111', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-        <div style={{
-          display: 'flex', gap: 40, whiteSpace: 'nowrap', color: GOLD, fontSize: 16, fontWeight: 900,
-          transform: `translateX(-${(f * 2.5) % 400}px)`
-        }}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i}>★ 값없는 은혜 (GRACE) ★ 내 공로 0% ★ 100% 예수 그리스도의 사랑 ★</span>
-          ))}
+    <AbsoluteFill
+      style={{
+        background: '#38040e',
+        fontFamily: FONT,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 80px',
+      }}
+    >
+      {/* ── 1. 좌측 십자가 및 말씀 블록 (좌측 420px 영역 고정) ── */}
+      <div
+        style={{
+          width: 440,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transform: `scale(${popObject})`,
+          zIndex: 10,
+        }}
+      >
+        {/* 십자가 그래픽 & 후광 */}
+        <div
+          style={{
+            position: 'relative',
+            width: 260,
+            height: 260,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* 방사형 빛 */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(250, 204, 21, 0.25) 0%, transparent 70%)',
+              filter: 'blur(10px)',
+            }}
+          />
+          {/* 십자가 아이콘 */}
+          <span
+            style={{
+              fontSize: 160,
+              lineHeight: 1,
+              filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.6))',
+            }}
+          >
+            ✝️
+          </span>
+        </div>
+
+        {/* 십자가 하단 텍스트 (위계와 간격 정돈) */}
+        <div
+          style={{
+            marginTop: 16,
+            textAlign: 'center',
+            color: '#fde8ea',
+          }}
+        >
+          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px' }}>
+            일을 행하시는 여호와
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 600, color: '#fca5a5', marginTop: 6 }}>
+            그것을 지어 성취하시는 하나님
+          </div>
         </div>
       </div>
 
-      {/* ── 2. 좌측 메인 비주얼 (십자가 & 말씀 심볼) ── */}
-      <div style={{
-        position: 'absolute', left: 160, top: 160, width: 340, height: 340,
-        transform: `scale(${popObject})`, display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
-        {/* 황금빛 십자가 엠블럼 */}
-        <div style={{
-          width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,192,66,0.3) 0%, transparent 70%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))'
-        }}>
-          <span style={{ fontSize: 160, lineHeight: 1 }}>✝️</span>
+      {/* ── 2. 우측 정돈된 가격표 카드 (우측 영역 고정, W: 450px) ── */}
+      <div
+        style={{
+          position: 'relative',
+          width: 450,
+          transformOrigin: 'top center',
+          transform: `translateY(${(1 - cardDrop) * -160}px) rotate(${cardSwing}deg)`,
+          zIndex: 20,
+        }}
+      >
+        {/* 상단 100% FREE 배지 (카드 좌상단 모서리에 겹치되 화면 안쪽으로 배치) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -24,
+            left: -24,
+            width: 90,
+            height: 90,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #facc15 0%, #eab308 100%)',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: `scale(${badgePop}) rotate(-12deg)`,
+            zIndex: 30,
+            border: '3px solid #fef08a',
+          }}
+        >
+          <span style={{ fontSize: 20, fontWeight: 900, color: '#78350f', lineHeight: 1 }}>
+            100%
+          </span>
+          <span style={{ fontSize: 13, fontWeight: 900, color: '#78350f', marginTop: 2 }}>
+            FREE
+          </span>
         </div>
-        <div style={{ position: 'absolute', bottom: -20, color: '#fde8ea', fontSize: 26, fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-          독생자를 주신 사랑
-        </div>
-      </div>
 
-      {/* ── 3. 노란 별 모양 '100% FREE' 배지 ── */}
-      <div style={{
-        position: 'absolute', left: 490, top: 140, transform: `scale(${badgeSpring}) rotate(-12deg)`,
-        filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.4))', zIndex: 20
-      }}>
-        <svg width="150" height="150" viewBox="0 0 100 100">
-          <polygon points="50,0 63,28 95,20 78,48 98,75 66,78 55,100 38,76 8,82 22,52 2,26 33,28" fill="#FACC15" />
-        </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-          <span style={{ fontSize: 26, fontWeight: 900, color: '#B45309', lineHeight: 1 }}>100%</span>
-          <span style={{ fontSize: 18, fontWeight: 900, color: '#B45309' }}>FREE</span>
-        </div>
-      </div>
-
-      {/* ── 4. 대롱대롱 매달려 흔들리는 가격표 택 (구원 계산서) ── */}
-      <div style={{
-        position: 'absolute', left: 630, top: 110, width: 380,
-        transformOrigin: 'top center',
-        transform: `translateY(${(1 - tagDrop) * -200}px) rotate(${tagSwing}deg)`,
-        zIndex: 10
-      }}>
-        {/* 매달린 줄과 고리 */}
-        <div style={{ width: 4, height: 50, background: '#ddd', margin: '0 auto' }} />
-        <div style={{ width: 14, height: 14, borderRadius: '50%', background: '#fff', border: '3px solid #666', margin: '-7px auto 0 auto' }} />
-
-        {/* 화이트 택 카드 */}
-        <div style={{
-          background: '#FFFFFF', borderRadius: 24, padding: '36px 30px 40px 30px', textAlign: 'center',
-          boxShadow: '0 20px 45px rgba(0,0,0,0.5)'
-        }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
+        {/* 메인 화이트 카드 바디 */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 32,
+            padding: '44px 36px 36px 36px',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.6)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          {/* 1) 카드 제목 */}
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 900,
+              color: '#0f172a',
+              letterSpacing: '-0.5px',
+              marginBottom: 20,
+            }}
+          >
             구원과 영생의 가격
           </div>
 
-          {/* 이전 가격: 2줄 취소선 지원 (예시를 꼭 넣으세요 / 핵심은) */}
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, fontSize: 36, fontWeight: 800, color: "#94a3b8", marginBottom: 10 }}>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <span>예시를 꼭 넣으세요</span>
-              {/* 빨간 손그림 취소선 */}
-              <div style={{
-                position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
-                width: `${strikeProgress * 110}%`, transform: 'rotate(-3deg)'
-              }} />
-            </div>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <span>핵심은</span>
-              {/* 빨간 손그림 취소선 */}
-              <div style={{
-                position: 'absolute', top: '50%', left: '-5%', height: 4, background: '#E11D48', borderRadius: 2,
-                width: `${strikeProgress * 110}%`, transform: 'rotate(-3deg)'
-              }} />
-            </div>
+          {/* 2) 이전 대가 (가로폭을 넓혀 줄바꿈 없이 1줄로 표시 + 중앙 취소선) */}
+          <div
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+              fontSize: 26,
+              fontWeight: 700,
+              color: '#94a3b8',
+              letterSpacing: '-0.5px',
+              padding: '0 6px',
+            }}
+          >
+            <span>세상의 공로와 대가</span>
+
+            {/* 빨간색 관통 취소선 */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '52%',
+                left: 0,
+                width: `${strikeProgress}%`,
+                height: 4,
+                background: '#e11d48',
+                borderRadius: 2,
+                transform: 'translateY(-50%) rotate(-3deg)',
+              }}
+            />
           </div>
 
-          {/* 최종 확정 가격: 0원 (은혜) 쾅! */}
-          <div style={{
-            fontSize: 68, fontWeight: 900, color: '#E11D48', lineHeight: 1.1,
-            transform: `scale(${finalPriceSpring})`, transformOrigin: 'center'
-          }}>
-            0원 <span style={{ fontSize: 36, color: '#B45309' }}>(은혜)</span>
+          {/* 3) 최종 가격 (충분한 상하 여백 부여) */}
+          <div
+            style={{
+              margin: '20px 0 24px 0',
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'center',
+              gap: 12,
+              transform: `scale(${pricePop})`,
+              transformOrigin: 'center center',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 68,
+                fontWeight: 900,
+                color: '#e11d48',
+                lineHeight: 1,
+                letterSpacing: '-1px',
+              }}
+            >
+              0원
+            </span>
+            <span
+              style={{
+                fontSize: 32,
+                fontWeight: 800,
+                color: '#b45309',
+                lineHeight: 1,
+              }}
+            >
+              (은혜)
+            </span>
+          </div>
+
+          {/* 4) 하단 장절 캡슐 뱃지 (패딩과 폰트 크기 조화) */}
+          <div
+            style={{
+              width: '100%',
+              background: '#fef08a',
+              border: '1.5px solid #facc15',
+              color: '#713f12',
+              fontSize: 16,
+              fontWeight: 800,
+              padding: '10px 0',
+              borderRadius: 14,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            지금 믿을 때 · 예레미야 33:2
           </div>
         </div>
-
-        {/* ── 5. 하단 타임 뱃지 ── */}
-        <div style={{
-          marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 10,
-          background: '#FACC15', color: '#1E293B', padding: '8px 24px', borderRadius: 12, fontWeight: 900, fontSize: 18,
-          boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
-        }}>
-          <span>지금 믿을 때</span>
-          <span style={{ fontFamily: 'monospace', fontSize: 20, color: '#000' }}>에베소서 2:8</span>
-        </div>
       </div>
-
-      {/* ── 6. 하단 고정 카피 ── */}
-      <div style={{ position: 'absolute', bottom: 35, left: 60, fontSize: 26, fontWeight: 800, color: '#FFFFFF', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
-        너희는 그 은혜에 의하여 믿음으로 말미암아 구원을 받았으니
-      </div>
-
     </AbsoluteFill>
   );
 };
