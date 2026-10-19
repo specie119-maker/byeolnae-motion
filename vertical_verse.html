@@ -847,7 +847,8 @@
         const cardW = panelW * .70, cardH = panelH * .36;
         // 처음에만 천천히 들어온 뒤, 끝까지 중앙에 선명하게 머뭅니다.
         const ease = Math.min(1, phase / .28);
-        const cardX = -cardW + ease * (panelW + cardW * .6);
+        // 시작은 패널 밖 왼쪽, 도착은 각 패널의 정확한 가로 중앙입니다.
+        const cardX = -cardW + ease * (cardW + (panelW - cardW) / 2);
         const spin = Math.min(1, phase / .35) * Math.PI * 2;
         const drawCard = (x, y, alpha = 1, blur = 0, showText = true) => {
           ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x + cardW/2, y + cardH/2); ctx.rotate(spin); ctx.filter = blur ? `blur(${blur}px)` : 'none';
