@@ -288,3 +288,9 @@ export const ScriptureThreeCardsScene: React.FC<ScriptureThreeCardsProps> = ({
     </AbsoluteFill>
   );
 };
+
+export const Scene = () => (
+  <AbsoluteFill>
+    <ScriptureThreeCardsScene />
+  </AbsoluteFill>
+);
