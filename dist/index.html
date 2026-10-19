@@ -1903,8 +1903,65 @@
           drawText(lines[2] || '별내사랑의교회', W * 0.12, H * 0.65, 24, '#cbd5e1', W * 0.75, 'left', motionFont);
         }
         ctx.restore();
-      } else if (code === 9) { // 장면 전환
-        const scene=Math.floor(cycle/60)%3; const sceneColors=['#5e2e78','#1c5b62','#a04b27'];ctx.fillStyle=sceneColors[scene];ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=Math.min(1,(cycle%60)/18);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);ctx.restore();drawText(lines[scene],W/2,H*.48,portrait?34:43,'#fff',W*.8);drawText(`말씀 장면 ${scene+1}`,W/2,H*.70,portrait?16:19,theme[2],W*.7);
+      } else if (code === 9) { // CODE 09 · 장면 전환 (시네마틱 페이드 트랜지션)
+        const sceneDur = 80;
+        const scene = Math.floor(cycle / sceneDur) % 3;
+        const sceneFrame = cycle % sceneDur;
+
+        // 부드러운 페이드 인/아웃 계산
+        const fadeIn = Math.min(1, sceneFrame / 16);
+        const fadeOut = Math.max(0, (sceneDur - sceneFrame) / 16);
+        const alpha = Math.min(fadeIn, fadeOut);
+
+        // 시네마틱 줌인 (Ken Burns)
+        const zoom = 0.98 + (sceneFrame / sceneDur) * 0.05;
+
+        // 장면별 딥 프리미엄 그라데이션
+        const sceneGradients = [
+          ['#1e1b4b', '#0f172a', '#020617'], // 1. 미드나잇 인디고
+          ['#3b0764', '#1e0538', '#090212'], // 2. 딥 퍼플 오로라
+          ['#4c0519', '#1f040b', '#090104']  // 3. 루비 와인
+        ];
+        const curColors = sceneGradients[scene];
+
+        const bg = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, Math.max(W, H) * 0.7);
+        bg.addColorStop(0, curColors[0]);
+        bg.addColorStop(0.55, curColors[1]);
+        bg.addColorStop(1, curColors[2]);
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // 은은한 회전 빛줄기
+        ctx.save();
+        ctx.translate(W / 2, H / 2);
+        ctx.rotate(f * 0.005);
+        ctx.globalAlpha = 0.12 * alpha;
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 16; i++) {
+          ctx.rotate(Math.PI / 8);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(W, -H * 0.06);
+          ctx.lineTo(W, H * 0.06);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // 메인 말씀 구절 (상단 작은글씨 & 말씀장면 1,2,3 모두 삭제! 오직 본문만 중앙 집중)
+        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        ctx.save();
+        ctx.translate(W / 2, H / 2);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-W / 2, -H / 2);
+        ctx.globalAlpha = alpha;
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 24;
+
+        const currentLine = lines[scene] || (scene === 0 ? '주 예수 믿으라' : scene === 1 ? '죄가 많아도' : '별내사랑의교회');
+        const mainSize = portrait ? Math.max(34, Math.floor(W * 0.092)) : Math.max(42, Math.floor(H * 0.09));
+        drawText(currentLine, W / 2, H * 0.50, mainSize, '#ffffff', W * 0.85, 'center', motionFont);
+        ctx.restore();
       } else { // 방사형 광선
         ctx.save();ctx.translate(W/2,H/2);ctx.rotate(f*.01);ctx.globalAlpha=.35;ctx.fillStyle=theme[2];for(let i=0;i<20;i++){ctx.rotate(Math.PI/10);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W, -H*.08);ctx.lineTo(W,H*.08);ctx.closePath();ctx.fill();}ctx.restore();drawText(lines[0],W/2,H*.30,portrait?23:29,'#fff',W*.8);drawText(lines[1],W/2,H*.52,portrait?36:46,theme[2],W*.85);drawText(lines[2],W/2,H*.72,portrait?22:27,'#fff',W*.8);
       }
@@ -2376,6 +2433,14 @@ ${url}`;
     state.isPlaying = true;
     applyMotionCanvasSize();
     render();
+
+    // URL 파라미터에 ?code= 가 있으면 해당 코드 버튼 즉시 선택 실행
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('code')) {
+      const targetCode = parseInt(urlParams.get('code'), 10);
+      const targetBtn = document.querySelector(`.btnMotionCode[data-code="${targetCode}"]`);
+      if (targetBtn) targetBtn.click();
+    }
 
 
 
