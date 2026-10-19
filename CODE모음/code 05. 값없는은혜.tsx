@@ -95,7 +95,7 @@ export const GraceOfferScene: React.FC = () => {
           </div>
 
           {/* 이전 가격: 내 행위와 공로 (빨간 줄이 그어짐) */}
-          <div style={{ position: 'relative', display: 'inline-block', fontSize: 32, fontWeight: 800, color: '#94a3b8', marginBottom: 10 }}>
+          <div style={{ position: 'relative', display: 'inline-block', fontSize: 48, fontWeight: 800, color: "#94a3b8", marginBottom: 10 }}>
             <span>내 착한 행위 999억</span>
             {/* 빨간 손그림 취소선 */}
             <div style={{
