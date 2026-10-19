@@ -1505,10 +1505,13 @@ export const BibleShortsScene: React.FC = () => {
 
     // 모달 토글 및 복사
     const codeModal = document.getElementById('codeModal');
-    document.getElementById('btnOpenCode').addEventListener('click', () => {
-      document.getElementById('codeText').innerText = getRemotionCode();
-      codeModal.classList.remove('hidden');
-    });
+    const btnOpenCode = document.getElementById('btnOpenCode');
+    if (btnOpenCode) {
+      btnOpenCode.addEventListener('click', () => {
+        document.getElementById('codeText').innerText = getRemotionCode();
+        codeModal.classList.remove('hidden');
+      });
+    }
 
     document.getElementById('btnCloseModal').addEventListener('click', () => {
       codeModal.classList.add('hidden');
