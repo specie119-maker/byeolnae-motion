@@ -1037,6 +1037,77 @@
         const strikeP = Math.min(1, Math.max(0, (f - 65) / 15));
         const finalPriceScale = Math.min(1, Math.max(0, (f - 85) / 15));
 
+        // 성스럽고 우아한 골드 십자가 렌더러 (예쁜 입체 십자가)
+        const drawSacredGoldCross = (scale = 1.0) => {
+          ctx.save();
+          ctx.scale(scale, scale);
+
+          // 1. 천천히 회전하는 금빛 후광 광채 (16줄기)
+          ctx.save();
+          ctx.rotate(f * 0.008);
+          ctx.strokeStyle = 'rgba(255, 215, 100, 0.22)';
+          ctx.lineWidth = 2;
+          for (let i = 0; i < 16; i++) {
+            const ang = (i * Math.PI) / 8;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(ang) * 22, Math.sin(ang) * 22);
+            ctx.lineTo(Math.cos(ang) * 88, Math.sin(ang) * 88);
+            ctx.stroke();
+          }
+          ctx.restore();
+
+          // 2. 십자가 본체 치수 (라틴 십자가 황금 비율)
+          const vW = 28, vH = 152, vTop = -64;
+          const hW = 104, hH = 28, hTop = -28;
+
+          // 외부 따뜻한 금빛 네온 글로우
+          ctx.shadowColor = 'rgba(255, 195, 50, 0.65)';
+          ctx.shadowBlur = 26;
+
+          // 골드 메탈릭 그라데이션
+          const crossGrad = ctx.createLinearGradient(-hW / 2, vTop, hW / 2, vTop + vH);
+          crossGrad.addColorStop(0, '#FFF2B2');
+          crossGrad.addColorStop(0.3, '#F5C042');
+          crossGrad.addColorStop(0.7, '#D99B18');
+          crossGrad.addColorStop(1, '#946006');
+          ctx.fillStyle = crossGrad;
+
+          // 세로 기둥 (라틴 십자가)
+          ctx.beginPath();
+          ctx.roundRect(-vW / 2, vTop, vW, vH, 6);
+          ctx.fill();
+
+          // 가로 막대
+          ctx.beginPath();
+          ctx.roundRect(-hW / 2, hTop, hW, hH, 6);
+          ctx.fill();
+
+          // 3. 입체 하이라이트 (빛을 받는 모서리 광택선)
+          ctx.shadowColor = 'transparent';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.lineWidth = 2.2;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(-vW / 2 + 3, vTop + 6);
+          ctx.lineTo(-vW / 2 + 3, vTop + vH - 6);
+          ctx.moveTo(-hW / 2 + 6, hTop + 3);
+          ctx.lineTo(hW / 2 - 6, hTop + 3);
+          ctx.stroke();
+
+          // 4. 교차점 중앙 다이아몬드 별빛 보석 효과
+          const midY = hTop + hH / 2;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.moveTo(0, midY - 8);
+          ctx.lineTo(7, midY);
+          ctx.lineTo(0, midY + 8);
+          ctx.lineTo(-7, midY);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+        };
+
         if (portrait) {
           // ── 세로(9:16) 레이아웃 ──
           // 상단: 십자가 엠블럼
@@ -1049,9 +1120,7 @@
           glow.addColorStop(1, 'transparent');
           ctx.fillStyle = glow;
           ctx.beginPath(); ctx.arc(0, 0, 80, 0, Math.PI * 2); ctx.fill();
-          ctx.font = '72px sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('✝️', 0, 0);
+          drawSacredGoldCross(0.68);
           ctx.font = `800 16px ${motionFont}`;
           ctx.fillStyle = '#fde8ea';
           ctx.fillText(lines[0] || '독생자를 주신 사랑', 0, 56);
@@ -1072,17 +1141,23 @@
           ctx.beginPath(); ctx.arc(W / 2, tagY - 26, 6, 0, Math.PI * 2); ctx.fill();
 
           // 카드 본체
+          const isTwoLines = (lines[1] || '').includes('핵심') || (lines[1] || '').includes('\n') || (lines[1] || '').length > 8;
+          const pTagH = isTwoLines ? 212 : 198;
           ctx.fillStyle = '#ffffff';
           ctx.shadowColor = 'rgba(0,0,0,0.5)';
           ctx.shadowBlur = 24;
-          ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, tagH, 20); ctx.fill();
+          ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, pTagH, 20); ctx.fill();
           ctx.shadowColor = 'transparent';
 
-          // 제목
-          ctx.fillStyle = '#334155';
-          ctx.font = `800 17px ${motionFont}`;
+          // 제목 (더 크고 굵게: 900 24px + 굵기 강화)
+          const pTitleSize = 24;
+          ctx.font = `900 ${pTitleSize}px ${motionFont}`;
+          ctx.fillStyle = '#0f172a';
           ctx.textAlign = 'center';
-          ctx.fillText('구원과 영생의 가격', W / 2, tagY + 32);
+          ctx.lineWidth = 1.2;
+          ctx.strokeStyle = '#0f172a';
+          ctx.strokeText('구원과 영생의 가격', W / 2, tagY + 30);
+          ctx.fillText('구원과 영생의 가격', W / 2, tagY + 30);
 
           // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
           const oldRaw = lines[1] || '내 착한 행위 999억';
@@ -1112,13 +1187,12 @@
             }
           }
 
-          const isTwoLines = subLines.length > 1;
-          const oldFontSize = isTwoLines ? 24 : 30;
+          const oldFontSize = isTwoLines ? 22 : 28;
           ctx.font = `800 ${oldFontSize}px ${motionFont}`;
           ctx.fillStyle = '#94a3b8';
 
           subLines.forEach((subTxt, idx) => {
-            const oldY = isTwoLines ? (tagY + 76 + idx * 32) : (tagY + 84);
+            const oldY = isTwoLines ? (tagY + 62 + idx * 26) : (tagY + 74);
             ctx.fillText(subTxt, W / 2, oldY);
             const oldW = ctx.measureText(subTxt).width;
             if (strikeP > 0) {
@@ -1141,23 +1215,24 @@
 
           // 최종 확정 가격: 0원 (은혜)
           ctx.save();
-          const finalPriceY = isTwoLines ? (tagY + 158) : (tagY + 148);
+          const finalPriceY = isTwoLines ? (tagY + 132) : (tagY + 126);
           ctx.translate(W / 2, finalPriceY);
           ctx.scale(finalPriceScale, finalPriceScale);
-          ctx.font = `900 46px ${motionFont}`;
+          ctx.font = `900 42px ${motionFont}`;
           ctx.fillStyle = '#E11D48';
           ctx.fillText('0원', -26, 0);
-          ctx.font = `800 24px ${motionFont}`;
+          ctx.font = `800 22px ${motionFont}`;
           ctx.fillStyle = '#B45309';
           ctx.fillText('(은혜)', 46, -4);
           ctx.restore();
 
-          // 하단 뱃지
+          // 하단 뱃지 (간격 좁혀 밀착 배치)
           ctx.fillStyle = '#FACC15';
-          ctx.beginPath(); ctx.roundRect(W / 2 - 85, tagY + tagH - 42, 170, 30, 8); ctx.fill();
+          const pBadgeY = isTwoLines ? (tagY + 168) : (tagY + 158);
+          ctx.beginPath(); ctx.roundRect(W / 2 - 85, pBadgeY, 170, 28, 8); ctx.fill();
           ctx.fillStyle = '#1E293B';
           ctx.font = `900 12px ${motionFont}`;
-          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, W / 2, tagY + tagH - 22);
+          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, W / 2, pBadgeY + 18);
 
           ctx.restore();
 
@@ -1192,16 +1267,16 @@
           glow.addColorStop(1, 'transparent');
           ctx.fillStyle = glow;
           ctx.beginPath(); ctx.arc(0, 0, 130, 0, Math.PI * 2); ctx.fill();
-          ctx.font = '120px sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('✝️', 0, -10);
+          drawSacredGoldCross(1.0);
           ctx.font = `800 20px ${motionFont}`;
           ctx.fillStyle = '#fde8ea';
-          ctx.fillText(lines[0] || '독생자를 주신 사랑', 0, 80);
+          ctx.fillText(lines[0] || '독생자를 주신 사랑', 0, 95);
           ctx.restore();
 
           // 우측: 대롱대롱 매달려 흔들리는 화이트 가격표 택
-          const tagW = W * .42, tagH = H * .65;
+          const tagW = W * .42;
+          const isTwoLines = (lines[1] || '').includes('핵심') || (lines[1] || '').includes('\n') || (lines[1] || '').length > 8;
+          const tagH = isTwoLines ? 228 : 220;
           const tagX = W * .52;
           const tagY = H * .18 + (1 - tagDrop) * -120;
 
@@ -1222,11 +1297,15 @@
           ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, tagH, 24); ctx.fill();
           ctx.shadowColor = 'transparent';
 
-          // 카드 상단 라벨
-          ctx.fillStyle = '#334155';
-          ctx.font = `800 ${Math.max(16, tagW * .065)}px ${motionFont}`;
+          // 카드 상단 라벨 (크고 굵게: 900 26px + 굵기 강화)
+          const titleSize = Math.max(26, Math.floor(tagW * 0.098));
+          ctx.font = `900 ${titleSize}px ${motionFont}`;
+          ctx.fillStyle = '#0f172a';
           ctx.textAlign = 'center';
-          ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 38);
+          ctx.lineWidth = 1.2;
+          ctx.strokeStyle = '#0f172a';
+          ctx.strokeText('구원과 영생의 가격', tagX + tagW / 2, tagY + 36);
+          ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 36);
 
           // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
           const oldRaw = lines[1] || '내 착한 행위 999억';
@@ -1256,8 +1335,7 @@
             }
           }
 
-          const isTwoLines = subLines.length > 1;
-          let oldFontSize = isTwoLines ? Math.max(26, Math.floor(tagW * 0.105)) : Math.max(30, Math.floor(tagW * 0.13));
+          let oldFontSize = isTwoLines ? Math.max(24, Math.floor(tagW * 0.10)) : Math.max(28, Math.floor(tagW * 0.12));
           ctx.font = `800 ${oldFontSize}px ${motionFont}`;
           ctx.fillStyle = '#94a3b8';
 
@@ -1268,8 +1346,8 @@
               curFont = Math.floor(curFont * (tagW * 0.88 / curW));
               ctx.font = `800 ${curFont}px ${motionFont}`;
             }
-            // 줄간격 여유 있게 띄움 (title Y: 38 -> text Y: 88)
-            const oldY = isTwoLines ? (tagY + 88 + idx * 36) : (tagY + 102);
+            // 가운데 글씨 줄간격 좁혀서 배치
+            const oldY = isTwoLines ? (tagY + 68 + idx * 28) : (tagY + 80);
             ctx.fillText(subTxt, tagX + tagW / 2, oldY);
             const oldW = ctx.measureText(subTxt).width;
             if (strikeP > 0) {
@@ -1281,9 +1359,9 @@
               ctx.lineCap = 'round';
               ctx.beginPath();
               const startX = tagX + tagW / 2 - oldW / 2 - 8;
-              const startY = strikeY + 6;
+              const startY = strikeY + 5;
               const endX = startX + (oldW + 16) * strikeP;
-              const endY = startY - 12 * strikeP;
+              const endY = startY - 10 * strikeP;
               ctx.moveTo(startX, startY);
               ctx.lineTo(endX, endY);
               ctx.stroke();
@@ -1291,26 +1369,27 @@
             }
           });
 
-          // 최종 확정 가격: 0원 (은혜) 쾅!
+          // 최종 확정 가격: 0원 (은혜) 쾅! (간격 좁혀서 위로 밀착)
           ctx.save();
-          const finalPriceY = isTwoLines ? (tagY + 185) : (tagY + 180);
+          const finalPriceY = isTwoLines ? (tagY + 142) : (tagY + 134);
           ctx.translate(tagX + tagW / 2, finalPriceY);
           ctx.scale(finalPriceScale, finalPriceScale);
-          ctx.font = `900 ${Math.max(46, tagW * .18)}px ${motionFont}`;
+          ctx.font = `900 ${Math.max(42, tagW * .17)}px ${motionFont}`;
           ctx.fillStyle = '#E11D48';
-          ctx.fillText('0원', -38, 0);
-          ctx.font = `800 ${Math.max(24, tagW * .095)}px ${motionFont}`;
+          ctx.fillText('0원', -36, 0);
+          ctx.font = `800 ${Math.max(22, tagW * .09)}px ${motionFont}`;
           ctx.fillStyle = '#B45309';
-          ctx.fillText('(은혜)', 54, -6);
+          ctx.fillText('(은혜)', 50, -6);
           ctx.restore();
 
-          // 하단 타임 뱃지
+          // 하단 타임 뱃지: 지금 믿을 때 (간격 좁혀서 위로 밀착)
           ctx.fillStyle = '#FACC15';
           const bW = Math.min(220, tagW * .75);
-          ctx.beginPath(); ctx.roundRect(tagX + (tagW - bW) / 2, tagY + tagH - 52, bW, 36, 10); ctx.fill();
+          const badgeY = isTwoLines ? (tagY + 178) : (tagY + 170);
+          ctx.beginPath(); ctx.roundRect(tagX + (tagW - bW) / 2, badgeY, bW, 32, 10); ctx.fill();
           ctx.fillStyle = '#1E293B';
-          ctx.font = `900 14px ${motionFont}`;
-          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, tagX + tagW / 2, tagY + tagH - 28);
+          ctx.font = `900 13px ${motionFont}`;
+          ctx.fillText(`지금 믿을 때 · ${state.verse || '에베소서 2:8'}`, tagX + tagW / 2, badgeY + 20);
 
           ctx.restore();
 

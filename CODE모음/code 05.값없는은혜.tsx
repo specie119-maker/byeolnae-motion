@@ -90,7 +90,7 @@ export const GraceOfferScene: React.FC = () => {
           background: '#FFFFFF', borderRadius: 24, padding: '36px 30px 40px 30px', textAlign: 'center',
           boxShadow: '0 20px 45px rgba(0,0,0,0.5)'
         }}>
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#334155', marginBottom: 12 }}>
+          <div style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
             구원과 영생의 가격
           </div>
 
