@@ -8,7 +8,8 @@ const BASE_DIR = __dirname;
 const server = http.createServer((req, res) => {
   // CORS 허용
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
@@ -35,6 +36,77 @@ const server = http.createServer((req, res) => {
       res.writeHead(404, {'Content-Type': 'text/plain; charset=utf-8'});
       return res.end('파일을 찾을 수 없습니다.');
     }
+  }
+
+    // 2-2. 캔버스 녹화 영상 -> 정품 MP4 (H.264) 변환 다운로드 API: /convert-video (POST)
+  if (pathname === '/convert-video' && req.method === 'POST') {
+    const { execFile } = require('child_process');
+    const tempDir = path.join(BASE_DIR, 'temp_convert');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+    let bodyChunks = [];
+    req.on('data', chunk => bodyChunks.push(chunk));
+    req.on('end', () => {
+      try {
+        const bodyStr = Buffer.concat(bodyChunks).toString('utf-8');
+        const data = JSON.parse(bodyStr);
+        const { videoBase64, filename = '말씀모션영상.mp4' } = data;
+
+        if (!videoBase64) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: '비디오 데이터(videoBase64)가 필요합니다.' }));
+        }
+
+        const id = Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+        const tempIn = path.join(tempDir, `in_${id}.webm`);
+        const tempOut = path.join(tempDir, `out_${id}.mp4`);
+
+        const videoBuffer = Buffer.from(videoBase64.includes(';base64,') ? videoBase64.split(';base64,')[1] : videoBase64, 'base64');
+        fs.writeFileSync(tempIn, videoBuffer);
+
+        const ffmpegPath = '/opt/homebrew/bin/ffmpeg';
+        const ffmpegArgs = [
+          '-y',
+          '-i', tempIn,
+          '-c:v', 'libx264',
+          '-pix_fmt', 'yuv420p',
+          '-movflags', '+faststart',
+          tempOut
+        ];
+
+        execFile(ffmpegPath, ffmpegArgs, (err, stdout, stderr) => {
+          if (err || !fs.existsSync(tempOut)) {
+            console.error('FFmpeg convert-video error:', err, stderr);
+            if (fs.existsSync(tempIn)) fs.unlinkSync(tempIn);
+            if (fs.existsSync(tempOut)) fs.unlinkSync(tempOut);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'MP4 변환 실패' }));
+          }
+
+          const stat = fs.statSync(tempOut);
+          const safeName = encodeURIComponent(filename);
+          res.writeHead(200, {
+            'Content-Type': 'video/mp4',
+            'Content-Disposition': `attachment; filename="${safeName}"`,
+            'Content-Length': stat.size
+          });
+
+          const stream = fs.createReadStream(tempOut);
+          stream.pipe(res);
+          stream.on('close', () => {
+            try {
+              if (fs.existsSync(tempIn)) fs.unlinkSync(tempIn);
+              if (fs.existsSync(tempOut)) fs.unlinkSync(tempOut);
+            } catch (e) {}
+          });
+        });
+      } catch (err) {
+        console.error('Convert video error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   // 2. MP3 -> MP4 변환 전용 API: /convert-mp3 (POST)
