@@ -9,7 +9,7 @@
   <meta property="og:type" content="video.other">
   <meta property="og:title" content="별내사랑의교회 · 세로 말씀 모션 쇼츠">
   <meta property="og:description" content="일을 행하시는 여호와, 그것을 만들며 성취하시는 하나님 ✨ (예레미야 33:2)">
-  <meta property="og:url" content="https://venue-holes-milan-productions.trycloudflare.com/vertical_verse.html">
+  <meta property="og:url" content="https://byeolnae-verse-motion.brownchord7.chatgpt.site/">
   <meta property="og:site_name" content="별내사랑의교회 모션 스튜디오">
   <meta name="theme-color" content="#FEE500">
 
@@ -1029,9 +1029,7 @@
 
     // 현재 작성한 말씀 카드 데이터가 고스란히 담긴 동적 URL 생성
     function getShareUrl() {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const baseOrigin = isLocal ? 'https://venue-holes-milan-productions.trycloudflare.com' : window.location.origin;
-      const path = window.location.pathname;
+      const baseOrigin = 'https://byeolnae-verse-motion.brownchord7.chatgpt.site';
 
       const params = new URLSearchParams();
       params.set('l1', state.line1);
@@ -1043,7 +1041,7 @@
       if (state.colorLine2) params.set('c2', state.colorLine2);
       if (state.colorLine3) params.set('c3', state.colorLine3);
 
-      return `${baseOrigin}${path}?${params.toString()}`;
+      return `${baseOrigin}/?${params.toString()}`;
     }
 
     function getInviteMessage() {
