@@ -31,7 +31,7 @@ export const MotionThreeCardsScene: React.FC<{
 
   // [수정 2] 정확한 정중앙 안착 좌표
   const targetCenterX = (panelW - cardW) / 2; // 패널의 가로 정중앙
-  const targetCenterY = (panelH - cardH) / 2; // 패널의 세로 정중앙
+  const targetCenterY = (panelH - cardH) / 2 - 20; // 패널의 세로 정중앙
 
   const cards = [
     { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: line1, delay: 0 },
@@ -114,11 +114,10 @@ export const MotionThreeCardsScene: React.FC<{
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 900,
-                  fontSize: 28,
+                  fontSize: 32,
                   color: '#050914',
-                  writingMode: 'vertical-rl', // 세로 읽기 (글자 잘림 방지)
-                  textOrientation: 'upright',
-                  letterSpacing: '6px',
+                  letterSpacing: '-0.5px',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {card.text}

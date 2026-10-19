@@ -145,7 +145,7 @@ const server = http.createServer((req, res) => {
 
   // 3. 정적 웹 파일 서빙
   if (pathname === '/' || pathname === '') {
-    pathname = '/index.html';
+    pathname = '/vertical_verse.html';
   }
 
   const filePath = path.join(BASE_DIR, pathname);
