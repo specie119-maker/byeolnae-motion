@@ -3,933 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>별내사랑의교회 세로 말씀 모션 스튜디오</title>
-
-  <!-- 카카오톡 미리보기 메타 태그 (Open Graph) -->
-  <meta property="og:type" content="video.other">
-  <meta property="og:title" content="별내사랑의교회 · 세로 말씀 모션 쇼츠">
-  <meta property="og:description" content="일을 행하시는 여호와, 그것을 만들며 성취하시는 하나님 ✨ (예레미야 33:2)">
-  <meta property="og:url" content="https://venue-holes-milan-productions.trycloudflare.com/vertical_verse.html">
-  <meta property="og:site_name" content="별내사랑의교회 모션 스튜디오">
-  <meta name="theme-color" content="#FEE500">
-
-  <!-- 구글 폰트: 고운바탕, 고운돋움, 나눔명조 (부드럽고 감성적인 은혜 서체) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Gothic:wght@700;800&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
-
+  <title>별내사랑의교회 가로 말씀 모션 스튜디오 (16:9)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
   <style>
-    body { font-family: 'Gowun Batang', 'Pretendard', sans-serif; }
-    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
-    /* 모바일 터치 및 입력 호환성 보장 (iOS 자동 확대 방지) */
-    input, select, textarea {
-      font-size: 16px !important;
-      -webkit-user-select: text !important;
-      user-select: text !important;
-      touch-action: manipulation !important;
-    }
+    body { font-family: 'Pretendard', sans-serif; }
+    .font-gowun { font-family: 'Gowun Batang', serif; }
   </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased select-none">
 
   <!-- 헤더 -->
-  <header class="h-14 border-b border-zinc-800 bg-zinc-900/90 px-4 sm:px-5 flex items-center justify-between sticky top-0 z-30">
-    <div class="flex items-center gap-2.5">
-      <span class="w-7 h-7 rounded-lg bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">✝</span>
-      <div>
-        <h1 class="font-bold text-xs sm:text-sm text-white tracking-tight">별내사랑의교회 · 성도 말씀 모션 스튜디오</h1>
-        <p class="text-[10px] text-zinc-400 hidden sm:block">성도님 누구나 나만의 은혜로운 말씀 모션을 만들어 나눠보세요</p>
-      </div>
+  <header class="h-14 border-b border-zinc-800 bg-zinc-900/90 px-6 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <span class="w-7 h-7 rounded-lg bg-rose-600 flex items-center justify-center font-black text-sm text-white">✝</span>
+      <h1 class="font-bold text-base text-white tracking-tight">별내사랑의교회 · 가로(16:9) 말씀 모션</h1>
+      <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">16:9 가로 모드</span>
     </div>
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <button id="btnJumpToEditHeader" class="lg:hidden px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1">
-        <span>✏️</span> 글씨 수정
-      </button>
-      <button id="btnNavMp3Header" class="px-2 sm:px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1">
-        <span>🎵</span> <span class="hidden sm:inline">MP3➔MP4</span> 변환
-      </button>
-      <button id="btnShareKakao" class="px-2.5 sm:px-3.5 py-1.5 bg-[#FEE500] hover:bg-[#FDD835] text-[#191919] rounded-lg text-xs font-bold shadow transition flex items-center gap-1">
-        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.855 1.867 5.372 4.678 6.713-.207.77-.751 2.784-.86 3.221-.137.545.2.538.421.392.292-.194 4.01-2.721 4.646-3.159.367.051.74.078 1.115.078 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
-        <span>카톡 공유</span>
-      </button>
-      <button id="btnDownloadImage" class="px-2 sm:px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1">
-        <span>📸</span> <span class="hidden sm:inline">이미지</span> 저장
-      </button>
-      <button id="btnDownloadMp4" class="px-2 sm:px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-lg text-xs font-bold shadow transition flex items-center gap-1">
-        <span>🎬</span> <span class="hidden sm:inline">영상</span> 다운로드
-      </button>
-    </div>
+    <button id="btnCopyCode" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1.5">
+      <span>📋</span> Remotion 가로 코드 복사
+    </button>
   </header>
 
-  <!-- 다른 성도님이 보낸 초대 링크로 열었을 때 상단 안내 배너 -->
-  <div id="bannerSharedNotice" class="hidden bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 p-2.5 text-white text-xs font-bold flex items-center justify-between px-3 sm:px-6 shadow-md transition-all">
-    <div class="flex items-center gap-2">
-      <span class="text-base">💌</span>
-      <span>성도님이 보내주신 맞춤 말씀입니다!</span>
-      <button id="btnBannerEditJump" class="underline bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-[11px] font-extrabold ml-1">
-        ✏️ 글씨 수정하기 ↓
-      </button>
-    </div>
-    <button id="btnCloseSharedBanner" class="text-white/80 hover:text-white text-sm px-2">✕</button>
-  </div>
-
-  <!-- 모바일 뷰 전환 탭 (스마트폰에서 글씨 입력창과 영상 미리보기를 1초 만에 전환) -->
-  <div class="lg:hidden flex border-b border-zinc-800 bg-zinc-900/95 px-3 py-2 gap-2 sticky top-14 z-20 shadow-md">
-    <button id="mobileTabEdit" type="button" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow">
-      <span>✏️</span> 말씀 글씨 입력하기
-    </button>
-    <button id="mobileTabPreview" type="button" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-zinc-800 text-zinc-300">
-      <span>🎬</span> 영상 미리보기 (재생)
-    </button>
-  </div>
-
   <!-- 메인 작업창 -->
-  <main class="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
-    <!-- 좌측/중앙: 모바일 9:16 프리뷰 뷰포트 -->
-    <section id="previewSection" class="hidden lg:flex flex-none lg:flex-1 flex-col items-center justify-center bg-zinc-900/40 p-3 sm:p-4 lg:p-6 relative border-b lg:border-b-0 border-zinc-800">
-      <div class="relative shadow-2xl rounded-2xl lg:rounded-3xl overflow-hidden border border-zinc-700/80 bg-black flex items-center justify-center w-[200px] sm:w-[240px] lg:max-w-[340px] lg:w-full aspect-[9/16] shrink-0">
-        <canvas id="motionCanvas" width="360" height="640" class="block w-full h-full"></canvas>
+  <main class="flex-1 flex overflow-hidden">
+    <!-- 좌측: 모니터 프리뷰 (16:9 가로 비율) -->
+    <section class="flex-1 flex flex-col items-center justify-center bg-zinc-900/50 p-6 relative">
+      <div class="relative shadow-2xl rounded-2xl overflow-hidden border border-zinc-800 bg-black" style="width: 720px; height: 405px;">
+        <canvas id="motionCanvas" width="720" height="405" class="block w-full h-full"></canvas>
       </div>
 
-      <!-- 타임라인 스크러버 & 속도 컨트롤러 -->
-      <div class="w-full max-w-[280px] sm:max-w-sm mt-2 sm:mt-3 flex flex-col gap-1.5 sm:gap-2 bg-zinc-950/90 p-2 sm:p-3 rounded-2xl border border-zinc-800">
+      <!-- 타임라인 컨트롤 바 (16:9에 맞추어 확대) -->
+      <div class="w-full max-w-2xl mt-4 flex flex-col gap-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
         <div class="flex items-center justify-between text-xs text-zinc-400">
-          <div class="flex items-center gap-1.5">
-            <button id="btnPlay" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white text-zinc-950 font-bold flex items-center justify-center hover:bg-zinc-200 transition text-xs">▶</button>
-            <button id="btnPrevFrame" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-[10px] sm:text-[11px] text-zinc-300 font-mono">◀</button>
-            <button id="btnNextFrame" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-[10px] sm:text-[11px] text-zinc-300 font-mono">▶</button>
-            <span class="font-mono text-zinc-300 text-[11px] sm:text-xs"><span id="lblFrame" class="text-white font-bold">0</span> / <span id="lblTotalFrames">240</span> F</span>
+          <div class="flex items-center gap-2">
+            <button id="btnPlay" class="w-7 h-7 rounded-full bg-white text-zinc-950 font-bold flex items-center justify-center hover:bg-zinc-200 transition">▶</button>
+            <span class="font-mono text-zinc-300"><span id="lblFrame" class="text-white font-bold">0</span> / 180 F</span>
           </div>
-          <div class="flex items-center gap-1 bg-zinc-900 px-1.5 py-0.5 rounded-lg border border-zinc-800 text-[10px] sm:text-[11px]">
-            <span class="text-zinc-500 font-semibold hidden sm:inline mr-0.5">속도:</span>
-            <button id="btnSpeed05" class="px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition">0.5x</button>
-            <button id="btnSpeed075" class="px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold transition">0.75x</button>
-            <button id="btnSpeed10" class="px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition">1.0x</button>
+          <div class="flex items-center gap-1 text-xs">
+            <span class="text-zinc-500 mr-1">속도:</span>
+            <button class="btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white" data-speed="0.5">0.5x</button>
+            <button class="btn-speed px-2 py-0.5 rounded bg-blue-600 text-white font-semibold" data-speed="0.75">0.75x</button>
+            <button class="btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white" data-speed="1.0">1.0x</button>
           </div>
         </div>
-        <input id="timeline" type="range" min="0" max="240" value="0" class="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-blue-500">
+        <input id="timeline" type="range" min="0" max="180" value="0" class="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-blue-500">
       </div>
-
-      <!-- 모바일 전용: 말씀 입력하러 가기 버튼 -->
-      <button id="btnScrollToEdit" type="button" class="lg:hidden mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg transition active:scale-95">
-        <span>✏️</span>
-        <span>말씀 글씨 수정하러 가기 ➔</span>
-      </button>
     </section>
 
-    <!-- 우측: 텍스트 줄별 편집 및 MP3->MP4 변환 컨트롤 패널 -->
-    <aside id="sidebarAside" class="flex w-full lg:w-[420px] border-t lg:border-t-0 lg:border-l border-zinc-800 bg-zinc-950 p-4 sm:p-5 flex-col gap-3.5 overflow-y-auto custom-scrollbar">
-      <!-- 모바일 전용 상단 미니 안내 배너 -->
-      <div class="lg:hidden p-3 bg-blue-950/40 border border-blue-500/40 rounded-xl flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">🎬</span>
-          <div>
-            <p class="text-xs font-bold text-blue-200">글씨를 입력한 후 영상을 확인하세요!</p>
-            <p class="text-[10px] text-zinc-400">아래 입력창에 글을 쓰면 즉시 반영됩니다</p>
-          </div>
-        </div>
-        <button id="btnQuickWatchPreview" type="button" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow shrink-0">
-          영상 보기 ▶
-        </button>
+    <!-- 우측: 텍스트 및 스타일 설정 패널 -->
+    <aside class="w-96 border-l border-zinc-800 bg-zinc-950 p-6 flex flex-col gap-4 overflow-y-auto">
+      <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">말씀 텍스트 설정 (16:9)</h2>
+
+      <!-- 글씨체 선택 -->
+      <div>
+        <label class="text-xs text-zinc-300 font-semibold block mb-1">🌸 글씨체</label>
+        <select id="fontSelect" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <option value="Gowun Batang" selected>🌸 고운바탕 (따뜻한 붓터치 감성)</option>
+          <option value="Pretendard">깔끔한 고딕 (Pretendard)</option>
+        </select>
       </div>
 
-      <!-- 상단 탭 네비게이션 (성도 누구나 찾기 쉬운 직관적 탭) -->
-      <div class="flex items-center gap-1.5 p-1 bg-zinc-900 rounded-xl border border-zinc-800 shrink-0">
-        <button id="tabBtnVerse" type="button" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow">
-          <span>📖</span> 말씀 서체 편집
-        </button>
-        <button id="tabBtnMp3" type="button" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-zinc-400 hover:text-white relative">
-          <span>🎵</span> MP3 ➔ MP4 변환
-          <span class="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-rose-500 to-amber-500 text-[9px] text-white font-extrabold rounded-full animate-bounce shadow">NEW</span>
-        </button>
+      <!-- 1번째 줄 -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs text-blue-400 font-semibold">● 1번째 줄 (시작 구절)</label>
+          <input id="col1" type="color" value="#0f172a" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
+        </div>
+        <input id="line1" type="text" value="두려워말라" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
       </div>
 
-      <!-- 패널 1: 말씀 내용 & 서체 편집 -->
-      <div id="panelVerse" class="flex flex-col gap-4">
-        <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2">
-          <div>
-            <h2 class="text-xs font-bold text-zinc-200 uppercase tracking-wider">말씀 내용 & 서체 설정</h2>
-            <p class="text-[11px] text-zinc-400">직접 입력하시면 화면에 실시간으로 반영됩니다</p>
-          </div>
-          <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 실시간 적용
-          </span>
+      <!-- 2번째 줄 -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs text-emerald-400 font-semibold">● 2번째 줄 (이어지는 구절)</label>
+          <input id="col2" type="color" value="#1e293b" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
         </div>
-
-        <!-- 추천 말씀 원클릭 적용 버튼 (성도 맞춤 기능) -->
-        <div class="bg-amber-950/20 p-3 rounded-xl border border-amber-500/30 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-              <span>⭐</span> 성도 추천 말씀 바로 넣기
-            </span>
-            <span class="text-[10px] text-zinc-400">누르면 즉시 변경</span>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <button type="button" class="btnPreset px-2.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-zinc-200 border border-zinc-800 transition flex flex-col active:scale-95" data-preset="0">
-              <span class="font-bold text-amber-200">렘 33:2</span>
-              <span class="text-[10px] text-zinc-400 truncate">성취하시는 하나님</span>
-            </button>
-            <button type="button" class="btnPreset px-2.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-zinc-200 border border-zinc-800 transition flex flex-col active:scale-95" data-preset="1">
-              <span class="font-bold text-amber-200">사 41:10</span>
-              <span class="text-[10px] text-zinc-400 truncate">두려워하지 말라</span>
-            </button>
-            <button type="button" class="btnPreset px-2.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-zinc-200 border border-zinc-800 transition flex flex-col active:scale-95" data-preset="2">
-              <span class="font-bold text-amber-200">빌 4:13</span>
-              <span class="text-[10px] text-zinc-400 truncate">능력 주시는 자</span>
-            </button>
-            <button type="button" class="btnPreset px-2.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-zinc-200 border border-zinc-800 transition flex flex-col active:scale-95" data-preset="3">
-              <span class="font-bold text-amber-200">시 23:1</span>
-              <span class="text-[10px] text-zinc-400 truncate">나의 목자시니</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 모션그래픽 코드 템플릿 선택 -->
-        <div class="bg-violet-950/25 p-3 rounded-xl border border-violet-400/35 space-y-2">
-          <div class="rounded-lg bg-violet-950/70 border border-violet-400/30 px-3 py-2 text-[11px] leading-relaxed text-violet-100">
-            <b>만드는 순서</b><br>① 가로·세로 선택 → ② 코드 선택 → ③ 위 문구 3줄 입력 → ④ 아래 실행하기
-          </div>
-          <div class="flex items-center gap-1.5 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
-            <button type="button" id="btnLandscape" class="btnAspect flex-1 py-2 rounded-md bg-violet-600 text-white text-xs font-bold transition">▭ 가로 16:9</button>
-            <button type="button" id="btnPortrait" class="btnAspect flex-1 py-2 rounded-md text-zinc-400 hover:text-white text-xs font-bold transition">▯ 세로 9:16</button>
-          </div>
-          <p id="selectedAspectHelp" class="text-[10px] text-zinc-400">가로 영상(유튜브·강의·교회 안내)에 맞춰 고릅니다.</p>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-violet-200">🎬 모션그래픽 코드 선택</span>
-            <span id="selectedMotionCode" class="text-[10px] text-violet-300">코드를 선택하세요</span>
-          </div>
-          <div class="grid grid-cols-2 gap-1.5" id="motionCodePicker">
-            <button type="button" class="btnMotionCode" data-code="1" data-title="히어로 등장">01 · 히어로 등장</button>
-            <button type="button" class="btnMotionCode" data-code="2" data-title="모션 블러 비교">02 · 모션 블러 비교</button>
-            <button type="button" class="btnMotionCode" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
-            <button type="button" class="btnMotionCode" data-code="4" data-title="세로 말씀 쇼츠">04 · 세로 말씀 쇼츠</button>
-            <button type="button" class="btnMotionCode" data-code="5" data-title="은혜 강조 배지">05 · 은혜 배지</button>
-            <button type="button" class="btnMotionCode" data-code="6" data-title="기도 손과 말씀">06 · 기도 손·말씀</button>
-            <button type="button" class="btnMotionCode" data-code="7" data-title="면류관 쇼케이스">07 · 면류관 쇼케이스</button>
-            <button type="button" class="btnMotionCode" data-code="8" data-title="패럴랙스 장면">08 · 패럴랙스</button>
-            <button type="button" class="btnMotionCode" data-code="9" data-title="말씀 장면 전환">09 · 장면 전환</button>
-            <button type="button" class="btnMotionCode" data-code="10" data-title="방사형 광선 배경">10 · 광선 배경</button>
-          </div>
-          <button type="button" id="btnRunMotionCode" class="w-full py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-sm font-black shadow-lg transition active:scale-[.99]">
-            ▶ 선택한 코드로 미리보기 실행하기
-          </button>
-        </div>
-
-        <!-- 폰트 서체 선택 (부드러운 서체) -->
-        <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-500/40 space-y-2">
-          <label class="text-xs font-bold text-blue-200 flex items-center gap-1.5">
-            <span>🌸</span> 글씨체 (부드러운 감성 폰트)
-          </label>
-          <select id="selectFont" class="w-full bg-zinc-950 border border-blue-500/50 rounded-xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-blue-400 font-semibold cursor-pointer">
-            <option value="'Gowun Batang', serif" selected>🌸 고운바탕 (따뜻하고 부드러운 붓터치 - 추천)</option>
-            <option value="'Gowun Dodum', sans-serif">🌿 고운돋움 (둥글둥글 부드러운 고딕)</option>
-            <option value="'Nanum Myeongjo', serif">📖 나눔명조 (은혜롭고 경건한 서체)</option>
-            <option value="'Pretendard', sans-serif">🏢 프리텐다드 (기본 고딕)</option>
-          </select>
-        </div>
-
-        <!-- 성경 말씀: 첫 번째 줄 -->
-        <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800 space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-zinc-300 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span> 1번째 줄 (시작 구절)
-            </label>
-            <div class="flex items-center gap-1.5">
-              <input id="colorLine1" type="color" value="#0f172a" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-              <span id="lblColorLine1" class="text-[10px] font-mono text-zinc-400">#0f172a</span>
-            </div>
-          </div>
-          <input id="inputLine1" type="text" value="일을 행하시는 여호와" class="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:border-blue-400 font-semibold shadow-inner">
-        </div>
-
-        <!-- 성경 말씀: 두 번째 줄 -->
-        <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800 space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-zinc-300 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 2번째 줄 (이어지는 구절)
-            </label>
-            <div class="flex items-center gap-1.5">
-              <input id="colorLine2" type="color" value="#1e293b" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-              <span id="lblColorLine2" class="text-[10px] font-mono text-zinc-400">#1e293b</span>
-            </div>
-          </div>
-          <input id="inputLine2" type="text" value="일을 지어 성취하시는" class="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:border-blue-400 font-semibold shadow-inner">
-        </div>
-
-        <!-- 성경 말씀: 마지막 한 줄 (강조 라인) -->
-        <div class="bg-rose-950/20 p-3.5 rounded-2xl border border-rose-500/40 space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> 마지막 강조 줄 (색상&바운스 강조)
-            </label>
-            <div class="flex items-center gap-1.5">
-              <input id="colorLine3" type="color" value="#e11d48" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
-              <span id="lblColorLine3" class="text-[10px] font-mono text-rose-300 font-bold">#e11d48</span>
-            </div>
-          </div>
-          <input id="inputLine3" type="text" value="하나님" class="w-full bg-zinc-950 border border-rose-500/50 rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:border-rose-400 font-bold shadow-inner">
-        </div>
-
-        <!-- 성경 장절 뱃지 -->
-        <div class="bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800 space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-zinc-300">성경 장절 (하단 뱃지)</label>
-            <div class="flex items-center gap-1.5">
-              <input id="colorVerseBg" type="color" value="#eff6ff" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0" title="배경색">
-              <input id="colorVerseText" type="color" value="#2563eb" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0" title="글자색">
-            </div>
-          </div>
-          <input id="inputVerse" type="text" value="예레미야 33:2" class="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:border-blue-400 font-semibold shadow-inner">
-        </div>
-
-        <!-- 링크 정보 -->
-        <div class="space-y-3 pt-2">
-          <div>
-            <label class="text-[11px] text-zinc-400 font-semibold block mb-1 flex items-center gap-1">
-              <span class="text-red-500">▶</span> 상단 유튜브 주소
-            </label>
-            <input id="inputYoutube" type="text" value="https://www.youtube.com/@별내사랑의교회1" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none focus:border-blue-500">
-          </div>
-          <div>
-            <label class="text-[11px] text-zinc-400 font-semibold block mb-1 flex items-center gap-1">
-              <span class="text-emerald-500 font-bold">N</span> 하단 블로그 주소
-            </label>
-            <input id="inputBlog" type="text" value="https://blog.naver.com/aiyamok2015/224430812151" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono focus:outline-none focus:border-blue-500">
-          </div>
-        </div>
+        <input id="line2" type="text" value="내가 너와" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
       </div>
 
-      <!-- 패널 2: 🎵 MP3 ➔ MP4 비디오 변환 전용 코너 -->
-      <div id="panelMp3" class="flex flex-col gap-4 hidden">
-        <!-- 코너 소개 헤더 배너 -->
-        <div class="bg-gradient-to-br from-indigo-950/70 via-purple-950/50 to-zinc-900 p-3.5 rounded-2xl border border-indigo-500/40 space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-indigo-200 flex items-center gap-1.5">
-              <span class="text-base">🎵</span> MP3 ➔ MP4 비디오 변환기
-            </span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-400/30">성도 친화형</span>
-          </div>
-          <p class="text-[11px] text-zinc-300 leading-relaxed">
-            성도님의 <strong>찬양 음원, 목사님 설교 음성, 성경 낭독 MP3</strong>를 은혜로운 세로 쇼츠 비디오(MP4)로 손쉽게 만들어 카톡과 유튜브로 전해보세요.
-          </p>
+      <!-- 3번째 줄 (강조) -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs text-rose-400 font-semibold">● 마지막 강조 줄 (포인트 색상)</label>
+          <input id="col3" type="color" value="#e11d48" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0">
         </div>
+        <input id="line3" type="text" value="함께 함이니라 ✨" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-rose-500">
+      </div>
 
-        <!-- 1. 음원 파일 업로드 및 선택 -->
-        <div class="bg-zinc-900/80 p-3.5 rounded-2xl border border-zinc-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
-              <span>📂</span> 1단계: MP3 음원 파일 선택
-            </span>
-            <span id="lblAudioDuration" class="text-[10px] text-zinc-400 font-mono">길이: 0:00</span>
-          </div>
+      <!-- 장절 -->
+      <div>
+        <label class="text-xs text-zinc-300 font-semibold block mb-1">성경 장절 (하단 뱃지)</label>
+        <input id="verse" type="text" value="이사야 41:10" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+      </div>
 
-          <!-- 드래그 & 클릭 업로드 드롭존 -->
-          <div id="dropZone" class="border-2 border-dashed border-zinc-700 hover:border-indigo-400 bg-zinc-950/80 hover:bg-indigo-950/20 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
-            <input type="file" id="inputAudioFile" accept="audio/*" class="hidden">
-            <div class="w-10 h-10 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-lg">
-              🎧
-            </div>
-            <p id="lblSelectedAudio" class="text-xs font-bold text-zinc-200">클릭하여 MP3 / 오디오 파일 불러오기</p>
-            <p class="text-[10px] text-zinc-400">스마트폰 음성 녹음, 찬양 MP3, WAV 모두 지원</p>
-          </div>
-
-          <!-- 샘플 은혜 찬양 원클릭 불러오기 -->
-          <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-zinc-400">파일이 아직 없으신가요?</span>
-            <button id="btnLoadSampleAudio" type="button" class="text-xs font-bold text-amber-400 hover:text-amber-300 underline flex items-center gap-1 transition">
-              <span>✨</span> 은혜 피아노 찬양 샘플 불러오기
-            </button>
-          </div>
+      <!-- 링크 정보 -->
+      <div class="pt-3 border-t border-zinc-800 flex flex-col gap-3">
+        <div>
+          <label class="text-xs text-zinc-400 block mb-1">상단 유튜브 주소</label>
+          <input id="youtube" type="text" value="https://www.youtube.com/@별내사랑의교회1" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono">
         </div>
-
-        <!-- 2. 오디오 플레이어 & 이퀄라이저 파형 제어 -->
-        <div class="bg-zinc-900/80 p-3.5 rounded-2xl border border-zinc-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
-              <span>🎧</span> 2단계: 음원 미리듣기 & 파형 효과
-            </span>
-            <label class="flex items-center gap-1.5 cursor-pointer text-[11px] text-indigo-300">
-              <input type="checkbox" id="chkWaveform" checked class="accent-indigo-500 w-3.5 h-3.5">
-              <span>화면 파형 표시</span>
-            </label>
-          </div>
-
-          <!-- 내장 오디오 플레이어 바 -->
-          <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800/80 flex items-center gap-2.5">
-            <button id="btnAudioPlay" type="button" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center text-xs shrink-0 transition">
-              ▶
-            </button>
-            <div class="flex-1 flex flex-col gap-1">
-              <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
-                <span id="lblAudioCurrent">0:00</span>
-                <span id="lblAudioTotal">0:00</span>
-              </div>
-              <input type="range" id="audioSeek" min="0" max="100" value="0" class="w-full h-1 bg-zinc-800 rounded appearance-none cursor-pointer accent-indigo-500">
-            </div>
-            <div class="flex items-center gap-1 text-[11px] text-zinc-400 shrink-0">
-              <span>🔊</span>
-              <input type="range" id="audioVolume" min="0" max="1" step="0.05" value="0.9" class="w-12 h-1 bg-zinc-800 rounded appearance-none cursor-pointer accent-indigo-500">
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. 비디오 합성 모드 선택 -->
-        <div class="bg-zinc-900/80 p-3.5 rounded-2xl border border-zinc-800 space-y-2">
-          <span class="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
-            <span>🎬</span> 3단계: 영상 합성 스타일 선택
-          </span>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label id="lblModeMotion" class="p-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/70 cursor-pointer flex flex-col gap-1 hover:border-indigo-400 transition">
-              <div class="flex items-center gap-1.5">
-                <input type="radio" name="convertMode" value="motion" checked class="accent-indigo-500">
-                <span class="font-bold text-indigo-200">초고화질 모션</span>
-              </div>
-              <span class="text-[10px] text-zinc-400">렘 33:2 세로 영상 루프 + MP3 (1초 초고속)</span>
-            </label>
-            <label id="lblModeCard" class="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 cursor-pointer flex flex-col gap-1 hover:border-zinc-700 transition">
-              <div class="flex items-center gap-1.5">
-                <input type="radio" name="convertMode" value="card" class="accent-indigo-500">
-                <span class="font-bold text-zinc-300">내 맞춤 카드</span>
-              </div>
-              <span class="text-[10px] text-zinc-400">내가 편집한 말씀 카드 + MP3</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- 4. 변환 실행 버튼 & 진행 상태 -->
-        <div class="space-y-2 pt-1">
-          <button id="btnConvertMp3ToMp4" type="button" class="w-full py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
-            <span class="text-base">🎬</span>
-            <span>MP3 ➔ MP4 비디오 변환 & 다운로드</span>
-          </button>
-
-          <!-- 변환 진행 상태 알림창 -->
-          <div id="convertProgressCard" class="hidden bg-zinc-900 border border-indigo-500/40 p-3 rounded-xl space-y-2">
-            <div class="flex items-center justify-between text-xs">
-              <span id="convertStatusText" class="font-bold text-indigo-300 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
-                음원 처리 및 비디오 인코딩 중...
-              </span>
-              <span id="convertPercentText" class="font-mono text-zinc-400 text-[11px]">0%</span>
-            </div>
-            <div class="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
-              <div id="convertProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-rose-500 w-0 transition-all duration-300"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 변환 완료 시 축하 및 카톡 공유 섹션 -->
-        <div id="convertSuccessBox" class="hidden bg-emerald-950/40 border border-emerald-500/50 p-3.5 rounded-2xl space-y-2">
-          <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs">
-            <span>🎉</span>
-            <span>MP4 찬양 비디오가 성공적으로 변환되었습니다!</span>
-          </div>
-          <p class="text-[10px] text-zinc-300 leading-relaxed">
-            방금 다운로드된 영상을 카카오톡 단톡방이나 인스타그램 릴스, 유튜브 쇼츠에 올려 은혜를 나눠보세요.
-          </p>
-          <button id="btnShareConvertedKakao" type="button" class="w-full py-2 bg-[#FEE500] hover:bg-[#FDD835] text-[#191919] font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 shadow">
-            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.855 1.867 5.372 4.678 6.713-.207.77-.751 2.784-.86 3.221-.137.545.2.538.421.392.292-.194 4.01-2.721 4.646-3.159.367.051.74.078 1.115.078 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
-            <span>카톡으로 말씀 찬양 영상 나눔 문구 복사</span>
-          </button>
+        <div>
+          <label class="text-xs text-zinc-400 block mb-1">하단 블로그 주소</label>
+          <input id="blog" type="text" value="https://blog.naver.com/aiyamok2015/224430812151" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 font-mono">
         </div>
       </div>
     </aside>
   </main>
 
-  <!-- Remotion TSX 코드 복사 모달 -->
-  <div id="codeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-      <div class="h-12 px-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/90">
-        <span class="text-xs font-bold text-white font-mono">BibleShortsScene.tsx</span>
-        <div class="flex items-center gap-2">
-          <button id="btnCopyModalCode" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition">
-            코드 복사
-          </button>
-          <button id="btnCloseModal" class="px-2 py-1 text-zinc-400 hover:text-white text-sm">✕</button>
-        </div>
-      </div>
-      <div class="p-4 flex-1 overflow-y-auto bg-zinc-950 font-mono text-xs text-zinc-300 leading-relaxed custom-scrollbar">
-        <pre><code id="codeText"></code></pre>
-      </div>
-    </div>
-  </div>
-
-  <!-- 성도 카톡 초대 & 함께 만들기 모달 -->
-  <div id="shareModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-700/80 w-full max-w-md rounded-3xl shadow-2xl flex flex-col overflow-hidden">
-      <!-- 모달 헤더 -->
-      <div class="p-4 sm:p-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/95">
-        <div class="flex items-center gap-2">
-          <span class="w-7 h-7 rounded-lg bg-[#FEE500] text-[#191919] font-black text-xs flex items-center justify-center">💬</span>
-          <div>
-            <h3 class="font-bold text-sm text-white">성도 카톡 초대 & 함께 만들기</h3>
-            <p class="text-[11px] text-zinc-400">내가 만든 말씀을 다른 성도님과 함께 수정하고 나눠보세요</p>
-          </div>
-        </div>
-        <button id="btnCloseShareModal" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center text-sm transition">✕</button>
-      </div>
-
-      <!-- 모달 본문 -->
-      <div class="p-5 flex flex-col gap-4 overflow-y-auto max-h-[75vh]">
-        <!-- 1. 원클릭 카톡 전송 버튼 -->
-        <button id="btnModalSendKakao" class="w-full py-3.5 bg-[#FEE500] hover:bg-[#FDD835] text-[#191919] font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 transition active:scale-95">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.582-10 8 0 2.855 1.867 5.372 4.678 6.713-.207.77-.751 2.784-.86 3.221-.137.545.2.538.421.392.292-.194 4.01-2.721 4.646-3.159.367.051.74.078 1.115.078 5.523 0 10-3.582 10-8s-4.477-8-10-8z"/></svg>
-          <span>카카오톡으로 초대장 보내기</span>
-        </button>
-
-        <!-- 2. 초대장 미리보기 박스 -->
-        <div class="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-amber-300">✉️ 전송될 카톡 메시지 내용:</span>
-            <button id="btnCopyInviteText" class="text-[11px] text-zinc-400 hover:text-white underline">문구 복사</button>
-          </div>
-          <div id="invitePreviewText" class="text-xs text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed p-2.5 bg-zinc-900/60 rounded-xl border border-zinc-800/80"></div>
-        </div>
-
-        <!-- 3. 실시간 QR 코드 (교회 현장/소그룹에서 카메라로 찍어서 열기) -->
-        <div class="bg-gradient-to-br from-zinc-950 to-indigo-950/30 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4">
-          <div class="p-2 bg-white rounded-xl shrink-0 shadow">
-            <img id="qrCodeImg" src="" alt="QR Code" class="w-20 h-20 block">
-          </div>
-          <div class="flex-1 space-y-1">
-            <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
-              <span>📷</span>
-              <span>스마트폰 카메라로 스캔</span>
-            </div>
-            <p class="text-[11px] text-zinc-400 leading-snug">
-              교회나 소그룹 모임에서 옆 성도님이 카메라로 비추면 바로 앱이 열려 함께 만들 수 있습니다.
-            </p>
-          </div>
-        </div>
-
-        <!-- 4. 링크 직접 복사 -->
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-zinc-400 block">🔗 내 말씀이 담긴 다이렉트 주소</label>
-          <div class="flex items-center gap-2">
-            <input id="inputShareLink" type="text" readonly class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-300 font-mono focus:outline-none">
-            <button id="btnCopyLinkDirect" class="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-bold transition shrink-0">
-              링크 복사
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <audio id="bgmAudio" preload="auto" playsinline></audio>
-
   <script>
     const canvas = document.getElementById('motionCanvas');
     const ctx = canvas.getContext('2d');
 
-    const audioState = {
-      audioElem: document.getElementById('bgmAudio'),
-      audioCtx: null,
-      analyser: null,
-      sourceNode: null,
-      audioBase64: null,
-      audioFileName: '',
-      showWaveform: true,
-      isPlaying: false
-    };
-
     const state = {
       frame: 0,
-      totalFrames: 240, // 8초간 충분하고 차분한 묵상 속도
+      totalFrames: 180,
       fps: 30,
-      speed: 0.75, // 기본 0.75x로 여유롭고 부드러운 속도
-      subFrame: 0,
+      speedRate: 0.75,
       isPlaying: true,
-      fontFamily: "'Gowun Batang', serif", // 부드러운 붓터치의 고운바탕체 (기본)
-      line1: '일을 행하시는 여호와',
-      colorLine1: '#0f172a',
-      line2: '일을 지어 성취하시는',
-      colorLine2: '#1e293b',
-      line3: '하나님',
-      colorLine3: '#e11d48',
-      verse: '예레미야 33:2',
-      verseBg: '#eff6ff',
-      verseText: '#2563eb',
+      font: 'Gowun Batang',
+      line1: '두려워말라',
+      line2: '내가 너와',
+      line3: '함께 함이니라 ✨',
+      verse: '이사야 41:10',
       youtube: 'https://www.youtube.com/@별내사랑의교회1',
       blog: 'https://blog.naver.com/aiyamok2015/224430812151',
-      motionCode: null,
-      motionCodeSelection: null
+      col1: '#0f172a',
+      col2: '#1e293b',
+      col3: '#e11d48',
+      bg1: '#090e17',
+      bg2: '#111e38'
     };
 
-    const motionProducts = {};
-    [[1, 'images/prayer_hands_cutout.png'], [5, 'images/prayer_hands_cutout.png']].forEach(([id, src]) => {
-      const image = new Image(); image.crossOrigin = 'anonymous'; image.src = src; image.onload = () => render(); motionProducts[id] = image;
-    });
-    const motionCrown = new Image();
-    motionCrown.crossOrigin = 'anonymous';
-    motionCrown.src = 'images/crown_of_life.png';
-    motionCrown.onload = () => render();
-
-    // 속도를 매우 부드럽고 천천히 늦춘 Remotion 감쇠 조화 진동(Spring) 수식
-    // stiffness: 55, damping: 18로 급격한 튕김 없이 부드럽게 안착
-    function remotionSpring(f, delay = 0, damping = 18, stiffness = 55) {
-      const t = Math.max(0, f - delay);
-      const mass = 1.2;
-      const omega0 = Math.sqrt(stiffness / mass);
-      const zeta = damping / (2 * Math.sqrt(stiffness * mass));
-      if (zeta < 1) {
-        const omegaD = omega0 * Math.sqrt(1 - zeta * zeta);
-        const decay = Math.exp(-zeta * omega0 * (t / 30));
-        return 1 - decay * (Math.cos(omegaD * (t / 30)) + (zeta * omega0 / omegaD) * Math.sin(omegaD * (t / 30)));
-      }
-      return Math.min(1, t / 30);
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
     }
 
     function render() {
       const W = canvas.width;
       const H = canvas.height;
       const f = state.frame;
+      const fontFamily = state.font === 'Gowun Batang' ? "'Gowun Batang', serif" : "'Pretendard', sans-serif";
 
-      if (state.motionCode) {
-        renderMotionCodePreview(W, H, f, state.motionCode);
-        return;
-      }
-
-
-      // 1. 깊은 배경 그라데이션
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#090e18');
-      grad.addColorStop(0.5, '#0f1b32');
-      grad.addColorStop(1, '#080d16');
+      // 1. 가로배경 그라데이션 (좌우 및 상하 고른 감도)
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, state.bg1);
+      grad.addColorStop(0.5, state.bg2);
+      grad.addColorStop(1, state.bg1);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      // 배경 은은한 후광
-      const glow = ctx.createRadialGradient(W / 2, H / 2, 30, W / 2, H / 2, 230);
-      glow.addColorStop(0, 'rgba(59, 130, 246, 0.14)');
-      glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+      // 넓은 가로 화면에 맞는 부드러운 우주/빛 후광 효과
+      const glow = ctx.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 400);
+      glow.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+      glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, W, H);
 
-      // 2. 상단 유튜브 헤더
-      const topAlpha = Math.min(1, Math.max(0, f / 24));
-      const topY = 30 + (1 - topAlpha) * -12;
+      // 2. 상단 유튜브 주소 (가로에 넓게 정돈)
+      const topP = easeOutCubic(f / 20);
       ctx.save();
-      ctx.globalAlpha = topAlpha;
+      ctx.globalAlpha = topP;
       ctx.textAlign = 'center';
+      const topY = 24 + (1 - topP) * -8;
 
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(W / 2 - 70, topY, 140, 24, 12);
+      ctx.roundRect(W / 2 - 80, topY, 160, 22, 11);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = '#ef4444';
-      ctx.font = 'bold 11px Pretendard';
-      ctx.fillText('▶ 별내사랑의교회', W / 2, topY + 16);
+      ctx.font = 'bold 10px Pretendard';
+      ctx.fillText('▶ 별내사랑의교회', W / 2, topY + 14);
 
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 10.5px monospace';
-      ctx.fillText(state.youtube, W / 2, topY + 39);
+      ctx.font = '500 9px monospace';
+      ctx.fillText(state.youtube, W / 2, topY + 32);
       ctx.restore();
 
-      // 3. 중앙 대형 화이트 박스 (글씨 2배 확대를 위한 넉넉한 카드 크기)
-      const boxAlpha = Math.min(1, Math.max(0, f / 20));
-      const boxCardW = 336;
-      const boxCardH = 430;
-      const boxCardX = (W - boxCardW) / 2;
-      const boxCardY = (H - boxCardH) / 2;
+      // 3. 중앙 큰 단일 화이트 말씀 카드 (가로 16:9 비율 최적화: 넓고 웅장함)
+      const cardW = 460; // 가로 크기를 시원시원하게 넓힘
+      const cardH = 240; // 높이를 세로 비례 낮춰 가로 중심 컴팩트화
+      const cardX = (W - cardW) / 2;
+      const cardY = (H - cardH) / 2 + 10; // 아래쪽에 살짝 배치
 
+      const cardP = easeOutCubic(f / 18);
       ctx.save();
-      ctx.globalAlpha = boxAlpha;
+      ctx.globalAlpha = cardP;
+      ctx.translate(W / 2, H / 2 + 10);
+      ctx.scale(0.97 + 0.03 * cardP, 0.97 + 0.03 * cardP);
+      ctx.translate(-W / 2, -H / 2 - 10);
 
-      // 부드러운 그림자
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-      ctx.shadowBlur = 36;
-      ctx.shadowOffsetY = 18;
+      // 그림자 효과
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 32;
+      ctx.shadowOffsetY = 15;
 
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.roundRect(boxCardX, boxCardY, boxCardW, boxCardH, 32);
+      ctx.roundRect(cardX, cardY, cardW, cardH, 24);
       ctx.fill();
       ctx.shadowColor = 'transparent';
 
-      // 상단 따옴표
-      ctx.fillStyle = '#3b82f6';
-      ctx.font = 'bold 44px serif';
+      // 따옴표 아이콘
+      ctx.fillStyle = '#2563eb';
+      ctx.font = 'bold 28px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('❝', W / 2, boxCardY + 48);
+      ctx.fillText('❝', W / 2, cardY + 34);
 
-      // --- [글씨 줄별 여유롭고 차분한 순차 모션 - 부드러운 고운바탕체] ---
+      // --- 세 한 줄씩 차분히 떠오르는 모션 ---
       ctx.textAlign = 'center';
 
-      // 줄 1: 시작 구절 (일을 행하시는 여호와 - 한 줄 넉넉히 안착)
-      const spr1 = remotionSpring(f, 24, 18, 55);
-      if (f >= 24) {
+      // 1번째 줄 (f >= 18 시작)
+      const p1 = easeOutCubic((f - 18) / 20);
+      if (p1 > 0) {
         ctx.save();
-        const y1 = boxCardY + 120;
-        ctx.translate(W / 2, y1);
-        ctx.scale(Math.max(0, spr1), Math.max(0, spr1));
-        ctx.fillStyle = state.colorLine1;
-        ctx.font = '700 24px ' + state.fontFamily;
-        ctx.fillText(state.line1, 0, 0);
+        ctx.globalAlpha = p1;
+        ctx.fillStyle = state.col1;
+        ctx.font = `700 21px ${fontFamily}`;
+        const y1 = cardY + 76 + (1 - p1) * 8;
+        ctx.fillText(state.line1, W / 2, y1);
         ctx.restore();
       }
 
-      // 줄 2: 이어지는 구절 (일을 지어 성취하시는 - 한 줄 넉넉히 안착)
-      const spr2 = remotionSpring(f, 72, 18, 55);
-      if (f >= 72) {
+      // 2번째 줄 (f >= 36 시작)
+      const p2 = easeOutCubic((f - 36) / 20);
+      if (p2 > 0) {
         ctx.save();
-        const y2 = boxCardY + 190;
-        ctx.translate(W / 2, y2);
-        ctx.scale(Math.max(0, spr2), Math.max(0, spr2));
-        ctx.fillStyle = state.colorLine2;
-        ctx.font = '700 24px ' + state.fontFamily;
-        ctx.fillText(state.line2, 0, 0);
+        ctx.globalAlpha = p2;
+        ctx.fillStyle = state.col2;
+        ctx.font = `700 22px ${fontFamily}`;
+        const y2 = cardY + 114 + (1 - p2) * 8;
+        ctx.fillText(state.line2, W / 2, y2);
         ctx.restore();
       }
 
-      // 줄 3: 마지막 강조 줄 (하나님 - 대형 강조)
-      const spr3 = remotionSpring(f, 120, 16, 60);
-      if (f >= 120) {
+      // 3번째 줄 (강조, f >= 54 시작)
+      const p3 = easeOutCubic((f - 54) / 22);
+      if (p3 > 0) {
+        const pulse = 1 + Math.sin(Math.max(0, f - 76) * 0.08) * 0.015;
         ctx.save();
-        const y3 = boxCardY + 280;
-        
-        // 등장 후 은은한 심장박동 바운스(Pulse) 모션
-        const pulse = f > 140 ? 1 + Math.sin((f - 140) * 0.1) * 0.035 : 1;
-        const finalScale = Math.max(0, spr3) * pulse;
-
-        ctx.translate(W / 2, y3);
-        ctx.scale(finalScale, finalScale);
-        ctx.fillStyle = state.colorLine3;
-        ctx.font = '700 38px ' + state.fontFamily;
+        ctx.globalAlpha = p3;
+        ctx.translate(W / 2, cardY + 158 + (1 - p3) * 10);
+        ctx.scale(pulse, pulse);
+        ctx.fillStyle = state.col3;
+        ctx.font = `800 24px ${fontFamily}`;
         ctx.fillText(state.line3, 0, 0);
         ctx.restore();
       }
 
-      // 하단 성경 장절 뱃지
-      const sprVerse = remotionSpring(f, 165, 16, 55);
-      if (f >= 165) {
+      // 4번째 장절 뱃지 (f >= 72 시작)
+      const pBadge = easeOutCubic((f - 72) / 18);
+      if (pBadge > 0) {
         ctx.save();
-        const badgeY = boxCardY + boxCardH - 48;
-        ctx.translate(W / 2, badgeY);
-        ctx.scale(Math.max(0, sprVerse), Math.max(0, sprVerse));
-
-        ctx.fillStyle = state.verseBg;
-        ctx.strokeStyle = state.verseText + '55';
-        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = pBadge;
+        const bY = cardY + cardH - 40 + (1 - pBadge) * 6;
+        ctx.fillStyle = '#eff6ff';
+        ctx.strokeStyle = '#bfdbfe';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(-90, -18, 180, 36, 18);
+        ctx.roundRect(W / 2 - 60, bY, 120, 24, 12);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = state.verseText;
-        ctx.font = '700 18px ' + state.fontFamily;
-        ctx.textBaseline = 'middle';
-        ctx.fillText(state.verse, 0, 0);
+        ctx.fillStyle = '#1d4ed8';
+        ctx.font = '700 11px Pretendard';
+        ctx.fillText(state.verse, W / 2, bY + 16);
         ctx.restore();
       }
 
-      // 오디오 이퀄라이저 비주얼라이저 파형 그리기 (화면 파형 옵션 활성화 시)
-      if (typeof audioState !== 'undefined' && audioState.showWaveform) {
-        ctx.save();
-        const waveY = boxCardY + boxCardH - 12;
-        const barCount = 18;
-        const barWidth = 6;
-        const barGap = 4;
-        const totalW = barCount * barWidth + (barCount - 1) * barGap;
-        const startX = (W - totalW) / 2;
+      ctx.restore(); // 카드 restore
 
-        let freqs = null;
-        if (audioState.isPlaying && audioState.analyser) {
-          const arr = new Uint8Array(audioState.analyser.frequencyBinCount);
-          audioState.analyser.getByteFrequencyData(arr);
-          freqs = arr;
-        }
-
-        for (let i = 0; i < barCount; i++) {
-          let h = 4;
-          if (freqs) {
-            const raw = freqs[i * 2] || 0;
-            h = Math.max(3, (raw / 255) * 26);
-          } else {
-            // 은은한 대기 파동 애니메이션
-            h = 4 + Math.sin(f * 0.12 + i * 0.45) * 2.5;
-          }
-          const bx = startX + i * (barWidth + barGap);
-          const by = waveY - h;
-
-          const gradWave = ctx.createLinearGradient(0, by, 0, waveY);
-          gradWave.addColorStop(0, '#f43f5e');
-          gradWave.addColorStop(0.5, '#6366f1');
-          gradWave.addColorStop(1, '#3b82f6');
-          ctx.fillStyle = gradWave;
-          ctx.beginPath();
-          ctx.roundRect(bx, by, barWidth, h, 2.5);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      ctx.restore(); // 흰 박스 복원
-
-      // 4. 하단 블로그 푸터
-      const botAlpha = Math.min(1, Math.max(0, (f - 30) / 30));
+      // 4. 하단 네이버 블로그 주소 (가로 하단 우아하게 배치)
+      const botP = easeOutCubic((f - 30) / 22);
       ctx.save();
-      ctx.globalAlpha = botAlpha;
+      ctx.globalAlpha = botP;
       ctx.textAlign = 'center';
-      const botY = H - 76;
+      const botY = H - 36;
 
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(W / 2 - 70, botY, 140, 24, 12);
+      ctx.roundRect(W / 2 - 65, botY, 130, 20, 10);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = '#10b981';
-      ctx.font = 'bold 11px Pretendard';
-      ctx.fillText('N 블로그 공식 채널', W / 2, botY + 16);
+      ctx.font = 'bold 9.5px Pretendard';
+      ctx.fillText('N 블로그 공식 채널', W / 2, botY + 13);
 
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 9.5px monospace';
-      ctx.fillText(state.blog, W / 2, botY + 41);
+      ctx.font = '500 8.5px monospace';
+      ctx.fillText(state.blog, W / 2, botY + 31);
       ctx.restore();
     }
 
-    function renderMotionCodePreview(W, H, f, code) {
-      // CODE 01–10은 원본 TSX의 모션 성격에 맞춰 각각 별도로 미리보기 합니다.
-      // 제품 자리는 기도 손 이미지를 12%로만 사용해 말씀보다 앞서지 않게 했습니다.
-      const portrait = motionAspect === 'portrait';
-      const p = Math.min(1, Math.max(0, f / 24));
-      const cycle = f % 180;
-      const lines = [state.line1 || '오늘의 말씀', state.line2 || '주님 안에서', state.line3 || '새 힘을 얻습니다'];
-      const hand = motionProducts[1];
-      const colors = {
-        1: ['#a20d27', '#3a0008', '#fff7d6'], 2: ['#153d87', '#07142f', '#dbeafe'],
-        3: ['#175548', '#08251f', '#dcfce7'], 4: ['#4b1d6b', '#17051f', '#fce7f3'],
-        5: ['#b91c3a', '#5e0a1d', '#fde68a'], 6: ['#523b18', '#191007', '#fff1b8'],
-        7: ['#182a62', '#050917', '#f8d77d'], 8: ['#25365f', '#080d23', '#d9e8ff'],
-        9: ['#4c2567', '#160720', '#f6d8ff'], 10: ['#5c3510', '#160b02', '#ffe6a6']
-      };
-      const theme = colors[code] || colors[1];
-      const bg = ctx.createLinearGradient(0, 0, W, H);
-      bg.addColorStop(0, theme[0]); bg.addColorStop(1, theme[1]); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-      const font = state.fontFamily || 'sans-serif';
-      const drawText = (text, x, y, size, color, maxWidth = W * .82, align = 'center', fontFace = font) => {
-        ctx.save(); ctx.textAlign = align; ctx.fillStyle = color; ctx.font = `900 ${size}px ${fontFace}`;
-        const chars = Array.from(text); let row = '', rows = [];
-        chars.forEach(ch => { if (ctx.measureText(row + ch).width > maxWidth && row) { rows.push(row); row = ch; } else row += ch; });
-        if (row) rows.push(row); rows.slice(0, 2).forEach((r, i) => ctx.fillText(r, x, y + i * size * 1.18)); ctx.restore();
-      };
-      const drawHand = (x, y, h, alpha = .12) => {
-        if (!hand?.complete || !hand.naturalWidth) return;
-        const w = h * hand.naturalWidth / hand.naturalHeight;
-        ctx.save(); ctx.globalAlpha = alpha * p; ctx.drawImage(hand, x, y, w, h); ctx.restore();
-      };
-      const header = `CODE ${String(code).padStart(2, '0')} · ${portrait ? '세로 9:16' : '가로 16:9'}`;
-
-      if (code === 1) { // 히어로 등장
-        ctx.save(); ctx.globalAlpha = .18; ctx.strokeStyle = theme[2];
-        for (let i = 0; i < 18; i++) { const a = i * Math.PI / 9 + f * .012; ctx.beginPath(); ctx.moveTo(W*.56,H*.57); ctx.lineTo(W*.56 + Math.cos(a)*H, H*.57 + Math.sin(a)*H); ctx.stroke(); } ctx.restore();
-        drawHand(W * .61, H * .23 + (1-p)*H*.4, H * .62, .12);
-        drawText(lines[0], W*.28, H*.37, portrait ? 23 : 29, '#fff', W*.48);
-        drawText(lines[1], W*.29, H*.51, portrait ? 31 : 42, theme[2], W*.52);
-        drawText(lines[2], W*.31, H*.66, portrait ? 21 : 27, '#fff', W*.52);
-      } else if (code === 2) { // 모션 블러 비교: 원본 code 02 모션블러 구성
-        const motionFont = "'Nanum Gothic', sans-serif";
-        const cardText = lines[1];
-        const panelGap = W * .025, panelW = (W - panelGap * 4) / 3;
-        const panelH = H * .62, panelY = H * .20;
-        // 한 사이클을 240프레임(약 8초)으로: 눈이 편안하게 비교할 수 있도록 느리게 이동합니다.
-        const phase = (f % 240) / 240;
-        const cardW = panelW * .70, cardH = panelH * .36;
-        // 처음에만 천천히 들어온 뒤, 끝까지 중앙에 선명하게 머뭅니다.
-        const ease = Math.min(1, phase / .28);
-        // 시작은 패널 밖 왼쪽, 도착은 각 패널의 정확한 가로 중앙입니다.
-        const cardX = -cardW + ease * (cardW + (panelW - cardW) / 2);
-        const spin = Math.min(1, phase / .35) * Math.PI * 2;
-        const drawCard = (x, y, alpha = 1, blur = 0, showText = true) => {
-          ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x + cardW/2, y + cardH/2); ctx.rotate(spin); ctx.filter = blur ? `blur(${blur}px)` : 'none';
-          ctx.fillStyle = '#ffc93c'; ctx.beginPath(); ctx.roundRect(-cardW/2, -cardH/2, cardW, cardH, 13); ctx.fill();
-          ctx.restore(); if (showText) drawText(cardText, x + cardW/2, y + cardH*.60, portrait ? 17 : Math.max(19, panelW*.13), '#050914', cardW*.78, 'center', motionFont);
-        };
-        ctx.fillStyle = '#050914'; ctx.fillRect(0,0,W,H);
-        drawText(lines[0], W/2, H*.11, portrait ? 24 : 30, '#fff', W*.88, 'center', motionFont);
-        const panels = [
-          ['깔끔한 등장', '선명한 말씀 상자'],
-          ['부드러운 이동', '천천히 중심으로'],
-          ['또렷한 강조', '그림자 없이 선명하게']
-        ];
-        panels.forEach(([name, sub], i) => {
-          const x = panelGap + i * (panelW + panelGap);
-          ctx.save(); ctx.fillStyle = '#13224d'; ctx.beginPath(); ctx.roundRect(x,panelY,panelW,panelH,12);ctx.fill();ctx.restore();
-          const cardY = panelY + panelH*.32;
-          // 세 패널 모두 잔상·블러·그림자 없이 선명한 상자 한 개만 표시합니다.
-          drawCard(x + cardX, cardY);
-          ctx.save(); ctx.textAlign='left';ctx.font=`900 ${portrait?14:Math.max(14,panelW*.108)}px ${motionFont}`;ctx.fillStyle='#ffc93c';ctx.fillText(name,x,panelY+panelH+25);ctx.font=`800 ${portrait?11:Math.max(11,panelW*.074)}px ${motionFont}`;ctx.fillStyle='rgba(255,255,255,.88)';ctx.fillText(sub,x,panelY+panelH+45);ctx.restore();
-        });
-        drawText(lines[2],W/2,H*.95,portrait?16:19,'rgba(255,255,255,.88)',W*.82,'center',motionFont);
-      } else if (code === 3) { // 콜아웃
-        drawHand(W*.62,H*.22,H*.65,.10);
-        drawText(lines[0], W*.08, H*.22, portrait?22:28, theme[2], W*.44, 'left');
-        [lines[1], lines[2]].forEach((text, i) => { const y = H*(.45+i*.20); ctx.save(); ctx.strokeStyle=theme[2];ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*.12,y);ctx.lineTo(W*.38,y);ctx.stroke();ctx.beginPath();ctx.arc(W*.42,y,7,0,Math.PI*2);ctx.fillStyle=theme[2];ctx.fill();ctx.restore(); drawText(text,W*.47,y+9,portrait?20:27,'#fff',W*.42,'left'); });
-      } else if (code === 4) { // 원본 세로 쇼츠
-        const slam = Math.min(1, Math.max(0,(f-12)/22));
-        drawText(lines[0], W/2,H*.18,portrait?28:26,'#fff',W*.8);
-        drawText(lines[1], W/2,H*.37,portrait?40:37,theme[2],W*.86);
-        drawHand(W*.19,H*.49+(1-slam)*H*.35,H*.42,.12);
-        drawText(lines[2], W/2,H*.79,portrait?29:27,'#fff',W*.8);
-      } else if (code === 5) { // 은혜 강조 배지
-        const r = Math.min(W,H)*.26*(.85+Math.sin(f*.08)*.04); ctx.save();ctx.translate(W*.68,H*.52);ctx.rotate(f*.008);ctx.fillStyle=theme[2];ctx.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12, rr=i%2?r*.8:r; i?ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):ctx.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.restore();
-        drawText(lines[1],W*.68,H*.49,portrait?25:32,theme[1],r*1.3); drawText(lines[0],W*.12,H*.30,portrait?22:28,'#fff',W*.46,'left'); drawText(lines[2],W*.12,H*.66,portrait?27:34,'#fff',W*.46,'left'); drawHand(W*.72,H*.55,H*.34,.07);
-      } else if (code === 6) { // 기도 손과 말씀
-        ctx.save();ctx.fillStyle='rgba(255,242,190,.15)';ctx.beginPath();ctx.arc(W*.72,H*.48,Math.min(W,H)*.32,0,Math.PI*2);ctx.fill();ctx.restore(); drawHand(W*.56,H*.16,H*.72,.14); drawText(lines[0],W*.08,H*.25,portrait?22:27,theme[2],W*.46,'left'); drawText(lines[1],W*.08,H*.46,portrait?29:37,'#fff',W*.47,'left'); drawText(lines[2],W*.08,H*.64,portrait?20:25,'#fff',W*.45,'left');
-      } else if (code === 7) { // 면류관 쇼케이스
-        const crown = motionCrown; if(crown?.complete&&crown.naturalWidth){const h=H*.52,w=h*crown.naturalWidth/crown.naturalHeight;ctx.save();ctx.globalAlpha=p;ctx.drawImage(crown,W*.5-w/2,H*.24,w,h);ctx.restore();} drawText(lines[0],W*.1,H*.18,portrait?20:25,theme[2],W*.8); drawText(lines[1],W*.5,H*.79,portrait?29:37,'#fff',W*.8); drawText(lines[2],W*.5,H*.89,portrait?19:23,'rgba(255,255,255,.86)',W*.8);
-      } else if (code === 8) { // 패럴랙스
-        ctx.save();ctx.globalAlpha=.25;ctx.fillStyle='#d7e6ff';for(let i=0;i<22;i++)ctx.fillRect((i*71-f*.35)%W,(i*37)%Math.max(1,H*.5),2,2);ctx.restore(); [0,.35,.8].forEach((speed,i)=>{ctx.save();ctx.fillStyle=['#2a4275','#17294e','#0a142e'][i];ctx.beginPath();ctx.moveTo(0,H*(.62+i*.1));for(let x=0;x<=W;x+=35)ctx.lineTo(x,H*(.60+i*.1)+Math.sin((x+f*speed*18)/70)*20);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();ctx.restore();}); drawHand(W*.62,H*.22,H*.55,.09);drawText(lines[0],W*.08,H*.22,portrait?22:28,'#fff',W*.48,'left');drawText(lines[1],W*.08,H*.40,portrait?31:39,theme[2],W*.5,'left');drawText(lines[2],W*.08,H*.54,portrait?21:25,'#fff',W*.48,'left');
-      } else if (code === 9) { // 장면 전환
-        const scene=Math.floor(cycle/60)%3; const sceneColors=['#5e2e78','#1c5b62','#a04b27'];ctx.fillStyle=sceneColors[scene];ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=Math.min(1,(cycle%60)/18);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);ctx.restore();drawText(lines[scene],W/2,H*.48,portrait?34:43,'#fff',W*.8);drawText(`말씀 장면 ${scene+1}`,W/2,H*.70,portrait?16:19,theme[2],W*.7);
-      } else { // 방사형 광선
-        ctx.save();ctx.translate(W/2,H/2);ctx.rotate(f*.01);ctx.globalAlpha=.35;ctx.fillStyle=theme[2];for(let i=0;i<20;i++){ctx.rotate(Math.PI/10);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W, -H*.08);ctx.lineTo(W,H*.08);ctx.closePath();ctx.fill();}ctx.restore();drawText(lines[0],W/2,H*.30,portrait?23:29,'#fff',W*.8);drawText(lines[1],W/2,H*.52,portrait?36:46,theme[2],W*.85);drawText(lines[2],W/2,H*.72,portrait?22:27,'#fff',W*.8);
-      }
-      ctx.save();ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,26);ctx.fillStyle=theme[2];ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(header,W/2,17);ctx.restore();
-    }
-
-
-    // 재생 루프 (배속 적용 및 부드러운 순환)
-    function loop() {
+    // 애니메이션 렌더 루프
+    let lastTime = performance.now();
+    function loop(time) {
       if (state.isPlaying) {
-        state.subFrame = (state.subFrame || 0) + (state.speed || 0.75);
-        if (state.subFrame >= 1) {
-          const step = Math.floor(state.subFrame);
-          state.subFrame -= step;
-          state.frame = (state.frame + step) % state.totalFrames;
+        const interval = 1000 / (state.fps * state.speedRate);
+        if (time - lastTime >= interval) {
+          state.frame = (state.frame + 1) % state.totalFrames;
           document.getElementById('lblFrame').innerText = state.frame;
           document.getElementById('timeline').value = state.frame;
           render();
+          lastTime = time;
         }
       }
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
-
-    // 속도 변경 제어
-    function setSpeed(spd) {
-      state.speed = spd;
-      ['btnSpeed05', 'btnSpeed075', 'btnSpeed10'].forEach(id => {
-        const b = document.getElementById(id);
-        b.className = 'px-1.5 py-0.5 rounded text-zinc-400 hover:text-white transition';
-      });
-      if (spd === 0.5) document.getElementById('btnSpeed05').className = 'px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold transition';
-      if (spd === 0.75) document.getElementById('btnSpeed075').className = 'px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold transition';
-      if (spd === 1.0) document.getElementById('btnSpeed10').className = 'px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold transition';
-    }
-    document.getElementById('btnSpeed05').addEventListener('click', () => setSpeed(0.5));
-    document.getElementById('btnSpeed075').addEventListener('click', () => setSpeed(0.75));
-    document.getElementById('btnSpeed10').addEventListener('click', () => setSpeed(1.0));
 
     // 이벤트 리스너 연동
     const btnPlay = document.getElementById('btnPlay');
@@ -938,25 +327,8 @@
       btnPlay.innerText = state.isPlaying ? '❚❚' : '▶';
     });
 
-    document.getElementById('btnPrevFrame').addEventListener('click', () => {
-      state.isPlaying = false;
-      btnPlay.innerText = '▶';
-      state.frame = Math.max(0, state.frame - 1);
-      document.getElementById('lblFrame').innerText = state.frame;
-      document.getElementById('timeline').value = state.frame;
-      render();
-    });
-
-    document.getElementById('btnNextFrame').addEventListener('click', () => {
-      state.isPlaying = false;
-      btnPlay.innerText = '▶';
-      state.frame = Math.min(state.totalFrames, state.frame + 1);
-      document.getElementById('lblFrame').innerText = state.frame;
-      document.getElementById('timeline').value = state.frame;
-      render();
-    });
-
-    document.getElementById('timeline').addEventListener('input', (e) => {
+    const timeline = document.getElementById('timeline');
+    timeline.addEventListener('input', (e) => {
       state.frame = parseInt(e.target.value);
       state.isPlaying = false;
       btnPlay.innerText = '▶';
@@ -964,1047 +336,106 @@
       render();
     });
 
-    // 텍스트 & 색상 실시간 연동
-    function bindInput(id, key) {
-      document.getElementById(id).addEventListener('input', (e) => {
-        state[key] = e.target.value;
-        render();
-      });
-    }
-    bindInput('inputLine1', 'line1');
-    bindInput('inputLine2', 'line2');
-    bindInput('inputLine3', 'line3');
-    bindInput('inputVerse', 'verse');
-    bindInput('inputYoutube', 'youtube');
-    bindInput('inputBlog', 'blog');
-
-    // 폰트 스타일 변경 연동
-    document.getElementById('selectFont').addEventListener('change', (e) => {
-      state.fontFamily = e.target.value;
-      render();
-    });
-    if (document.fonts) {
-      document.fonts.ready.then(() => render());
-    }
-
-    function bindColor(id, lblId, key) {
-      document.getElementById(id).addEventListener('input', (e) => {
-        state[key] = e.target.value;
-        if (lblId) document.getElementById(lblId).innerText = e.target.value;
-        render();
-      });
-    }
-    bindColor('colorLine1', 'lblColorLine1', 'colorLine1');
-    bindColor('colorLine2', 'lblColorLine2', 'colorLine2');
-    bindColor('colorLine3', 'lblColorLine3', 'colorLine3');
-    bindColor('colorVerseBg', null, 'verseBg');
-    bindColor('colorVerseText', null, 'verseText');
-
-    // ==========================================
-    // 💬 카카오톡 동적 공유 & 성도 함께 만들기 초대 로직
-    // ==========================================
-
-    // 현재 작성한 말씀 카드 데이터가 고스란히 담긴 동적 URL 생성
-    function getShareUrl() {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const baseOrigin = isLocal ? 'https://venue-holes-milan-productions.trycloudflare.com' : window.location.origin;
-      const path = window.location.pathname;
-
-      const params = new URLSearchParams();
-      params.set('l1', state.line1);
-      params.set('l2', state.line2);
-      params.set('l3', state.line3);
-      params.set('v', state.verse);
-      if (state.fontFamily) params.set('f', state.fontFamily);
-      if (state.colorLine1) params.set('c1', state.colorLine1);
-      if (state.colorLine2) params.set('c2', state.colorLine2);
-      if (state.colorLine3) params.set('c3', state.colorLine3);
-
-      return `${baseOrigin}${path}?${params.toString()}`;
-    }
-
-    function getInviteMessage() {
-      const url = getShareUrl();
-      return `✝ [별내사랑의교회 · 함께 만드는 말씀 카드]
-"${state.line1} ${state.line2} ${state.line3}"
-(${state.verse})
-
-✨ 은혜로운 말씀 모션 카드입니다.
-아래 링크를 누르면 스마트폰에서 바로 재생되며,
-성도님도 마음에 품은 말씀이나 기도로 직접 수정해 나만의 은혜 영상을 만들 수 있습니다!
-
-👉 지금 열어보고 함께 만들기:
-${url}`;
-    }
-
-    // 모달 제어
-    const shareModal = document.getElementById('shareModal');
-    const invitePreviewText = document.getElementById('invitePreviewText');
-    const inputShareLink = document.getElementById('inputShareLink');
-    const qrCodeImg = document.getElementById('qrCodeImg');
-
-    function openShareModal() {
-      const url = getShareUrl();
-      const msg = getInviteMessage();
-      if (invitePreviewText) invitePreviewText.innerText = msg;
-      if (inputShareLink) inputShareLink.value = url;
-      if (qrCodeImg) {
-        qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}`;
-      }
-      if (shareModal) shareModal.classList.remove('hidden');
-    }
-
-    function closeShareModal() {
-      if (shareModal) shareModal.classList.add('hidden');
-    }
-
-    document.getElementById('btnShareKakao').addEventListener('click', openShareModal);
-    document.getElementById('btnCloseShareModal').addEventListener('click', closeShareModal);
-
-    // 모달 내 카톡 전송 버튼
-    document.getElementById('btnModalSendKakao').addEventListener('click', async () => {
-      const msg = getInviteMessage();
-      const url = getShareUrl();
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: '별내사랑의교회 말씀 모션 카드',
-            text: msg,
-            url: url
-          });
-          closeShareModal();
-          return;
-        } catch (e) {}
-      }
-
-      navigator.clipboard.writeText(msg).then(() => {
-        showToast('카톡 초대장 문구와 링크가 복사되었습니다! 카톡 대화방에 붙여넣기(Cmd+V)하세요. 🎬');
-        closeShareModal();
-      }).catch(() => {
-        copyFallback(msg);
-        closeShareModal();
-      });
-    });
-
-    document.getElementById('btnCopyInviteText').addEventListener('click', () => {
-      const msg = getInviteMessage();
-      navigator.clipboard.writeText(msg).then(() => {
-        showToast('초대장 문구가 복사되었습니다! 카톡에 붙여넣으세요.');
-      }).catch(() => copyFallback(msg));
-    });
-
-    document.getElementById('btnCopyLinkDirect').addEventListener('click', () => {
-      const url = getShareUrl();
-      navigator.clipboard.writeText(url).then(() => {
-        showToast('내 말씀 링크가 복사되었습니다! 🔗');
-      }).catch(() => copyFallback(url));
-    });
-
-    function copyFallback(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast('클립보드에 복사되었습니다!');
-    }
-
-    // URL 파라미터가 있을 때(다른 사람이 공유한 링크로 열었을 때) 자동 적용
-    function loadStateFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      let isShared = false;
-
-      if (params.has('l1')) { state.line1 = params.get('l1'); document.getElementById('inputLine1').value = state.line1; isShared = true; }
-      if (params.has('l2')) { state.line2 = params.get('l2'); document.getElementById('inputLine2').value = state.line2; isShared = true; }
-      if (params.has('l3')) { state.line3 = params.get('l3'); document.getElementById('inputLine3').value = state.line3; isShared = true; }
-      if (params.has('v')) { state.verse = params.get('v'); document.getElementById('inputVerse').value = state.verse; isShared = true; }
-      if (params.has('f')) { state.fontFamily = params.get('f'); document.getElementById('selectFont').value = state.fontFamily; }
-      if (params.has('c1')) { state.colorLine1 = params.get('c1'); document.getElementById('colorLine1').value = state.colorLine1; }
-      if (params.has('c2')) { state.colorLine2 = params.get('c2'); document.getElementById('colorLine2').value = state.colorLine2; }
-      if (params.has('c3')) { state.colorLine3 = params.get('c3'); document.getElementById('colorLine3').value = state.colorLine3; }
-
-      if (isShared) {
-        const banner = document.getElementById('bannerSharedNotice');
-        if (banner) banner.classList.remove('hidden');
-        render();
-      }
-    }
-    loadStateFromUrl();
-
-    const btnCloseSharedBanner = document.getElementById('btnCloseSharedBanner');
-    if (btnCloseSharedBanner) {
-      btnCloseSharedBanner.addEventListener('click', () => {
-        document.getElementById('bannerSharedNotice').classList.add('hidden');
-      });
-    }
-
-    // 모바일 전용 뷰 전환 (입력하기 vs 영상 미리보기)
-    const mobileTabEdit = document.getElementById('mobileTabEdit');
-    const mobileTabPreview = document.getElementById('mobileTabPreview');
-    const previewSection = document.getElementById('previewSection');
-    const sidebarAside = document.getElementById('sidebarAside');
-
-    function setMobileTab(mode) {
-      if (mode === 'preview') {
-        previewSection.classList.remove('hidden');
-        previewSection.classList.add('flex');
-        sidebarAside.classList.add('hidden');
-        sidebarAside.classList.remove('flex');
-        if (mobileTabPreview) mobileTabPreview.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow';
-        if (mobileTabEdit) mobileTabEdit.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-zinc-800 text-zinc-300';
-      } else {
-        previewSection.classList.add('hidden');
-        previewSection.classList.remove('flex');
-        sidebarAside.classList.remove('hidden');
-        sidebarAside.classList.add('flex');
-        if (mobileTabEdit) mobileTabEdit.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow';
-        if (mobileTabPreview) mobileTabPreview.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-zinc-800 text-zinc-300';
-      }
-    }
-
-    if (mobileTabEdit) mobileTabEdit.addEventListener('click', () => setMobileTab('edit'));
-    if (mobileTabPreview) mobileTabPreview.addEventListener('click', () => setMobileTab('preview'));
-
-    const btnQuickWatchPreview = document.getElementById('btnQuickWatchPreview');
-    if (btnQuickWatchPreview) btnQuickWatchPreview.addEventListener('click', () => setMobileTab('preview'));
-
-    // 말씀 입력창 바로가기 스크롤
-    function scrollToEditSection() {
-      setMobileTab('edit');
-      switchTab('verse');
-      const target = document.getElementById('inputLine1');
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => target.focus(), 150);
-      }
-    }
-    const btnJumpToEditHeader = document.getElementById('btnJumpToEditHeader');
-    if (btnJumpToEditHeader) btnJumpToEditHeader.addEventListener('click', scrollToEditSection);
-    const btnScrollToEdit = document.getElementById('btnScrollToEdit');
-    if (btnScrollToEdit) btnScrollToEdit.addEventListener('click', scrollToEditSection);
-    const btnBannerEditJump = document.getElementById('btnBannerEditJump');
-    if (btnBannerEditJump) btnBannerEditJump.addEventListener('click', scrollToEditSection);
-
-    function showToast(msg) {
-      let toast = document.getElementById('toastNotice');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toastNotice';
-        toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#FEE500] text-[#191919] px-6 py-3 rounded-2xl font-bold text-xs shadow-2xl transition-all duration-300 pointer-events-none flex items-center gap-2 border border-amber-300';
-        document.body.appendChild(toast);
-      }
-      toast.innerHTML = `<span class="text-base">💬</span> ${msg}`;
-      toast.style.opacity = '1';
-      toast.style.transform = 'translate(-50%, 0)';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, 20px)';
-      }, 3500);
-    }
-
-    // 성도 추천 말씀 프리셋 데이터
-    const PRESETS = [
-      {
-        line1: '일을 행하시는 여호와',
-        line2: '일을 지어 성취하시는',
-        line3: '하나님',
-        verse: '예레미야 33:2'
-      },
-      {
-        line1: '두려워하지 말라',
-        line2: '내가 너와 함께함이라',
-        line3: '나의 하나님',
-        verse: '이사야 41:10'
-      },
-      {
-        line1: '내게 능력 주시는',
-        line2: '자 안에서 내가 모든 것을',
-        line3: '할 수 있느니라',
-        verse: '빌립보서 4:13'
-      },
-      {
-        line1: '여호와는 나의 목자시니',
-        line2: '내게 부족함이',
-        line3: '없으리로다',
-        verse: '시편 23:1'
-      }
+    // 인풋 데이터 실시간 바인딩
+    const bindings = [
+      { id: 'line1', key: 'line1' },
+      { id: 'line2', key: 'line2' },
+      { id: 'line3', key: 'line3' },
+      { id: 'verse', key: 'verse' },
+      { id: 'col1', key: 'col1' },
+      { id: 'col2', key: 'col2' },
+      { id: 'col3', key: 'col3' },
+      { id: 'youtube', key: 'youtube' },
+      { id: 'blog', key: 'blog' },
+      { id: 'fontSelect', key: 'font' }
     ];
-
-    document.querySelectorAll('.btnPreset').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.getAttribute('data-preset'));
-        const p = PRESETS[idx];
-        if (!p) return;
-        state.line1 = p.line1;
-        state.line2 = p.line2;
-        state.line3 = p.line3;
-        state.verse = p.verse;
-        document.getElementById('inputLine1').value = p.line1;
-        document.getElementById('inputLine2').value = p.line2;
-        document.getElementById('inputLine3').value = p.line3;
-        document.getElementById('inputVerse').value = p.verse;
-        state.frame = 0;
+    bindings.forEach(({ id, key }) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', (e) => {
+        state[key] = e.target.value;
         render();
-        showToast(`'${p.verse}' 말씀이 적용되었습니다! ✨`);
+      });
+      el.addEventListener('change', (e) => {
+        state[key] = e.target.value;
+        render();
       });
     });
 
-    // 원본 템플릿 01–10 선택 상태
-    document.querySelectorAll('.btnMotionCode').forEach(btn => {
-      btn.className += ' px-2.5 py-2 rounded-lg bg-zinc-900 hover:bg-violet-700 text-[11px] text-left text-zinc-200 border border-zinc-700 transition';
+    // 속도 컨트롤
+    document.querySelectorAll('.btn-speed').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.btnMotionCode').forEach(b => {
-          b.classList.remove('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
-          b.classList.add('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
+        document.querySelectorAll('.btn-speed').forEach(b => {
+          b.className = 'btn-speed px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 hover:text-white';
         });
-        btn.classList.remove('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
-        btn.classList.add('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
-        const code = String(btn.dataset.code).padStart(2, '0');
-        const title = btn.dataset.title;
-        state.motionCodeSelection = Number(btn.dataset.code);
-        if (state.motionCodeSelection === 4 && motionAspect !== 'portrait') {
-          setMotionAspect('portrait');
-          showToast('CODE 04는 원본이 세로 쇼츠라 9:16으로 맞췄습니다.');
-        }
-        document.getElementById('selectedMotionCode').innerText = `CODE ${code} · ${title}`;
-        showToast(`🎬 CODE ${code} 선택 완료! 위 문구를 입력한 뒤 [미리보기 실행]을 누르세요.`);
+        btn.className = 'btn-speed px-2 py-0.5 rounded bg-blue-600 text-white font-semibold';
+        state.speedRate = parseFloat(btn.dataset.speed);
       });
     });
 
-    let motionAspect = 'landscape';
-    function applyMotionCanvasSize() {
-      const landscape = motionAspect === 'landscape';
-      canvas.width = landscape ? 640 : 360;
-      canvas.height = landscape ? 360 : 640;
-      const frame = canvas.parentElement;
-      frame.classList.remove('aspect-[9/16]', 'aspect-video');
-      frame.classList.add(landscape ? 'aspect-video' : 'aspect-[9/16]');
-    }
-    function setMotionAspect(aspect) {
-      motionAspect = aspect;
-      const landscape = aspect === 'landscape';
-      applyMotionCanvasSize();
-      document.getElementById('btnLandscape').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
-      document.getElementById('btnPortrait').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${!landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
-      document.getElementById('selectedAspectHelp').innerText = landscape ? '가로 16:9 · 유튜브·강의·교회 안내 영상' : '세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스';
-      showToast(landscape ? '▭ 가로 16:9 영상으로 선택했습니다.' : '▯ 세로 9:16 쇼츠로 선택했습니다.');
-      if (state.motionCode) render();
-    }
-    document.getElementById('btnLandscape').addEventListener('click', () => setMotionAspect('landscape'));
-    document.getElementById('btnPortrait').addEventListener('click', () => setMotionAspect('portrait'));
-
-    document.getElementById('btnRunMotionCode').addEventListener('click', () => {
-      if (!state.motionCodeSelection) {
-        showToast('먼저 가로·세로와 CODE 01~10 중 하나를 선택하세요.');
-        return;
-      }
-      state.motionCode = state.motionCodeSelection;
-      applyMotionCanvasSize();
-      state.frame = 0;
-      state.isPlaying = true;
-      btnPlay.innerText = '❚❚';
-      render();
-      showToast(`▶ CODE ${String(state.motionCode).padStart(2, '0')} 미리보기를 실행합니다.`);
-    });
-
-
-    // 이미지 다운로드 기능 (모바일 갤러리 저장 호환)
-    document.getElementById('btnDownloadImage').addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = `${state.verse.replace(/[\s:]/g, '_')}_말씀카드.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('📸 고화질 말씀 이미지가 저장되었습니다!');
-    });
-
-    // MP4/영상 다운로드 기능 (서버 고화질 직통 + 모바일 녹화 지원)
-    document.getElementById('btnDownloadMp4').addEventListener('click', () => {
-      // 1) 기본 렘 33:2 말씀일 경우 1080x1920 초고화질 서버 렌더링 파일 다운로드
-      if (state.line1 === '일을 행하시는 여호와' && state.line2 === '일을 지어 성취하시는') {
-        const downloadEndpoint = `http://localhost:5500/download?file=videos/Jeremiah33_Shorts.mp4`;
-        const a = document.createElement('a');
-        a.href = downloadEndpoint;
-        a.download = 'Jeremiah33_Shorts.mp4';
-        a.click();
-        showToast('🎬 고화질 말씀 영상이 다운로드되었습니다!');
-        return;
-      }
-
-      // 2) 성도님이 직접 글씨를 수정한 경우 브라우저 즉시 캔버스 녹화
-      recordCanvasVideo();
-    });
-
-    function recordCanvasVideo() {
-      if (!window.MediaRecorder) {
-        showToast('현재 기기에서는 [이미지 저장]을 권장합니다!');
-        return;
-      }
-      showToast('🎬 맞춤 말씀 영상을 생성 중입니다... (약 8초 소요)');
-      const stream = canvas.captureStream(30);
-      let mimeType = 'video/webm';
-      if (MediaRecorder.isTypeSupported('video/mp4')) {
-        mimeType = 'video/mp4';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-        mimeType = 'video/webm;codecs=vp9';
-      }
-      const recorder = new MediaRecorder(stream, { mimeType });
-      const chunks = [];
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-        a.download = `${state.verse.replace(/[\s:]/g, '_')}_말씀영상.${ext}`;
-        a.click();
-        showToast('🎬 말씀 영상이 성공적으로 저장되었습니다!');
-      };
-
-      state.frame = 0;
-      state.isPlaying = true;
-      recorder.start();
-      setTimeout(() => {
-        recorder.stop();
-      }, 8200);
-    }
-
-    // Remotion 코드 생성기 (천천히 감속된 설정값 적용)
-    function getRemotionCode() {
-      return `import React from 'react';
+    // Remotion 가로 전용 16:9 코드 생성 및 복사
+    document.getElementById('btnCopyCode').addEventListener('click', () => {
+      const code = `// Remotion Scene.tsx (16:9 가로 버전)
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export const BibleShortsScene: React.FC = () => {
+export const BibleLanscapeScene = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 상/하단 주소 페이드인
-  const topOpacity = interpolate(frame, [0, 24], [0, 1], { extrapolateRight: 'clamp' });
-  const bottomOpacity = interpolate(frame, [30, 65], [0, 1], { extrapolateRight: 'clamp' });
-
-  // 흰색 큰 박스 페이드인 (부드러운 정착)
-  const boxOpacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: 'clamp' });
-
-  // 1번째 줄 바운스 (Frame 24, 감속된 편안한 묵상 속도)
-  const spr1 = spring({ frame: frame - 24, fps, config: { damping: 18, stiffness: 55, mass: 1.2 } });
-
-  // 2번째 줄 바운스 (Frame 72)
-  const spr2 = spring({ frame: frame - 72, fps, config: { damping: 18, stiffness: 55, mass: 1.2 } });
-
-  // 3번째 강조 줄 바운스 + 심장박동 펄스 모션 (Frame 120)
-  const spr3 = spring({ frame: frame - 120, fps, config: { damping: 16, stiffness: 60, mass: 1.2 } });
-  const pulse = frame > 140 ? 1 + Math.sin((frame - 140) * 0.1) * 0.035 : 1;
-  const line3Scale = Math.max(0, spr3) * pulse;
-
-  // 장절 뱃지 (Frame 165)
-  const sprVerse = spring({ frame: frame - 165, fps, config: { damping: 16, stiffness: 55, mass: 1.2 } });
+  const p1 = interpolate(frame, [18, 38], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const p2 = interpolate(frame, [36, 56], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const p3 = interpolate(frame, [54, 76], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const pBadge = interpolate(frame, [72, 90], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
   return (
-    <AbsoluteFill
-      style={{
-        background: 'linear-gradient(180deg, #090e18 0%, #0f1b32 50%, #080d16 100%)',
-        fontFamily: '"Gowun Batang", "Nanum Myeongjo", serif',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '100px 48px 80px 48px',
-        color: '#ffffff',
-      }}
-    >
-      {/* 구글 폰트 로드 */}
-      <style>{\`
-        @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@700;800&display=swap');
-      \`}</style>
-
-      {/* 상단 유튜브 주소 */}
-      <div style={{ opacity: topOpacity, textAlign: 'center' }}>
-        <div style={{
-          display: 'inline-block',
-          background: 'rgba(239, 68, 68, 0.15)',
-          border: '1.5px solid rgba(239, 68, 68, 0.5)',
-          padding: '8px 22px',
-          borderRadius: 999,
-          color: '#ef4444',
-          fontSize: 26,
-          fontWeight: 700,
-        }}>
-          ▶ 별내사랑의교회
-        </div>
-        <p style={{ fontSize: 24, color: '#94a3b8', marginTop: 12 }}>
-          ${state.youtube}
-        </p>
+    <AbsoluteFill style={{
+      background: 'linear-gradient(135deg, ${state.bg1} 0%, ${state.bg2} 100%)',
+      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+      alignItems: 'center', padding: '70px 60px 50px 60px',
+      fontFamily: '${state.font === 'Gowun Batang' ? 'Gowun Batang, serif' : 'Pretendard, sans-serif'}'
+    }}>
+      {/* 상단 */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 24, color: '#ef4444', fontWeight: 700 }}>▶ 별내사랑의교회</div>
+        <p style={{ fontSize: 20, color: '#94a3b8', margin: '4px 0 0 0' }}>${state.youtube}</p>
       </div>
 
-      {/* 중앙 대형 화이트 카드 */}
-      <div
-        style={{
-          opacity: boxOpacity,
-          width: '100%',
-          maxWidth: 980,
-          background: '#ffffff',
-          borderRadius: 64,
-          padding: '90px 40px 80px 40px',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 40,
-        }}
-      >
-        <span style={{ fontSize: 96, color: '#3b82f6', lineHeight: 1 }}>❝</span>
-
-        {/* 1번째 줄 (한 줄 보장, 줄바꿈 방지) */}
-        <div style={{
-          transform: \`scale(\${Math.max(0, spr1)})\`,
-          color: '${state.colorLine1}',
-          fontSize: 76,
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          whiteSpace: 'nowrap',
-        }}>
+      {/* 가로형 대형 중앙 보드 */}
+      <div style={{
+        width: 1000, height: 520, background: '#ffffff', borderRadius: 48,
+        padding: '50px 60px', textAlign: 'center', boxShadow: '0 40px 100px rgba(0,0,0,0.5)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
+      }}>
+        <div style={{ fontSize: 72, color: '#2563eb', marginBottom: 5 }}>❝</div>
+        <div style={{ fontSize: 44, fontWeight: 700, color: '${state.col1}', opacity: p1, transform: \`translateY(\${(1-p1)*15}px)\`, marginBottom: 20 }}>
           ${state.line1}
         </div>
-
-        {/* 2번째 줄 (한 줄 보장, 줄바꿈 방지) */}
-        <div style={{
-          transform: \`scale(\${Math.max(0, spr2)})\`,
-          color: '${state.colorLine2}',
-          fontSize: 76,
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          whiteSpace: 'nowrap',
-        }}>
+        <div style={{ fontSize: 46, fontWeight: 700, color: '${state.col2}', opacity: p2, transform: \`translateY(\${(1-p2)*15}px)\`, marginBottom: 25 }}>
           ${state.line2}
         </div>
-
-        {/* 3번째 강조 줄 */}
-        <div style={{
-          transform: \`scale(\${line3Scale})\`,
-          color: '${state.colorLine3}',
-          fontSize: 110,
-          fontWeight: 900,
-          letterSpacing: '-0.02em',
-          whiteSpace: 'nowrap',
-        }}>
+        <div style={{ fontSize: 52, fontWeight: 800, color: '${state.col3}', opacity: p3, transform: \`translateY(\${(1-p3)*15}px)\`, marginBottom: 35 }}>
           ${state.line3}
         </div>
-
-        {/* 장절 뱃지 */}
-        <div style={{
-          transform: \`scale(\${Math.max(0, sprVerse)})\`,
-          background: '${state.verseBg}',
-          color: '${state.verseText}',
-          border: '2px solid ${state.verseText}55',
-          padding: '14px 44px',
-          borderRadius: 999,
-          fontSize: 44,
-          fontWeight: 700,
-          marginTop: 10,
-          whiteSpace: 'nowrap',
-        }}>
+        <div style={{ opacity: pBadge, display: 'inline-block', background: '#eff6ff', color: '#1d4ed8', fontSize: 24, fontWeight: 700, padding: '10px 32px', borderRadius: 999 }}>
           ${state.verse}
         </div>
       </div>
 
-      {/* 하단 블로그 주소 */}
-      <div style={{ opacity: bottomOpacity, textAlign: 'center' }}>
-        <div style={{
-          display: 'inline-block',
-          background: 'rgba(16, 185, 129, 0.15)',
-          border: '1.5px solid rgba(16, 185, 129, 0.5)',
-          padding: '8px 22px',
-          borderRadius: 999,
-          color: '#10b981',
-          fontSize: 24,
-          fontWeight: 700,
-        }}>
-          N 블로그 공식 채널
-        </div>
-        <p style={{ fontSize: 22, color: '#94a3b8', marginTop: 10 }}>
-          ${state.blog}
-        </p>
+      {/* 하단 */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 22, color: '#10b981', fontWeight: 700 }}>N 블로그 공식 채널</div>
+        <p style={{ fontSize: 18, color: '#94a3b8', margin: '4px 0 0 0' }}>${state.blog}</p>
       </div>
     </AbsoluteFill>
   );
 };`;
-    }
-
-    // 모달 토글 및 복사
-    const codeModal = document.getElementById('codeModal');
-    const btnOpenCode = document.getElementById('btnOpenCode');
-    if (btnOpenCode) {
-      btnOpenCode.addEventListener('click', () => {
-        document.getElementById('codeText').innerText = getRemotionCode();
-        codeModal.classList.remove('hidden');
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('btnCopyCode');
+        btn.innerHTML = '<span>✓</span> 가로 복사 완료!';
+        setTimeout(() => { btn.innerHTML = '<span>📋</span> Remotion 가로 코드 복사'; }, 1500);
       });
-    }
-
-    document.getElementById('btnCloseModal').addEventListener('click', () => {
-      codeModal.classList.add('hidden');
     });
 
-    document.getElementById('btnCopyModalCode').addEventListener('click', () => {
-      const code = getRemotionCode();
-      const ta = document.createElement('textarea');
-      ta.value = code;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-
-      const btn = document.getElementById('btnCopyModalCode');
-      btn.innerText = '복사 완료!';
-      setTimeout(() => { btn.innerText = '코드 복사'; }, 1500);
-    });
-
-    // ==========================================
-    // 🎵 MP3 ➔ MP4 변환 코너 자바스크립트 로직
-    // ==========================================
-
-    // 1. 탭 네비게이션
-    const tabBtnVerse = document.getElementById('tabBtnVerse');
-    const tabBtnMp3 = document.getElementById('tabBtnMp3');
-    const panelVerse = document.getElementById('panelVerse');
-    const panelMp3 = document.getElementById('panelMp3');
-
-    function switchTab(target) {
-      if (target === 'mp3') {
-        panelVerse.classList.add('hidden');
-        panelMp3.classList.remove('hidden');
-        tabBtnMp3.className = 'flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow';
-        tabBtnVerse.className = 'flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-zinc-400 hover:text-white';
-        // 음원이 아직 없으면 샘플 자동 로드 제안
-        if (!audioState.audioBase64) {
-          loadSampleAudio();
-        }
-      } else {
-        panelMp3.classList.add('hidden');
-        panelVerse.classList.remove('hidden');
-        tabBtnVerse.className = 'flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow';
-        tabBtnMp3.className = 'flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-zinc-400 hover:text-white relative';
-      }
-    }
-
-    if (tabBtnVerse) tabBtnVerse.addEventListener('click', () => switchTab('verse'));
-    if (tabBtnMp3) tabBtnMp3.addEventListener('click', () => switchTab('mp3'));
-    const btnNavMp3Header = document.getElementById('btnNavMp3Header');
-    if (btnNavMp3Header) btnNavMp3Header.addEventListener('click', () => switchTab('mp3'));
-
-    // 2. Web Audio Context 초기화
-    function initAudioContext() {
-      if (!audioState.audioCtx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        audioState.audioCtx = new AudioCtx();
-        audioState.analyser = audioState.audioCtx.createAnalyser();
-        audioState.analyser.fftSize = 64;
-        audioState.sourceNode = audioState.audioCtx.createMediaElementSource(audioState.audioElem);
-        audioState.sourceNode.connect(audioState.analyser);
-        audioState.analyser.connect(audioState.audioCtx.destination);
-      }
-      if (audioState.audioCtx.state === 'suspended') {
-        audioState.audioCtx.resume();
-      }
-    }
-
-    // 3. 파일 업로드 및 드롭존 이벤트
-    const dropZone = document.getElementById('dropZone');
-    const inputAudioFile = document.getElementById('inputAudioFile');
-    const lblSelectedAudio = document.getElementById('lblSelectedAudio');
-    const lblAudioDuration = document.getElementById('lblAudioDuration');
-
-    if (dropZone && inputAudioFile) {
-      dropZone.addEventListener('click', () => inputAudioFile.click());
-
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-indigo-500', 'bg-indigo-950/30');
-      });
-
-      dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/30');
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/30');
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-          handleAudioFile(e.dataTransfer.files[0]);
-        }
-      });
-
-      inputAudioFile.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-          handleAudioFile(e.target.files[0]);
-        }
-      });
-    }
-
-    function handleAudioFile(file) {
-      if (!file.type.includes('audio') && !file.name.match(/\.(mp3|wav|m4a|aac|ogg)$/i)) {
-        showToast('MP3 또는 오디오 파일만 불러올 수 있습니다!');
-        return;
-      }
-      audioState.audioFileName = file.name;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        audioState.audioBase64 = ev.target.result;
-        audioState.audioElem.src = ev.target.result;
-        if (lblSelectedAudio) lblSelectedAudio.innerText = `🎵 ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)}MB)`;
-        showToast(`'${file.name}' 음원이 준비되었습니다! ▶ 버튼으로 들어보세요.`);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // 샘플 찬양 음원 로드
-    async function loadSampleAudio() {
-      try {
-        const resp = await fetch('/audio/grace_sample.mp3');
-        if (!resp.ok) return;
-        const blob = await resp.blob();
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          audioState.audioBase64 = ev.target.result;
-          audioState.audioElem.src = ev.target.result;
-          audioState.audioFileName = '은혜피아노_찬양샘플.mp3';
-          if (lblSelectedAudio) lblSelectedAudio.innerText = '🎵 은혜피아노_찬양샘플.mp3 (0:15)';
-        };
-        reader.readAsDataURL(blob);
-      } catch (err) {
-        console.warn('Sample audio load failed:', err);
-      }
-    }
-
-    const btnLoadSampleAudio = document.getElementById('btnLoadSampleAudio');
-    if (btnLoadSampleAudio) {
-      btnLoadSampleAudio.addEventListener('click', async () => {
-        showToast('은혜 피아노 찬양 샘플을 불러오는 중...');
-        await loadSampleAudio();
-        showToast('✨ 은혜 피아노 찬양 음원이 로드되었습니다! ▶ 버튼을 눌러보세요.');
-      });
-    }
-
-    // 4. 오디오 플레이어 컨트롤
-    const btnAudioPlay = document.getElementById('btnAudioPlay');
-    const audioSeek = document.getElementById('audioSeek');
-    const audioVolume = document.getElementById('audioVolume');
-    const lblAudioCurrent = document.getElementById('lblAudioCurrent');
-    const lblAudioTotal = document.getElementById('lblAudioTotal');
-    const chkWaveform = document.getElementById('chkWaveform');
-
-    function formatTime(sec) {
-      if (isNaN(sec) || !isFinite(sec)) return '0:00';
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    if (btnAudioPlay) {
-      btnAudioPlay.addEventListener('click', () => {
-        initAudioContext();
-        if (audioState.audioElem.paused) {
-          if (!audioState.audioElem.src) {
-            loadSampleAudio().then(() => {
-              audioState.audioElem.play();
-              audioState.isPlaying = true;
-              btnAudioPlay.innerText = '❚❚';
-            });
-            return;
-          }
-          audioState.audioElem.play();
-          audioState.isPlaying = true;
-          btnAudioPlay.innerText = '❚❚';
-        } else {
-          audioState.audioElem.pause();
-          audioState.isPlaying = false;
-          btnAudioPlay.innerText = '▶';
-        }
-      });
-    }
-
-    audioState.audioElem.addEventListener('timeupdate', () => {
-      const cur = audioState.audioElem.currentTime;
-      const dur = audioState.audioElem.duration || 1;
-      if (lblAudioCurrent) lblAudioCurrent.innerText = formatTime(cur);
-      if (audioSeek) audioSeek.value = (cur / dur) * 100;
-    });
-
-    audioState.audioElem.addEventListener('loadedmetadata', () => {
-      const dur = audioState.audioElem.duration;
-      if (lblAudioTotal) lblAudioTotal.innerText = formatTime(dur);
-      if (lblAudioDuration) lblAudioDuration.innerText = `길이: ${formatTime(dur)}`;
-    });
-
-    audioState.audioElem.addEventListener('ended', () => {
-      audioState.isPlaying = false;
-      if (btnAudioPlay) btnAudioPlay.innerText = '▶';
-    });
-
-    if (audioSeek) {
-      audioSeek.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        const dur = audioState.audioElem.duration || 0;
-        audioState.audioElem.currentTime = (val / 100) * dur;
-      });
-    }
-
-    if (audioVolume) {
-      audioVolume.addEventListener('input', (e) => {
-        audioState.audioElem.volume = parseFloat(e.target.value);
-      });
-    }
-
-    if (chkWaveform) {
-      chkWaveform.addEventListener('change', (e) => {
-        audioState.showWaveform = e.target.checked;
-        render();
-      });
-    }
-
-    // 5. 모드 라디오 버튼 스타일 토글
-    const radMotion = document.querySelector('input[value="motion"]');
-    const radCard = document.querySelector('input[value="card"]');
-    const lblModeMotion = document.getElementById('lblModeMotion');
-    const lblModeCard = document.getElementById('lblModeCard');
-
-    function updateModeStyle() {
-      if (radMotion && radMotion.checked) {
-        if (lblModeMotion) lblModeMotion.className = 'p-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/70 cursor-pointer flex flex-col gap-1 hover:border-indigo-400 transition';
-        if (lblModeCard) lblModeCard.className = 'p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 cursor-pointer flex flex-col gap-1 hover:border-zinc-700 transition';
-      } else if (lblModeCard) {
-        lblModeCard.className = 'p-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/70 cursor-pointer flex flex-col gap-1 hover:border-indigo-400 transition';
-        if (lblModeMotion) lblModeMotion.className = 'p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 cursor-pointer flex flex-col gap-1 hover:border-zinc-700 transition';
-      }
-    }
-    if (radMotion) radMotion.addEventListener('change', updateModeStyle);
-    if (radCard) radCard.addEventListener('change', updateModeStyle);
-
-    // 6. 고해상도 1080x1920 카드 렌더링 함수
-    function getHighResCardImage() {
-      const off = document.createElement('canvas');
-      off.width = 1080;
-      off.height = 1920;
-      const octx = off.getContext('2d');
-      octx.scale(3, 3);
-
-      const prevFrame = state.frame;
-      state.frame = 180;
-
-      const W = 360;
-      const H = 640;
-
-      // 배경
-      const grad = octx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#090e18');
-      grad.addColorStop(0.5, '#0f1b32');
-      grad.addColorStop(1, '#080d16');
-      octx.fillStyle = grad;
-      octx.fillRect(0, 0, W, H);
-
-      // 글로우
-      const glow = octx.createRadialGradient(W / 2, H / 2, 30, W / 2, H / 2, 230);
-      glow.addColorStop(0, 'rgba(59, 130, 246, 0.14)');
-      glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
-      octx.fillStyle = glow;
-      octx.fillRect(0, 0, W, H);
-
-      // 유튜브 헤더
-      const topY = 30;
-      octx.textAlign = 'center';
-      octx.fillStyle = 'rgba(239, 68, 68, 0.15)';
-      octx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
-      octx.lineWidth = 1;
-      octx.beginPath();
-      octx.roundRect(W / 2 - 70, topY, 140, 24, 12);
-      octx.fill();
-      octx.stroke();
-      octx.fillStyle = '#ef4444';
-      octx.font = 'bold 11px Pretendard';
-      octx.fillText('▶ 별내사랑의교회', W / 2, topY + 16);
-      octx.fillStyle = '#94a3b8';
-      octx.font = '500 10.5px monospace';
-      octx.fillText(state.youtube, W / 2, topY + 39);
-
-      // 중앙 카드
-      const boxCardW = 336;
-      const boxCardH = 430;
-      const boxCardX = (W - boxCardW) / 2;
-      const boxCardY = (H - boxCardH) / 2;
-      octx.save();
-      octx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-      octx.shadowBlur = 32;
-      octx.shadowOffsetY = 16;
-      octx.fillStyle = '#ffffff';
-      octx.beginPath();
-      octx.roundRect(boxCardX, boxCardY, boxCardW, boxCardH, 28);
-      octx.fill();
-      octx.restore();
-
-      // 인용 부호
-      octx.textAlign = 'center';
-      octx.fillStyle = '#3b82f6';
-      octx.font = 'bold 36px serif';
-      octx.fillText('❝', W / 2, boxCardY + 46);
-
-      // 1번째 줄
-      octx.fillStyle = state.colorLine1;
-      octx.font = '700 24px ' + state.fontFamily;
-      octx.fillText(state.line1, W / 2, boxCardY + 105);
-
-      // 2번째 줄
-      octx.fillStyle = state.colorLine2;
-      octx.font = '700 24px ' + state.fontFamily;
-      octx.fillText(state.line2, W / 2, boxCardY + 190);
-
-      // 3번째 줄
-      octx.fillStyle = state.colorLine3;
-      octx.font = '700 38px ' + state.fontFamily;
-      octx.fillText(state.line3, W / 2, boxCardY + 280);
-
-      // 장절 뱃지
-      const badgeY = boxCardY + boxCardH - 48;
-      octx.save();
-      octx.translate(W / 2, badgeY);
-      octx.fillStyle = state.verseBg;
-      octx.strokeStyle = state.verseText + '55';
-      octx.lineWidth = 1.5;
-      octx.beginPath();
-      octx.roundRect(-90, -18, 180, 36, 18);
-      octx.fill();
-      octx.stroke();
-      octx.fillStyle = state.verseText;
-      octx.font = '700 18px ' + state.fontFamily;
-      octx.textBaseline = 'middle';
-      octx.fillText(state.verse, 0, 0);
-      octx.restore();
-
-      // 하단 블로그
-      const botY = H - 76;
-      octx.fillStyle = 'rgba(16, 185, 129, 0.15)';
-      octx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
-      octx.lineWidth = 1;
-      octx.beginPath();
-      octx.roundRect(W / 2 - 70, botY, 140, 24, 12);
-      octx.fill();
-      octx.stroke();
-      octx.fillStyle = '#10b981';
-      octx.font = 'bold 11px Pretendard';
-      octx.fillText('N 블로그 공식 채널', W / 2, botY + 16);
-      octx.fillStyle = '#94a3b8';
-      octx.font = '500 9.5px monospace';
-      octx.fillText(state.blog, W / 2, botY + 41);
-
-      state.frame = prevFrame;
-      return off.toDataURL('image/png');
-    }
-
-    // 7. MP3 -> MP4 비디오 변환 메인 핸들러
-    const btnConvertMp3ToMp4 = document.getElementById('btnConvertMp3ToMp4');
-    const convertProgressCard = document.getElementById('convertProgressCard');
-    const convertProgressBar = document.getElementById('convertProgressBar');
-    const convertStatusText = document.getElementById('convertStatusText');
-    const convertPercentText = document.getElementById('convertPercentText');
-    const convertSuccessBox = document.getElementById('convertSuccessBox');
-
-    if (btnConvertMp3ToMp4) {
-      btnConvertMp3ToMp4.addEventListener('click', async () => {
-        if (!audioState.audioBase64) {
-          showToast('변환할 음원을 선택하거나 [은혜 피아노 찬양 샘플]을 먼저 눌러주세요! 🎵');
-          return;
-        }
-
-        const mode = document.querySelector('input[name="convertMode"]:checked')?.value || 'motion';
-        convertProgressCard.classList.remove('hidden');
-        convertSuccessBox.classList.add('hidden');
-        convertProgressBar.style.width = '20%';
-        convertPercentText.innerText = '20%';
-        convertStatusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span> 1단계: 음원 및 고화질 비디오 데이터 준비 중...';
-
-        try {
-          let imageBase64 = null;
-          if (mode === 'card') {
-            convertProgressBar.style.width = '40%';
-            convertPercentText.innerText = '40%';
-            convertStatusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span> 1.5단계: 1080x1920 고화질 말씀 카드 렌더링 중...';
-            imageBase64 = getHighResCardImage();
-          }
-
-          convertProgressBar.style.width = '60%';
-          convertPercentText.innerText = '60%';
-          convertStatusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span> 2단계: FFmpeg 초고화질 비디오 합성 중...';
-
-          const cleanVerse = (state.verse || '말씀').replace(/[\s:]/g, '_');
-          const cleanAudioName = (audioState.audioFileName || '찬양').replace(/\.[^/.]+$/, '').replace(/[\s:]/g, '_');
-          const outFilename = `${cleanVerse}_${cleanAudioName}.mp4`;
-
-          const response = await fetch('/convert-mp3', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              audioBase64: audioState.audioBase64,
-              imageBase64: imageBase64,
-              mode: mode,
-              filename: outFilename
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('서버 인코딩 응답 실패');
-          }
-
-          convertProgressBar.style.width = '90%';
-          convertPercentText.innerText = '90%';
-          convertStatusText.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 3단계: MP4 비디오 파일 수신 및 저장 준비 중...';
-
-          const blob = await response.blob();
-          convertProgressBar.style.width = '100%';
-          convertPercentText.innerText = '100%';
-          convertStatusText.innerHTML = '✨ MP4 비디오 변환 성공!';
-
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = outFilename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-
-          convertSuccessBox.classList.remove('hidden');
-          showToast('🎉 MP3 찬양 말씀 비디오(MP4)가 다운로드되었습니다!');
-
-        } catch (err) {
-          console.error('FFmpeg convert failed:', err);
-          convertStatusText.innerHTML = '⚠️ 서버 변환 일시 지연 - 브라우저 직접 녹화 모드로 전환합니다.';
-          showToast('브라우저 직접 녹화 방식으로 비디오를 생성합니다.');
-          recordCanvasVideo();
-        }
-      });
-    }
-
-    // 8. 변환 완료 후 카톡 공유 문구 복사
-    const btnShareConvertedKakao = document.getElementById('btnShareConvertedKakao');
-    if (btnShareConvertedKakao) {
-      btnShareConvertedKakao.addEventListener('click', () => {
-        const text = `✝ [별내사랑의교회 · 은혜 말씀 찬양 영상]
-"${state.line1} ${state.line2} ${state.line3}"
-(${state.verse})
-
-🎵 찬양과 말씀이 담긴 세로 쇼츠 영상입니다.
-함께 은혜를 나누어보세요! ✨
-▶ 바로보기: ${shareUrl}`;
-
-        if (navigator.share) {
-          navigator.share({ title: '별내사랑의교회 말씀 찬양 영상', text, url: shareUrl }).catch(() => {});
-          return;
-        }
-        navigator.clipboard.writeText(text).then(() => {
-          showToast('카톡 공유 문구가 복사되었습니다! 카톡 대화방에 붙여넣기(Cmd+V)하세요. 🎬');
-        });
-      });
-    }
+    render();
   </script>
 </body>
 </html>
