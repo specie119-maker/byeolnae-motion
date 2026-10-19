@@ -189,6 +189,9 @@
 
         <!-- 모션그래픽 코드 템플릿 선택 -->
         <div class="bg-violet-950/25 p-3 rounded-xl border border-violet-400/35 space-y-2">
+          <div class="rounded-lg bg-violet-950/70 border border-violet-400/30 px-3 py-2 text-[11px] leading-relaxed text-violet-100">
+            <b>만드는 순서</b><br>① 가로·세로 선택 → ② 코드 선택 → ③ 위 문구 3줄 입력 → ④ 아래 실행하기
+          </div>
           <div class="flex items-center gap-1.5 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
             <button type="button" id="btnLandscape" class="btnAspect flex-1 py-2 rounded-md bg-violet-600 text-white text-xs font-bold transition">▭ 가로 16:9</button>
             <button type="button" id="btnPortrait" class="btnAspect flex-1 py-2 rounded-md text-zinc-400 hover:text-white text-xs font-bold transition">▯ 세로 9:16</button>
@@ -220,6 +223,9 @@
             <button type="button" class="btnMotionCode" data-code="19" data-title="강의 영상 레시피">19 · 강의 영상</button>
             <button type="button" class="btnMotionCode" data-code="20" data-title="모션 블러">20 · 모션 블러</button>
           </div>
+          <button type="button" id="btnRunMotionCode" class="w-full py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-sm font-black shadow-lg transition active:scale-[.99]">
+            ▶ 선택한 코드로 미리보기 실행하기
+          </button>
         </div>
 
         <!-- 폰트 서체 선택 (부드러운 서체) -->
@@ -558,8 +564,15 @@
       verseBg: '#eff6ff',
       verseText: '#2563eb',
       youtube: 'https://www.youtube.com/@별내사랑의교회1',
-      blog: 'https://blog.naver.com/aiyamok2015/224430812151'
+      blog: 'https://blog.naver.com/aiyamok2015/224430812151',
+      motionCode: null,
+      motionCodeSelection: null
     };
+
+    const motionProducts = {};
+    [[1, 'https://www.aicitybuilders.com/video/remotion/assets/product_coke.png'], [5, 'https://www.aicitybuilders.com/video/remotion/assets/product_chips_bowl.png']].forEach(([id, src]) => {
+      const image = new Image(); image.crossOrigin = 'anonymous'; image.src = src; image.onload = () => render(); motionProducts[id] = image;
+    });
 
     // 속도를 매우 부드럽고 천천히 늦춘 Remotion 감쇠 조화 진동(Spring) 수식
     // stiffness: 55, damping: 18로 급격한 튕김 없이 부드럽게 안착
@@ -580,6 +593,11 @@
       const W = canvas.width;
       const H = canvas.height;
       const f = state.frame;
+
+      if (state.motionCode) {
+        renderMotionCodePreview(W, H, f, state.motionCode);
+        return;
+      }
 
 
       // 1. 깊은 배경 그라데이션
@@ -784,6 +802,25 @@
       ctx.font = '500 9.5px monospace';
       ctx.fillText(state.blog, W / 2, botY + 41);
       ctx.restore();
+    }
+
+    function renderMotionCodePreview(W, H, f, code) {
+      const portrait = motionAspect === 'portrait';
+      const theme = code === 5 ? ['#d3122f', '#6e0616', '#ffd400'] : ['#e4002b', '#3a0008', '#ffffff'];
+      const bg = ctx.createRadialGradient(W * .5, H * .5, 12, W * .5, H * .5, H * .8);
+      bg.addColorStop(0, theme[0]); bg.addColorStop(1, theme[1]); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.globalAlpha = .16; ctx.strokeStyle = theme[2]; ctx.lineWidth = 1;
+      for (let i = 0; i < 18; i++) { const a = i * Math.PI / 9 + f * .01; ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.lineTo(W/2 + Math.cos(a)*H, H/2 + Math.sin(a)*H); ctx.stroke(); } ctx.restore();
+      const product = motionProducts[code] || motionProducts[1];
+      const enter = Math.min(1, Math.max(0, f / 22));
+      if (product?.complete && product.naturalWidth) {
+        const ph = portrait ? H * .43 : H * .64, pw = ph * product.naturalWidth / product.naturalHeight;
+        const x = (W-pw)/2 + (1-enter) * -W * .75, y = portrait ? H*.28 : (H-ph)/2;
+        ctx.save(); ctx.shadowColor='rgba(0,0,0,.42)';ctx.shadowBlur=18;ctx.drawImage(product,x,y,pw,ph);ctx.restore();
+      }
+      ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`900 ${portrait ? 29 : 34}px sans-serif`;ctx.fillText(code === 5 ? '오늘만 특가' : '시원하게',W/2,portrait?H*.13:H*.18);
+      ctx.font=`900 ${portrait ? 48 : 55}px sans-serif`;ctx.fillStyle=theme[2];ctx.fillText(code === 5 ? '30% OFF' : '한 캔',W/2,portrait?H*.21:H*.28);
+      ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,portrait?25:28);ctx.fillStyle=theme[2];ctx.font='bold 11px sans-serif';ctx.fillText(`CODE ${String(code).padStart(2,'0')} · ${portrait ? '세로 9:16 쇼츠' : '가로 16:9 영상'}`,W/2,18);
     }
 
 
@@ -1151,8 +1188,9 @@ ${url}`;
         btn.classList.add('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
         const code = String(btn.dataset.code).padStart(2, '0');
         const title = btn.dataset.title;
+        state.motionCodeSelection = Number(btn.dataset.code);
         document.getElementById('selectedMotionCode').innerText = `CODE ${code} · ${title}`;
-        showToast(`🎬 CODE ${code} '${title}' 템플릿을 선택했습니다.`);
+        showToast(`🎬 CODE ${code} 선택 완료! 위 문구를 입력한 뒤 [미리보기 실행]을 누르세요.`);
       });
     });
 
@@ -1164,9 +1202,23 @@ ${url}`;
       document.getElementById('btnPortrait').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${!landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
       document.getElementById('selectedAspectHelp').innerText = landscape ? '가로 16:9 · 유튜브·강의·교회 안내 영상' : '세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스';
       showToast(landscape ? '▭ 가로 16:9 영상으로 선택했습니다.' : '▯ 세로 9:16 쇼츠로 선택했습니다.');
+      if (state.motionCode) render();
     }
     document.getElementById('btnLandscape').addEventListener('click', () => setMotionAspect('landscape'));
     document.getElementById('btnPortrait').addEventListener('click', () => setMotionAspect('portrait'));
+
+    document.getElementById('btnRunMotionCode').addEventListener('click', () => {
+      if (!state.motionCodeSelection) {
+        showToast('먼저 가로·세로와 CODE 01~20 중 하나를 선택하세요.');
+        return;
+      }
+      state.motionCode = state.motionCodeSelection;
+      state.frame = 0;
+      state.isPlaying = true;
+      btnPlay.innerText = '❚❚';
+      render();
+      showToast(`▶ CODE ${String(state.motionCode).padStart(2, '0')} 미리보기를 실행합니다.`);
+    });
 
 
     // 이미지 다운로드 기능 (모바일 갤러리 저장 호환)
