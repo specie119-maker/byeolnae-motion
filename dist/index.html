@@ -544,11 +544,11 @@
       subFrame: 0,
       isPlaying: true,
       fontFamily: "'Gowun Batang', serif", // 부드러운 붓터치의 고운바탕체 (기본)
-      line1: '일을 행하시는 여호와',
+      line1: '두려워말라',
       colorLine1: '#0f172a',
-      line2: '일을 지어 성취하시는',
+      line2: '내가 너와',
       colorLine2: '#1e293b',
-      line3: '하나님',
+      line3: '함께 함이라',
       colorLine3: '#e11d48',
       verse: '예레미야 33:2',
       verseBg: '#eff6ff',
@@ -830,36 +830,172 @@
       };
       const header = `CODE ${String(code).padStart(2, '0')} · ${portrait ? '세로 9:16' : '가로 16:9'}`;
 
-      if (code === 1) { // 01 히어로 등장 (RedScriptureLandscape)
-        // 붉은 와인 방사형 배경
-        const grad = ctx.createRadialGradient(W * .70, H * .50, 0, W * .70, H * .50, W * .85);
-        grad.addColorStop(0, '#850b1f');
-        grad.addColorStop(0.6, '#47040f');
-        grad.addColorStop(1, '#200106');
+      if (code === 1) { // 01 히어로 등장: RedHeroScriptureScene
+        // 1) 붉은 와인 방사형 배경
+        const grad = ctx.createRadialGradient(W * .75, H * .50, 0, W * .75, H * .50, W * .85);
+        grad.addColorStop(0, '#880c21');
+        grad.addColorStop(0.55, '#44030d');
+        grad.addColorStop(1, '#180004');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
 
-        // 방사형 광선 빔
+        // 2) [배경] 골드 방사형 라이트 빔 (천천히 회전)
         ctx.save();
-        ctx.globalAlpha = .12;
+        ctx.globalAlpha = .10;
         ctx.strokeStyle = '#ffd166';
+        ctx.lineWidth = 1.5;
         for (let i = 0; i < 24; i++) {
           const a = (i * Math.PI / 12) + f * .006;
           ctx.beginPath();
-          ctx.moveTo(W * .70, H * .50);
-          ctx.lineTo(W * .70 + Math.cos(a) * W * 1.3, H * .50 + Math.sin(a) * H * 1.3);
+          ctx.moveTo(W * .75, H * .50);
+          ctx.lineTo(W * .75 + Math.cos(a) * W * 1.4, H * .50 + Math.sin(a) * H * 1.4);
           ctx.stroke();
         }
         ctx.restore();
 
-        // 우측 기도 손 그래픽 (부드럽게 페이드 & 이동)
-        drawHand(W * .62, H * .18 + (1 - p) * H * .22, H * .68, .22);
+        // 3) [배경] 텍스트 가독성 보호용 다크 딤
+        const dimGrad = ctx.createRadialGradient(W * .35, H * .50, 0, W * .35, H * .50, W * .55);
+        dimGrad.addColorStop(0, 'rgba(20, 0, 4, 0.6)');
+        dimGrad.addColorStop(1, 'rgba(20, 0, 4, 0)');
+        ctx.fillStyle = dimGrad;
+        ctx.fillRect(0, 0, W * .65, H);
 
-        // 좌측 말씀 (놀라지말라 / 너의 하나님이 / 되어주리라)
-        drawText('❝', W * .10, H * .26, portrait ? 24 : 32, '#fbbf24', W * .5, 'left');
-        drawText(lines[0] || '놀라지말라', W * .10, H * .38, portrait ? 24 : 34, '#fde8ea', W * .52, 'left');
-        drawText(lines[1] || '너의 하나님이', W * .10, H * .54, portrait ? 34 : 50, '#ffd166', W * .56, 'left');
-        drawText(lines[2] || '되어주리라', W * .10, H * .70, portrait ? 26 : 36, '#ffffff', W * .52, 'left');
+        // 4) 텍스트 순차 등장 타이밍 보간
+        const pQOpen = Math.min(1, Math.max(0, (f - 10) / 15));
+        const p1 = Math.min(1, Math.max(0, (f - 18) / 18));
+        const p2 = Math.min(1, Math.max(0, (f - 34) / 18));
+        const p3 = Math.min(1, Math.max(0, (f - 50) / 18));
+        const pQClose = Math.min(1, Math.max(0, (f - 65) / 15));
+
+        // ── 좌측: 말씀 텍스트 및 상/하 따옴표 ──
+        const textLeft = W * .10;
+        const fontFace = state.fontFamily || "'Gowun Batang', serif";
+
+        // 상단 여는 따옴표 ❝
+        if (pQOpen > 0) {
+          ctx.save();
+          ctx.globalAlpha = pQOpen;
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = `900 ${portrait ? 32 : 44}px ${fontFace}`;
+          ctx.textAlign = 'left';
+          ctx.shadowColor = 'rgba(0,0,0,0.7)';
+          ctx.shadowBlur = 12;
+          ctx.fillText('❝', textLeft, H * .26);
+          ctx.restore();
+        }
+
+        // 1번째 줄 (두려워말라)
+        if (p1 > 0) {
+          ctx.save();
+          ctx.globalAlpha = p1;
+          ctx.fillStyle = '#fde8ea';
+          ctx.font = `700 ${portrait ? 24 : 36}px ${fontFace}`;
+          ctx.textAlign = 'left';
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 16;
+          const y1 = H * .38 + (1 - p1) * 14;
+          ctx.fillText(lines[0] || '두려워말라', textLeft, y1);
+          ctx.restore();
+        }
+
+        // 2번째 줄 (내가 너와 - 메인 강조 골드)
+        if (p2 > 0) {
+          ctx.save();
+          ctx.globalAlpha = p2;
+          ctx.fillStyle = '#ffd166';
+          ctx.font = `900 ${portrait ? 36 : 54}px ${fontFace}`;
+          ctx.textAlign = 'left';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 24;
+          const y2 = H * .53 + (1 - p2) * 14;
+          ctx.fillText(lines[1] || '내가 너와', textLeft, y2);
+          ctx.restore();
+        }
+
+        // 3번째 줄 (함께 함이라 - 화이트)
+        if (p3 > 0) {
+          ctx.save();
+          ctx.globalAlpha = p3;
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `700 ${portrait ? 26 : 40}px ${fontFace}`;
+          ctx.textAlign = 'left';
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 16;
+          const y3 = H * .67 + (1 - p3) * 14;
+          ctx.fillText(lines[2] || '함께 함이라', textLeft, y3);
+          ctx.restore();
+        }
+
+        // 하단 닫는 따옴표 ❞ (따옴표 아래도 나타나게!)
+        if (pQClose > 0) {
+          ctx.save();
+          ctx.globalAlpha = pQClose;
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = `900 ${portrait ? 32 : 44}px ${fontFace}`;
+          ctx.textAlign = 'left';
+          ctx.shadowColor = 'rgba(0,0,0,0.7)';
+          ctx.shadowBlur = 12;
+          ctx.fillText('❞', textLeft + (portrait ? W * .40 : W * .35), H * .77);
+          ctx.restore();
+        }
+
+        // ── 우측: '뿅!' 하고 나타나는 풍성한 히어로 심볼 ──
+        const heroT = Math.max(0, (f - 45) / 25);
+        if (heroT > 0) {
+          const heroBounce = 1 - Math.exp(-heroT * 4) * Math.cos(heroT * 8);
+          const floatY = Math.sin(Math.max(0, f - 55) * 0.08) * 8;
+          const pulse = 1 + Math.sin(Math.max(0, f - 55) * 0.06) * 0.03;
+
+          const hCX = portrait ? W * .65 : W * .72;
+          const hCY = H * .50;
+
+          // 1) 등장 시 퍼지는 골드 글로우 링 (Shockwave)
+          const ringScale = Math.min(2.2, 0.4 + heroT * 1.4);
+          const ringAlpha = Math.max(0, 1 - (f - 45) / 35);
+          if (ringAlpha > 0) {
+            ctx.save();
+            ctx.globalAlpha = ringAlpha * .6;
+            ctx.strokeStyle = '#ffd166';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(hCX, hCY, 100 * ringScale, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 2) 메인 히어로 심볼 (비둘기/기도손/후광)
+          ctx.save();
+          ctx.translate(hCX, hCY + floatY);
+          const totalScale = Math.max(0, heroBounce) * pulse;
+          ctx.scale(totalScale, totalScale);
+
+          // 배경 은은한 골드 후광
+          const glowRad = ctx.createRadialGradient(0, 0, 10, 0, 0, 140);
+          glowRad.addColorStop(0, 'rgba(255, 209, 102, 0.35)');
+          glowRad.addColorStop(1, 'rgba(255, 209, 102, 0)');
+          ctx.fillStyle = glowRad;
+          ctx.beginPath();
+          ctx.arc(0, 0, 140, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 메인 이모티콘 🕊️ / 기도 손
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = `${portrait ? 110 : 140}px sans-serif`;
+          ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          ctx.shadowBlur = 30;
+          ctx.fillText('🕊️', 0, 0);
+
+          // 회전하는 별빛 반짝이 ✨
+          ctx.save();
+          ctx.translate(portrait ? 45 : 60, portrait ? -45 : -60);
+          ctx.rotate((f * 2 * Math.PI) / 180);
+          ctx.font = `${portrait ? 34 : 44}px sans-serif`;
+          ctx.fillText('✨', 0, 0);
+          ctx.restore();
+
+          ctx.restore();
+        }
       } else if (code === 2) { // 모션 블러 비교: 원본 code 02 모션블러 구성
         const motionFont = "'Nanum Gothic', sans-serif";
         const cardText = lines[1];
@@ -1228,27 +1364,27 @@ ${url}`;
     // 성도 추천 말씀 프리셋 데이터
     const PRESETS = [
       {
-        line1: '일을 행하시는 여호와',
-        line2: '일을 지어 성취하시는',
-        line3: '하나님',
+        line1: '두려워말라',
+        line2: '내가 너와',
+        line3: '함께 함이라',
         verse: '예레미야 33:2'
       },
       {
-        line1: '두려워하지 말라',
-        line2: '내가 너와 함께함이라',
-        line3: '나의 하나님',
+        line1: '두려워말라',
+        line2: '내가 너와',
+        line3: '함께 함이라',
         verse: '이사야 41:10'
       },
       {
-        line1: '내게 능력 주시는',
-        line2: '자 안에서 내가 모든 것을',
-        line3: '할 수 있느니라',
+        line1: '두려워말라',
+        line2: '내가 너와',
+        line3: '함께 함이라',
         verse: '빌립보서 4:13'
       },
       {
-        line1: '여호와는 나의 목자시니',
-        line2: '내게 부족함이',
-        line3: '없으리로다',
+        line1: '두려워말라',
+        line2: '내가 너와',
+        line3: '함께 함이라',
         verse: '시편 23:1'
       }
     ];
@@ -1399,71 +1535,75 @@ ${url}`;
 import {
   AbsoluteFill,
   interpolate,
+  spring,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
 
-export const RedScriptureLandscape: React.FC = () => {
+export const RedHeroScriptureScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 순차적 페이드 & 슬라이드 (가독성 유지하며 차분한 등장)
-  const pLine1 = interpolate(frame, [15, 35], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
+  // 1. 텍스트 순차 등장 (감속 커브)
+  const pQuoteOpen = interpolate(frame, [10, 25], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const pLine1 = interpolate(frame, [18, 36], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const pLine2 = interpolate(frame, [34, 52], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const pLine3 = interpolate(frame, [50, 68], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const pQuoteClose = interpolate(frame, [65, 80], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+
+  // 2. 오른쪽 상징 히어로 '뿅!' 등장 스프링 (Pop Bounce)
+  const heroSpring = spring({
+    frame: frame - 45, // 텍스트가 거의 다 나올 즈음 뿅! 등장
+    fps,
+    config: {
+      damping: 10,   // 탱탱한 탄성
+      stiffness: 140, // 쾌활한 팝업
+      mass: 0.8,
+    },
   });
-  const pLine2 = interpolate(frame, [32, 52], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const pLine3 = interpolate(frame, [50, 70], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const pBadge = interpolate(frame, [68, 88], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+
+  // 히어로 등장 후 은은한 공중 부유(Float) & 펄스 효과
+  const floatY = Math.sin(Math.max(0, frame - 55) * 0.08) * 8;
+  const pulseScale = 1 + Math.sin(Math.max(0, frame - 55) * 0.06) * 0.03;
 
   return (
     <AbsoluteFill
       style={{
-        background: 'radial-gradient(ellipse at 70% 50%, #850b1f 0%, #47040f 60%, #200106 100%)',
+        background: 'radial-gradient(ellipse at 75% 50%, #880c21 0%, #44030d 55%, #180004 100%)',
         fontFamily: "'Gowun Batang', 'Pretendard', serif",
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 100px',
+        padding: '0 80px',
       }}
     >
-      {/* 1. 배경 방사형 라이트 빔 (가독성을 해치지 않게 투명도 조절) */}
+      {/* [배경] 방사형 라이트 빔 */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           backgroundImage:
-            'repeating-conic-gradient(from 0deg at 70% 50%, rgba(255, 255, 255, 0.04) 0deg 7.5deg, transparent 7.5deg 15deg)',
+            'repeating-conic-gradient(from 0deg at 75% 50%, rgba(255, 215, 0, 0.05) 0deg 7.5deg, transparent 7.5deg 15deg)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* 2. 텍스트 영역 전용 어두운 비네팅 (글씨 뒤편 선 완화로 가독성 극대화) */}
+      {/* [배경] 텍스트 가독성 보호용 다크 딤 */}
       <div
         style={{
           position: 'absolute',
           left: 0,
           top: 0,
           bottom: 0,
-          width: '65%',
-          background:
-            'radial-gradient(circle at 35% 50%, rgba(20, 0, 4, 0.55) 0%, rgba(20, 0, 4, 0) 75%)',
+          width: '60%',
+          background: 'radial-gradient(circle at 35% 50%, rgba(20, 0, 4, 0.6) 0%, rgba(20, 0, 4, 0) 80%)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* 3. 좌측: 고가독성 말씀 블록 */}
+      {/* ──────────────── 좌측: 말씀 텍스트 영역 ──────────────── */}
       <div
         style={{
           position: 'relative',
@@ -1471,19 +1611,21 @@ export const RedScriptureLandscape: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
-          gap: 16,
-          maxWidth: 900,
+          gap: 14,
+          maxWidth: 620,
         }}
       >
-        {/* 인용 포인트 뱃지 */}
+        {/* 상단 여는 따옴표 ❝ */}
         <div
           style={{
-            fontSize: 32,
+            fontSize: 48,
             color: '#fbbf24',
-            opacity: pLine1,
+            opacity: pQuoteOpen,
+            transform: \`scale(\${pQuoteOpen})\`,
+            transformOrigin: 'left bottom',
             lineHeight: 1,
             marginBottom: -8,
-            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
+            textShadow: '0 2px 12px rgba(0,0,0,0.7)',
           }}
         >
           ❝
@@ -1492,98 +1634,124 @@ export const RedScriptureLandscape: React.FC = () => {
         {/* 1번째 줄 */}
         <div
           style={{
-            fontSize: 44,
+            fontSize: 42,
             fontWeight: 700,
             color: '#fde8ea',
             letterSpacing: '-0.5px',
-            lineHeight: 1.3,
+            lineHeight: 1.25,
             opacity: pLine1,
-            transform: \`translateY(\${(1 - pLine1) * 16}px)\`,
-            textShadow:
-              '0 2px 12px rgba(0,0,0,0.8), 0 4px 24px rgba(30,0,6,0.9)',
+            transform: \`translateY(\${(1 - pLine1) * 14}px)\`,
+            textShadow: '0 3px 14px rgba(0,0,0,0.85), 0 0 20px rgba(0,0,0,0.9)',
           }}
         >
-          놀라지말라
+          두려워말라
         </div>
 
-        {/* 2번째 줄 (가장 크고 강조: 골드 옐로우) */}
+        {/* 2번째 줄 (메인 강조: 골드 옐로우) */}
         <div
           style={{
-            fontSize: 68,
+            fontSize: 64,
             fontWeight: 800,
             color: '#ffd166',
             letterSpacing: '-1px',
-            lineHeight: 1.25,
+            lineHeight: 1.2,
             opacity: pLine2,
-            transform: \`translateY(\${(1 - pLine2) * 16}px)\`,
-            textShadow:
-              '0 4px 16px rgba(0,0,0,0.85), 0 8px 32px rgba(0,0,0,0.9), 0 0 40px rgba(255,209,102,0.3)',
+            transform: \`translateY(\${(1 - pLine2) * 14}px)\`,
+            textShadow: '0 4px 18px rgba(0,0,0,0.9), 0 0 35px rgba(255,209,102,0.35)',
           }}
         >
-          너의 하나님이
+          내가 너와
         </div>
 
         {/* 3번째 줄 */}
         <div
           style={{
-            fontSize: 48,
+            fontSize: 46,
             fontWeight: 700,
             color: '#ffffff',
             letterSpacing: '-0.5px',
-            lineHeight: 1.3,
+            lineHeight: 1.25,
             opacity: pLine3,
-            transform: \`translateY(\${(1 - pLine3) * 16}px)\`,
-            textShadow:
-              '0 2px 12px rgba(0,0,0,0.8), 0 4px 24px rgba(30,0,6,0.9)',
+            transform: \`translateY(\${(1 - pLine3) * 14}px)\`,
+            textShadow: '0 3px 14px rgba(0,0,0,0.85)',
           }}
         >
-          되어주리라
+          함께 함이라
         </div>
 
-        {/* 성경 장절 뱃지 */}
+        {/* 하단 닫는 따옴표 ❞ (우측 정렬 완결) */}
         <div
           style={{
-            marginTop: 18,
-            opacity: pBadge,
-            transform: \`translateY(\${(1 - pBadge) * 10}px)\`,
-            background: 'rgba(255, 255, 255, 0.12)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 209, 102, 0.4)',
-            color: '#ffd166',
-            fontSize: 22,
-            fontWeight: 700,
-            padding: '8px 24px',
-            borderRadius: 999,
-            letterSpacing: '1px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+            alignSelf: 'flex-end',
+            fontSize: 48,
+            color: '#fbbf24',
+            opacity: pQuoteClose,
+            transform: \`scale(\${pQuoteClose})\`,
+            transformOrigin: 'right top',
+            lineHeight: 1,
+            marginTop: -10,
+            marginRight: 20,
+            textShadow: '0 2px 12px rgba(0,0,0,0.7)',
           }}
         >
-          이사야 41:10
+          ❞
         </div>
       </div>
 
-      {/* 4. 우측: 기도 손 그래픽 (텍스트와 겹치지 않게 우측 30% 영역 고정) */}
+      {/* ──────────────── 우측: '뿅!' 하고 나타나는 히어로 이모티콘 ──────────────── */}
       <div
         style={{
           position: 'relative',
-          zIndex: 5,
+          zIndex: 10,
           width: 420,
+          height: 420,
           display: 'flex',
-          justifyContent: 'center',
           alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <img
-          src="images/prayer_hands_soft.png"
-          alt="기도하는 손"
+        {/* 히어로 등장 시 퍼지는 골드 글로우 링 (Shockwave) */}
+        <div
           style={{
-            maxWidth: '100%',
-            height: 'auto',
-            filter: 'drop-shadow(0 15px 35px rgba(0,0,0,0.6))',
-            opacity: pLine2,
-            transform: \`translateY(\${(1 - pLine2) * 20}px)\`,
+            position: 'absolute',
+            width: 260,
+            height: 260,
+            borderRadius: '50%',
+            border: '2px solid rgba(255, 215, 0, 0.4)',
+            boxShadow: '0 0 50px rgba(255, 209, 102, 0.45)',
+            transform: \`scale(\${Math.max(0, heroSpring)})\`,
+            opacity: Math.max(0, 1 - (frame - 45) / 40),
+            pointerEvents: 'none',
           }}
         />
+
+        {/* 뿅! 나타나는 메인 히어로 심볼 (비둘기/기도손/십자가 등 자유 교체 가능) */}
+        <div
+          style={{
+            transform: \`scale(\${heroSpring * pulseScale}) translateY(\${floatY}px)\`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.75)) drop-shadow(0 0 25px rgba(255,209,102,0.5))',
+          }}
+        >
+          {/* 메인 이모티콘 (예: 평안과 임재를 뜻하는 비둘기 🕊️ 또는 기도손 🙏) */}
+          <span style={{ fontSize: 160, lineHeight: 1 }}>🕊️</span>
+
+          {/* 반짝이는 별빛 효과 ✨ */}
+          <span
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 40,
+              fontSize: 48,
+              transform: \`scale(\${heroSpring}) rotate(\${frame * 2}deg)\`,
+            }}
+          >
+            ✨
+          </span>
+        </div>
       </div>
     </AbsoluteFill>
   );
