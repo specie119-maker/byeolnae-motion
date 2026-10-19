@@ -898,7 +898,7 @@
           ctx.restore();
         }
 
-        // 하단 닫는 따옴표 ❞
+        // 하단 닫는 따옴표 ❞ (하단으로 충분히 내려 전체 텍스트와 균형 유지)
         if (pQClose > 0) {
           ctx.save();
           ctx.globalAlpha = pQClose;
@@ -907,7 +907,9 @@
           ctx.textAlign = 'left';
           ctx.shadowColor = 'rgba(0,0,0,0.7)';
           ctx.shadowBlur = 12;
-          ctx.fillText('❞', textLeft + (portrait ? W * .45 : W * .38), H * .82);
+          const closeQuoteX = textLeft + Math.max(ctx.measureText(l3).width + (portrait ? 8 : 12), (portrait ? W * .45 : W * .38));
+          const closeQuoteY = portrait ? H * .87 : H * .89;
+          ctx.fillText('❞', closeQuoteX, closeQuoteY);
           ctx.restore();
         }
         // (비둘기 및 쇼크웨이브 완전 삭제 완료)

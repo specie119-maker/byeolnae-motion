@@ -165,7 +165,7 @@ export const RedHeroScriptureScene: React.FC<{
             transform: `scale(${pQuoteClose})`,
             transformOrigin: 'right top',
             lineHeight: 1,
-            marginTop: -10,
+            marginTop: 20,
             marginRight: 20,
             textShadow: '0 2px 12px rgba(0,0,0,0.7)',
           }}
