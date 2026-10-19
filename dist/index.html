@@ -1082,7 +1082,7 @@
           ctx.fillStyle = '#334155';
           ctx.font = `800 17px ${motionFont}`;
           ctx.textAlign = 'center';
-          ctx.fillText('구원과 영생의 가격', W / 2, tagY + 36);
+          ctx.fillText('구원과 영생의 가격', W / 2, tagY + 32);
 
           // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
           const oldRaw = lines[1] || '내 착한 행위 999억';
@@ -1118,16 +1118,22 @@
           ctx.fillStyle = '#94a3b8';
 
           subLines.forEach((subTxt, idx) => {
-            const oldY = isTwoLines ? (tagY + 68 + idx * 30) : (tagY + 76);
+            const oldY = isTwoLines ? (tagY + 76 + idx * 32) : (tagY + 84);
             ctx.fillText(subTxt, W / 2, oldY);
             const oldW = ctx.measureText(subTxt).width;
             if (strikeP > 0) {
+              const strikeY = oldY - oldFontSize * 0.35;
               ctx.save();
               ctx.strokeStyle = '#E11D48';
-              ctx.lineWidth = 4;
+              ctx.lineWidth = 4.5;
+              ctx.lineCap = 'round';
               ctx.beginPath();
-              ctx.moveTo(W / 2 - oldW / 2 - 6, oldY + 2);
-              ctx.lineTo(W / 2 - oldW / 2 - 6 + (oldW + 12) * strikeP, oldY - 4);
+              const startX = W / 2 - oldW / 2 - 8;
+              const startY = strikeY + 5;
+              const endX = startX + (oldW + 16) * strikeP;
+              const endY = startY - 10 * strikeP;
+              ctx.moveTo(startX, startY);
+              ctx.lineTo(endX, endY);
               ctx.stroke();
               ctx.restore();
             }
@@ -1135,7 +1141,7 @@
 
           // 최종 확정 가격: 0원 (은혜)
           ctx.save();
-          const finalPriceY = isTwoLines ? (tagY + 152) : (tagY + 145);
+          const finalPriceY = isTwoLines ? (tagY + 158) : (tagY + 148);
           ctx.translate(W / 2, finalPriceY);
           ctx.scale(finalPriceScale, finalPriceScale);
           ctx.font = `900 46px ${motionFont}`;
@@ -1220,7 +1226,7 @@
           ctx.fillStyle = '#334155';
           ctx.font = `800 ${Math.max(16, tagW * .065)}px ${motionFont}`;
           ctx.textAlign = 'center';
-          ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 42);
+          ctx.fillText('구원과 영생의 가격', tagX + tagW / 2, tagY + 38);
 
           // 이전 가격 (취소선 텍스트 - 1줄 또는 2줄)
           const oldRaw = lines[1] || '내 착한 행위 999억';
@@ -1262,16 +1268,24 @@
               curFont = Math.floor(curFont * (tagW * 0.88 / curW));
               ctx.font = `800 ${curFont}px ${motionFont}`;
             }
-            const oldY = isTwoLines ? (tagY + 80 + idx * 36) : (tagY + 98);
+            // 줄간격 여유 있게 띄움 (title Y: 38 -> text Y: 88)
+            const oldY = isTwoLines ? (tagY + 88 + idx * 36) : (tagY + 102);
             ctx.fillText(subTxt, tagX + tagW / 2, oldY);
             const oldW = ctx.measureText(subTxt).width;
             if (strikeP > 0) {
+              // 글씨 중간을 통과하는 사선(diagonal) 취소선
+              const strikeY = oldY - curFont * 0.35;
               ctx.save();
               ctx.strokeStyle = '#E11D48';
-              ctx.lineWidth = 4;
+              ctx.lineWidth = 4.5;
+              ctx.lineCap = 'round';
               ctx.beginPath();
-              ctx.moveTo(tagX + tagW / 2 - oldW / 2 - 8, oldY + 3);
-              ctx.lineTo(tagX + tagW / 2 - oldW / 2 - 8 + (oldW + 16) * strikeP, oldY - 4);
+              const startX = tagX + tagW / 2 - oldW / 2 - 8;
+              const startY = strikeY + 6;
+              const endX = startX + (oldW + 16) * strikeP;
+              const endY = startY - 12 * strikeP;
+              ctx.moveTo(startX, startY);
+              ctx.lineTo(endX, endY);
               ctx.stroke();
               ctx.restore();
             }
