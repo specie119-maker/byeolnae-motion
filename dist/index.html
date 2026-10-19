@@ -13,19 +13,25 @@
   <meta property="og:site_name" content="별내사랑의교회 모션 스튜디오">
   <meta name="theme-color" content="#FEE500">
 
-  <!-- 구글 폰트: 고운바탕, 고운돋움, 나눔명조 (부드럽고 감성적인 은혜 서체) -->
+  <!-- 구글 폰트: 나눔고딕, 고운바탕, 고운돋움, 나눔명조 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Gothic:wght@700;800&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
   <style>
-    body { font-family: 'Gowun Batang', 'Pretendard', sans-serif; }
+    * {
+      font-family: 'Nanum Gothic', sans-serif !important;
+    }
+    body {
+      font-family: 'Nanum Gothic', sans-serif !important;
+    }
     .custom-scrollbar::-webkit-scrollbar { width: 5px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
     /* 모바일 터치 및 입력 호환성 보장 (iOS 자동 확대 방지) */
     input, select, textarea {
+      font-family: 'Nanum Gothic', sans-serif !important;
       font-size: 16px !important;
       -webkit-user-select: text !important;
       user-select: text !important;
@@ -52,11 +58,11 @@
       <button id="btnDownloadImage" class="px-2 sm:px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1">
         <span>📸</span> <span class="hidden sm:inline">이미지 </span>저장
       </button>
-      <button id="btnDownloadMp4" class="px-2 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black rounded-lg text-xs shadow transition flex items-center gap-1">
-        <span>🎬</span> <span class="hidden sm:inline">영상 </span>다운로드
+      <button id="btnDownloadMp4" class="px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black rounded-lg text-xs shadow transition flex items-center gap-1">
+        <span>🎬</span> <span>MP4 다운로드</span>
       </button>
     </div>
-  </header></header>
+  </header>
 
   <!-- 다른 성도님이 보낸 초대 링크로 열었을 때 상단 안내 배너 -->
   <div id="bannerSharedNotice" class="hidden bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 p-2.5 text-white text-xs font-bold flex items-center justify-between px-3 sm:px-6 shadow-md transition-all">
@@ -173,8 +179,8 @@
             <span>🌸</span> 글씨체 (부드러운 감성 폰트)
           </label>
           <select id="selectFont" class="w-full bg-zinc-950 border border-blue-500/50 rounded-xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-blue-400 font-semibold cursor-pointer">
-            <option value="'Gowun Batang', serif" selected>🌸 고운바탕 (따뜻하고 부드러운 붓터치 - 추천)</option>
-            <option value="'Nanum Gothic', sans-serif">✨ 나눔고딕 (굵고 또렷한 고딕)</option>
+            <option value="'Nanum Gothic', sans-serif" selected>✨ 나눔고딕 (굵고 또렷한 고딕 - 기본)</option>
+            <option value="'Gowun Batang', serif">🌸 고운바탕 (따뜻하고 부드러운 붓터치)</option>
             <option value="'Gowun Dodum', sans-serif">🌿 고운돋움 (둥글둥글 부드러운 고딕)</option>
             <option value="'Nanum Myeongjo', serif">📖 나눔명조 (은혜롭고 경건한 서체)</option>
             <option value="'Pretendard', sans-serif">🏢 프리텐다드 (기본 고딕)</option>
@@ -493,7 +499,7 @@
       speed: 0.75, // 기본 0.75x로 여유롭고 부드러운 속도
       subFrame: 0,
       isPlaying: true,
-      fontFamily: "'Gowun Batang', serif", // 부드러운 붓터치의 고운바탕체 (기본)
+      fontFamily: "'Nanum Gothic', sans-serif", // 기본 나눔고딕체
       line1: document.getElementById('inputLine1')?.value || '일을 행하시는 여호와',
       colorLine1: document.getElementById('colorLine1')?.value || '#0f172a',
       line2: document.getElementById('inputLine2')?.value || '일을 지어 성취하시는',
@@ -575,7 +581,7 @@
       ctx.stroke();
 
       ctx.fillStyle = '#ef4444';
-      ctx.font = 'bold 11px Pretendard';
+      ctx.font = 'bold 11px "Nanum Gothic", sans-serif';
       ctx.fillText('▶ 별내사랑의교회', W / 2, topY + 16);
 
       ctx.fillStyle = '#94a3b8';
@@ -739,7 +745,7 @@
       ctx.stroke();
 
       ctx.fillStyle = '#10b981';
-      ctx.font = 'bold 11px Pretendard';
+      ctx.font = 'bold 11px "Nanum Gothic", sans-serif';
       ctx.fillText('N 블로그 공식 채널', W / 2, botY + 16);
 
       ctx.fillStyle = '#94a3b8';
@@ -766,7 +772,7 @@
       const theme = colors[code] || colors[1];
       const bg = ctx.createLinearGradient(0, 0, W, H);
       bg.addColorStop(0, theme[0]); bg.addColorStop(1, theme[1]); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-      const font = state.fontFamily || 'sans-serif';
+      const font = state.fontFamily || "'Nanum Gothic', sans-serif";
       const drawText = (text, x, y, size, color, maxWidth = W * .82, align = 'center', fontFace = font) => {
         ctx.save(); ctx.textAlign = align; ctx.fillStyle = color; ctx.font = `900 ${size}px ${fontFace}`;
         const chars = Array.from(text); let row = '', rows = [];
@@ -819,7 +825,7 @@
 
         // 5) 말씀 텍스트: 전체 글씨 크기를 '일을 지어 성취' 크기로 통일
         const textLeft = portrait ? W * .08 : W * .12;
-        const fontFace = state.fontFamily || "'Gowun Batang', serif";
+        const fontFace = state.fontFamily || "'Nanum Gothic', sans-serif";
         const l1 = state.line1 || '일을 행하시는 여호와';
         const l2 = state.line2 || '일을 지어 성취하시는';
         const l3 = state.line3 || '하나님';
@@ -907,7 +913,7 @@
         // (비둘기 및 쇼크웨이브 완전 삭제 완료)
       } else if (code === 2) {
         // 🔒 [LOCKED / 코드 확정] CODE 02 · 모션 롤러 (가로형 직사각형 카드 + 사용자 입력 글씨만 노출 확정 - 수정 금지)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         const panelGap = W * 0.025;
         const panelW = (W - panelGap * 4) / 3;
         const panelH = H * 0.62;
@@ -1008,7 +1014,7 @@
         drawHand(W*.19,H*.49+(1-slam)*H*.35,H*.42,.12);
         drawText(lines[2], W/2,H*.79,portrait?29:27,'#fff',W*.8);
       } else if (code === 5 || code === 11) { // CODE 05 · 한문장말씀 (SermonShortsScene)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
 
         // 1. 배경: 부드러운 우주 네이비 방사형 그라데이션
         const bgGrad = ctx.createRadialGradient(W * 0.5, H * 0.35, 10, W * 0.5, H * 0.35, Math.max(W, H) * 0.85);
@@ -1321,7 +1327,7 @@
           ctx.restore();
         }
       } else if (code === 6) { // CODE 06 · 손그림강조표시 (@remotion/rough-notation)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         // 배경: 깊은 다크 네이비 (#050914)
         ctx.save();
         ctx.fillStyle = '#050914';
@@ -1668,7 +1674,7 @@
         ctx.fillText('CONNECT AI LAB', W - Math.round(W * 0.02), H - Math.round(W * 0.015));
         ctx.restore();
       } else if (code === 7) { // CODE 07 · 3칸카드 (CleanThreeCardsScene - No Top Headline)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
 
         // 배경: 깊은 다크 (#0a0a0c)
         ctx.fillStyle = '#0a0a0c';
@@ -2230,7 +2236,7 @@
         ctx.fillRect(0, 0, W, H);
 
         // 4. 고대비 프리미엄 말씀 타이포그래피 (상단 작은글씨 없음)
-        const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         ctx.save();
         ctx.textAlign = 'center';
 
@@ -2819,8 +2825,16 @@ ${url}`;
       }
 
       let mimeType = 'video/webm;codecs=vp9';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'video/webm';
+      if (typeof MediaRecorder !== 'undefined') {
+        if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+          mimeType = 'video/mp4;codecs=avc1';
+        } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+          mimeType = 'video/mp4';
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+          mimeType = 'video/webm;codecs=vp9';
+        } else if (MediaRecorder.isTypeSupported('video/webm')) {
+          mimeType = 'video/webm';
+        }
       }
 
       const recorder = new MediaRecorder(stream, { mimeType });
@@ -2829,16 +2843,15 @@ ${url}`;
 
       const safeVerseName = (state.verse || '말씀').replace(/[\s:]/g, '_');
       const filenameMp4 = `${safeVerseName}_모션영상.mp4`;
-      const filenameWebm = `${safeVerseName}_모션영상.webm`;
 
       recorder.onstop = async () => {
         btnDownloadMp4.innerHTML = '<span>⚙️</span> <span>인코딩 중...</span>';
-        const webmBlob = new Blob(chunks, { type: mimeType });
+        const recordedBlob = new Blob(chunks, { type: mimeType });
 
         // 1) 로컬 서버 /convert-video API로 정품 H.264 MP4 변환 시도
         try {
           const reader = new FileReader();
-          reader.readAsDataURL(webmBlob);
+          reader.readAsDataURL(recordedBlob);
           reader.onloadend = async () => {
             const base64data = reader.result;
             try {
@@ -2856,23 +2869,23 @@ ${url}`;
                 return;
               }
             } catch (serverErr) {
-              console.warn('Server MP4 convert error, fallback to webm:', serverErr);
+              console.warn('Server MP4 convert error, fallback:', serverErr);
             }
 
-            // 2) 서버 실패 시 브라우저에서 직접 WebM 다운로드
-            downloadBlob(webmBlob, filenameWebm);
-            showToast('🎉 고화질 말씀 영상 다운로드가 완료되었습니다!');
+            // 2) 서버 실패 시 브라우저에서 직접 MP4 파일로 다운로드
+            downloadBlob(recordedBlob, filenameMp4);
+            showToast('🎉 MP4 말씀 영상 다운로드가 완료되었습니다!');
             resetDownloadBtn();
           };
         } catch (err) {
           console.error('Download error:', err);
-          downloadBlob(webmBlob, filenameWebm);
-          showToast('🎉 고화질 말씀 영상 다운로드가 완료되었습니다!');
+          downloadBlob(recordedBlob, filenameMp4);
+          showToast('🎉 MP4 말씀 영상 다운로드가 완료되었습니다!');
           resetDownloadBtn();
         }
       };
 
-      recorder.start();
+      recorder.start(500);
 
       // 5초간 녹화 카운트다운
       let remain = 5;
@@ -2910,8 +2923,8 @@ ${url}`;
     function resetDownloadBtn() {
       isRecordingVideo = false;
       btnDownloadMp4.disabled = false;
-      btnDownloadMp4.className = 'px-2 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black rounded-lg text-xs shadow transition flex items-center gap-1';
-      btnDownloadMp4.innerHTML = '<span>🎬</span> <span class="hidden sm:inline">영상 </span>다운로드';
+      btnDownloadMp4.className = 'px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black rounded-lg text-xs shadow transition flex items-center gap-1';
+      btnDownloadMp4.innerHTML = '<span>🎬</span> <span>MP4 다운로드</span>';
     }
 
     // Remotion 코드 생성기 (천천히 감속된 설정값 적용)
@@ -4282,7 +4295,7 @@ export const BibleScene: React.FC = () => {
       octx.fill();
       octx.stroke();
       octx.fillStyle = '#ef4444';
-      octx.font = 'bold 11px Pretendard';
+      octx.font = 'bold 11px "Nanum Gothic", sans-serif';
       octx.fillText('▶ 별내사랑의교회', W / 2, topY + 16);
       octx.fillStyle = '#94a3b8';
       octx.font = '500 10.5px monospace';
@@ -4351,7 +4364,7 @@ export const BibleScene: React.FC = () => {
       octx.fill();
       octx.stroke();
       octx.fillStyle = '#10b981';
-      octx.font = 'bold 11px Pretendard';
+      octx.font = 'bold 11px "Nanum Gothic", sans-serif';
       octx.fillText('N 블로그 공식 채널', W / 2, botY + 16);
       octx.fillStyle = '#94a3b8';
       octx.font = '500 9.5px monospace';
