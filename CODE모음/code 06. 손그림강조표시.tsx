@@ -18,8 +18,6 @@ const SceneBody = () => {
 
   return (
     <AbsoluteFill style={{background: '#050914', fontFamily: FONT, alignItems: 'center', justifyContent: 'center'}}>
-      <div style={{position: 'absolute', top: 40, color: '#fff', fontSize: 40, fontWeight: 900}}>@remotion/rough-notation</div>
-
       {/* Bracket: 문단 전체를 양쪽 괄호로 묶기 */}
       <Bracket progress={p(165)} color={BLUE} strokeWidth={5} bracketLeft bracketRight padding={{left: 30, right: 30, top: 10, bottom: 10}} seed={6}>
         {/* 줄 간격은 lineHeight 대신 gap으로! (lineHeight가 크면 표시가 줄 높이만큼 커져요) */}
@@ -43,30 +41,12 @@ const SceneBody = () => {
           </div>
         </div>
       </Bracket>
-
-      <div style={{position: 'absolute', bottom: 50, display: 'flex', gap: 28, fontSize: 26, fontWeight: 900}}>
-        {legend.map(([name, start]) => (
-          <div key={name} style={{color: p(start) > 0 ? GOLD : '#3a4a6e'}}>{`<${name}>`}</div>
-        ))}
-      </div>
     </AbsoluteFill>
-  );
-};
-
-// ── 채널 표시: CONNECT AI LAB (모든 예제 공통 · 오른쪽 아래) ──
-const BrandMark = () => {
-  const {width} = useVideoConfig();
-  return (
-    <div style={{position: 'absolute', right: Math.round(width * 0.02), bottom: Math.round(width * 0.015), fontFamily: FONT, fontWeight: 800,
-      fontSize: Math.round(width / 60), letterSpacing: '0.16em', color: 'rgba(255,255,255,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
-      CONNECT AI LAB
-    </div>
   );
 };
 
 export const Scene = () => (
   <AbsoluteFill>
     <SceneBody />
-    <BrandMark />
   </AbsoluteFill>
 );
