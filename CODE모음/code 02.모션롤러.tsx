@@ -1,115 +1,123 @@
 import React from 'react';
 import {
   AbsoluteFill,
-  interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
 
-export const RollingYellowBoxScene: React.FC = () => {
+export const MotionThreeCardsScene: React.FC<{
+  verse?: string;
+  line1?: string;
+  line2?: string;
+  line3?: string;
+}> = ({
+  verse = '이사야 41:10',
+  line1 = '구원',
+  line2 = '믿음',
+  line3 = '생명',
+}) => {
   const frame = useCurrentFrame();
-  const { fps, width } = useVideoConfig();
+  const { width, height } = useVideoConfig();
 
-  // 1. 구르는 물리 스프링 애니메이션 (0 -> 1 진행률)
-  // damping과 stiffness로 굴러오다가 딱 멈출 때 쫀득한 감속 구현
-  const rollProgress = spring({
-    frame: frame - 10,
-    fps,
-    config: {
-      damping: 14,   // 감속 마찰력
-      stiffness: 70, // 굴러오는 탄성력
-      mass: 1.2,     // 박스의 무게감
-    },
-  });
+  const phase = (frame % 240) / 240;
+  const ease = Math.min(1, phase / 0.28);
+  const spin = Math.min(1, phase / 0.35) * 360;
 
-  // 2. 이동 좌표: 화면 왼쪽 바깥(-650px)에서 화면 중앙(0px)으로 굴러옴
-  const translateX = interpolate(rollProgress, [0, 1], [-width * 0.7, 0]);
+  const panelGap = width * 0.025;
+  const panelW = (width - panelGap * 4) / 3;
+  const panelH = height * 0.62;
+  const panelY = height * 0.20;
+  const cardW = panelW * 0.70;
+  const cardH = panelH * 0.36;
+  const cardX = -cardW + ease * (panelW + cardW * 0.6);
 
-  // 3. 회전 각도: 구르면서 2바퀴(-720도) 회전 후 0도에서 정확히 수평 정지
-  const rotateDeg = interpolate(rollProgress, [0, 1], [-720, 0]);
-
-  // 4. 착지 순간 바닥 충격 바운스 (Y축으로 살짝 쿵 내려앉았다가 복원)
-  const squashY = interpolate(
-    rollProgress,
-    [0.85, 0.95, 1],
-    [1, 0.92, 1],
-    { extrapolateRight: 'clamp' }
-  );
-
-  // 5. 텍스트 등장 (박스가 멈추는 시점 35프레임 이후 선명하게 페이드인)
-  const textOpacity = interpolate(frame, [38, 55], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const textScale = spring({
-    frame: frame - 38,
-    fps,
-    config: { damping: 12, stiffness: 150 },
-  });
+  // 1번째 줄, 2번째 줄, 3번째 줄 각각 서로 다른 단어로 매핑 (카드 단어 중복 없음)
+  const cards = [
+    { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: line1 },
+    { title: '부드러운 이동', sub: '천천히 중심으로', text: line2 },
+    { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: line3 },
+  ];
 
   return (
     <AbsoluteFill
       style={{
-        background: 'radial-gradient(ellipse at 50% 40%, #1a1e29 0%, #0d1017 60%, #06080c 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: '#050914',
+        color: '#ffffff',
         fontFamily: "'Pretendard', sans-serif",
-        overflow: 'hidden',
       }}
     >
-      {/* 바닥 그림자 (박스 위치에 맞춰 함께 따라오며 크기 조절) */}
+      {/* 상단 장절 */}
       <div
         style={{
           position: 'absolute',
-          bottom: '22%',
-          width: 320,
-          height: 36,
-          borderRadius: '50%',
-          background: 'rgba(0, 0, 0, 0.6)',
-          filter: 'blur(16px)',
-          transform: `translateX(${translateX}px) scaleX(${rollProgress})`,
-        }}
-      />
-
-      {/* 데굴데굴 굴러오는 노란색 메인 박스 */}
-      <div
-        style={{
-          transform: `translateX(${translateX}px) rotate(${rotateDeg}deg) scaleY(${squashY})`,
-          width: 280,
-          height: 280,
-          backgroundColor: '#facc15', // 생생한 옐로우
-          backgroundImage: 'linear-gradient(135deg, #fde047 0%, #eab308 100%)',
-          borderRadius: 36,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(250, 204, 21, 0.35)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '4px solid #fef08a',
-          position: 'relative',
+          top: '7%',
+          width: '100%',
+          textAlign: 'center',
+          fontSize: 28,
+          fontWeight: 900,
+          color: '#ffd166',
         }}
       >
-        {/* 박스 안 내용: 굴러온 후 촥 나타나는 텍스트 */}
-        <div
-          style={{
-            opacity: textOpacity,
-            transform: `scale(${Math.max(0, textScale)})`,
-            textAlign: 'center',
-            color: '#1e293b',
-          }}
-        >
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#854d0e', marginBottom: 6 }}>
-            말씀 카드
+        {verse}
+      </div>
+
+      {/* 3단 카드 패널 (입력한 각 줄이 각각의 카드에 선명하게 나타남) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: panelY,
+          left: panelGap,
+          right: panelGap,
+          height: panelH,
+          display: 'flex',
+          gap: panelGap,
+        }}
+      >
+        {cards.map((card, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              backgroundColor: '#13224d',
+              borderRadius: 14,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* 회전하며 이동하는 노란색 말씀 카드 */}
+            <div
+              style={{
+                position: 'absolute',
+                left: cardX,
+                top: panelH * 0.32,
+                width: cardW,
+                height: cardH,
+                backgroundColor: '#ffc93c',
+                borderRadius: 14,
+                boxShadow: '0 0 20px rgba(255, 201, 60, 0.4)',
+                transform: `rotate(${spin}deg)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: 26,
+                color: '#050914',
+              }}
+            >
+              {card.text}
+            </div>
+
+            {/* 패널 하단 라벨 */}
+            <div style={{ position: 'absolute', bottom: 24, left: 20 }}>
+              <div style={{ color: '#ffc93c', fontSize: 17, fontWeight: 900 }}>
+                {card.title}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 700, marginTop: 4 }}>
+                {card.sub}
+              </div>
+            </div>
           </div>
-          <div style={{ fontSize: 34, fontWeight: 900, lineHeight: 1.25 }}>
-            두려워<br />말라
-          </div>
-          <div style={{ fontSize: 16, fontWeight: 700, marginTop: 10, color: '#713f12', background: 'rgba(255,255,255,0.4)', padding: '4px 14px', borderRadius: 999 }}>
-            이사야 41:10
-          </div>
-        </div>
+        ))}
       </div>
     </AbsoluteFill>
   );

@@ -996,101 +996,81 @@
 
           ctx.restore();
         }
-      } else if (code === 2) { // 02 모션 롤러: 데굴데굴 구르는 노란색 말씀 박스 (서로 다른 단어 적용)
-        // 1) 배경: 방사형 다크 딤
-        const bgGrad = ctx.createRadialGradient(W / 2, H * .40, 20, W / 2, H * .40, W * .75);
-        bgGrad.addColorStop(0, '#1a1e29');
-        bgGrad.addColorStop(0.6, '#0d1017');
-        bgGrad.addColorStop(1, '#06080c');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, W, H);
-
+            } else if (code === 2) { // 02 모션 롤러 / 3단 말씀 카드: 입력한 1, 2, 3번째 줄 단어가 각 카드에 각각 매핑
         const motionFont = state.fontFamily || "'Pretendard', sans-serif";
+        const panelGap = W * .025, panelW = (W - panelGap * 4) / 3;
+        const panelH = H * .62, panelY = H * .20;
+        const phase = (f % 240) / 240;
+        const cardW = panelW * .70, cardH = panelH * .36;
+        const ease = Math.min(1, phase / .28);
+        const cardX = -cardW + ease * (panelW + cardW * .6);
+        const spin = Math.min(1, phase / .35) * Math.PI * 2;
 
-        // 상단 헤더
-        drawText('말씀 모션 롤러 · ROLLING CARD', W / 2, H * .10, portrait ? 13 : 16, '#facc15', W * .85, 'center', motionFont);
-
-        // 2) 구르는 물리 스프링 계산 (0 -> 1 진행)
-        const rollT = Math.max(0, (f - 10) / 28);
-        const rollP = Math.min(1, 1 - Math.exp(-rollT * 3.5) * Math.cos(rollT * 6.5));
-        
-        // 이동: 왼쪽 바깥 -> 화면 중앙
-        const transX = (1 - rollP) * -W * 0.7;
-        // 회전: -720도 -> 0도
-        const rotDeg = (1 - rollP) * -720;
-        // 착지 바운스
-        const squash = (rollP > 0.85 && rollP < 1) ? 0.93 : 1;
-
-        const boxX = W / 2 + transX;
-        const boxY = H * .50;
-        const boxSz = portrait ? 200 : 250;
-
-        // 바닥 그림자 (박스 따라 이동)
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(boxX, H * .78, (boxSz * 0.65) * Math.max(0.2, rollP), 16, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-        ctx.filter = 'blur(10px)';
-        ctx.fill();
-        ctx.restore();
-
-        // 3) 노란색 메인 박스 렌더링
-        ctx.save();
-        ctx.translate(boxX, boxY);
-        ctx.rotate((rotDeg * Math.PI) / 180);
-        ctx.scale(1, squash);
-
-        // 박스 본체 그라데이션
-        const bGrad = ctx.createLinearGradient(-boxSz/2, -boxSz/2, boxSz/2, boxSz/2);
-        bGrad.addColorStop(0, '#fde047');
-        bGrad.addColorStop(1, '#eab308');
-        ctx.fillStyle = bGrad;
-        ctx.shadowColor = 'rgba(250, 204, 21, 0.45)';
-        ctx.shadowBlur = 30;
-        ctx.strokeStyle = '#fef08a';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.roundRect(-boxSz/2, -boxSz/2, boxSz, boxSz, 32);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.restore();
-
-        // 4) 박스 안 텍스트 등장 (멈춘 뒤 35프레임 이후 선명하게 페이드인)
-        const txtAlpha = Math.min(1, Math.max(0, (f - 35) / 18));
-        if (txtAlpha > 0) {
+        const drawCard = (x, y, cardText) => {
           ctx.save();
-          ctx.globalAlpha = txtAlpha;
+          ctx.translate(x + cardW / 2, y + cardH / 2);
+          ctx.rotate(spin);
+          ctx.fillStyle = '#ffc93c';
+          ctx.shadowColor = 'rgba(255, 201, 60, 0.4)';
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          ctx.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
+          ctx.fill();
+          ctx.shadowColor = 'transparent';
+          ctx.restore();
+
+          // 카드 내부 글씨: 사용자가 입력한 단어(lines[0], lines[1], lines[2])를 각각 정확히 표시
+          ctx.save();
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-
-          // 상단 라벨
-          ctx.font = `800 ${portrait ? 14 : 17}px ${motionFont}`;
-          ctx.fillStyle = '#854d0e';
-          ctx.fillText('말씀 카드', boxX, boxY - boxSz * .25);
-
-          // ── 핵심 수정: 카드 단어가 모두 같지 않고 서로 다른 구절 3줄 순차/조합 반영 ──
-          // 1번째 줄
-          ctx.font = `900 ${portrait ? 24 : 32}px ${motionFont}`;
-          ctx.fillStyle = '#1e293b';
-          ctx.fillText(lines[0] || '두려워말라', boxX, boxY - boxSz * .04);
-
-          // 2번째 줄 (서로 다른 단어)
-          ctx.font = `800 ${portrait ? 20 : 26}px ${motionFont}`;
-          ctx.fillStyle = '#0f172a';
-          ctx.fillText(lines[1] || '내가 너와', boxX, boxY + boxSz * .14);
-
-          // 3번째 줄 (하단 뱃지: 함께 함이라 & 장절)
-          ctx.font = `700 ${portrait ? 12 : 14}px ${motionFont}`;
-          ctx.fillStyle = '#713f12';
-          const subText = `${lines[2] || '함께 함이라'} · ${state.verse || '이사야 41:10'}`;
-          ctx.fillText(subText, boxX, boxY + boxSz * .32);
-
+          ctx.fillStyle = '#050914';
+          ctx.font = `900 ${portrait ? 16 : Math.max(18, panelW * .13)}px ${motionFont}`;
+          ctx.fillText(cardText, x + cardW / 2, y + cardH * .54);
           ctx.restore();
-        }
+        };
+
+        // 다크 네이비 배경
+        ctx.fillStyle = '#050914';
+        ctx.fillRect(0, 0, W, H);
+
+        // 상단 헤더: 성경 장절 (입력 구절과 중복되지 않도록 성경 장절 표시)
+        drawText(state.verse || '말씀 모션 3단 카드', W / 2, H * .11, portrait ? 20 : 26, '#ffd166', W * .88, 'center', motionFont);
+
+        const panels = [
+          ['깔끔한 등장', '선명한 말씀 상자'],
+          ['부드러운 이동', '천천히 중심으로'],
+          ['또렷한 강조', '그림자 없이 선명하게']
+        ];
+
+        // 3개 패널 순회: 각 카드에 lines[0], lines[1], lines[2]를 각각 배정하여 절대 같은 글자가 나오지 않게 함
+        panels.forEach(([name, sub], i) => {
+          const x = panelGap + i * (panelW + panelGap);
+          ctx.save();
+          ctx.fillStyle = '#13224d';
+          ctx.beginPath();
+          ctx.roundRect(x, panelY, panelW, panelH, 14);
+          ctx.fill();
+          ctx.restore();
+
+          const cardY = panelY + panelH * .32;
+          // ★ 사용자 입력 1, 2, 3번째 줄 각각 매핑 (모두 같지 않고 입력한 글자대로 각각 표시)
+          const thisCardText = lines[i] || (i === 0 ? '구원' : i === 1 ? '믿음' : '생명');
+          drawCard(x + cardX, cardY, thisCardText);
+
+          // 패널 하단 라벨
+          ctx.save();
+          ctx.textAlign = 'left';
+          ctx.font = `900 ${portrait ? 13 : Math.max(13, panelW * .102)}px ${motionFont}`;
+          ctx.fillStyle = '#ffc93c';
+          ctx.fillText(name, x + 16, panelY + panelH + 24);
+          ctx.font = `700 ${portrait ? 10 : Math.max(10, panelW * .070)}px ${motionFont}`;
+          ctx.fillStyle = 'rgba(255,255,255,.85)';
+          ctx.fillText(sub, x + 16, panelY + panelH + 42);
+          ctx.restore();
+        });
 
         // 하단 안내
-        drawText('데굴데굴 굴러와 착지하는 쫀득한 모션 롤러', W / 2, H * .94, portrait ? 12 : 14, '#94a3b8', W * .85, 'center', motionFont);
+        drawText(state.youtube || '별내사랑의교회', W / 2, H * .95, portrait ? 13 : 16, 'rgba(255,255,255,.75)', W * .82, 'center', motionFont);
       } else if (code === 3) { // 콜아웃
         drawHand(W*.62,H*.22,H*.65,.10);
         drawText(lines[0], W*.08, H*.22, portrait?22:28, theme[2], W*.44, 'left');
@@ -1591,119 +1571,117 @@ ${url}`;
 
     // Remotion 코드 생성기 (천천히 감속된 설정값 적용)
     function getRemotionCode() {
-            if (state.motionCode === 2) {
+                  if (state.motionCode === 2) {
         return `import React from 'react';
 import {
   AbsoluteFill,
-  interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
 
-export const RollingYellowBoxScene: React.FC = () => {
+export const MotionThreeCardsScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width } = useVideoConfig();
+  const { width, height } = useVideoConfig();
 
-  // 1. 구르는 물리 스프링 애니메이션 (0 -> 1 진행률)
-  // damping과 stiffness로 굴러오다가 딱 멈출 때 쫀득한 감속 구현
-  const rollProgress = spring({
-    frame: frame - 10,
-    fps,
-    config: {
-      damping: 14,   // 감속 마찰력
-      stiffness: 70, // 굴러오는 탄성력
-      mass: 1.2,     // 박스의 무게감
-    },
-  });
+  const phase = (frame % 240) / 240;
+  const ease = Math.min(1, phase / 0.28);
+  const spin = Math.min(1, phase / 0.35) * 360;
 
-  // 2. 이동 좌표: 화면 왼쪽 바깥(-650px)에서 화면 중앙(0px)으로 굴러옴
-  const translateX = interpolate(rollProgress, [0, 1], [-width * 0.7, 0]);
+  const panelGap = width * 0.025;
+  const panelW = (width - panelGap * 4) / 3;
+  const panelH = height * 0.62;
+  const panelY = height * 0.20;
+  const cardW = panelW * 0.70;
+  const cardH = panelH * 0.36;
+  const cardX = -cardW + ease * (panelW + cardW * 0.6);
 
-  // 3. 회전 각도: 구르면서 2바퀴(-720도) 회전 후 0도에서 정확히 수평 정지
-  const rotateDeg = interpolate(rollProgress, [0, 1], [-720, 0]);
-
-  // 4. 착지 순간 바닥 충격 바운스 (Y축으로 살짝 쿵 내려앉았다가 복원)
-  const squashY = interpolate(
-    rollProgress,
-    [0.85, 0.95, 1],
-    [1, 0.92, 1],
-    { extrapolateRight: 'clamp' }
-  );
-
-  // 5. 텍스트 등장 (박스가 멈추는 시점 35프레임 이후 선명하게 페이드인)
-  const textOpacity = interpolate(frame, [38, 55], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const textScale = spring({
-    frame: frame - 38,
-    fps,
-    config: { damping: 12, stiffness: 150 },
-  });
+  // 1번째 줄, 2번째 줄, 3번째 줄 각각 서로 다른 입력 단어로 매핑
+  const cards = [
+    { title: '깔끔한 등장', sub: '선명한 말씀 상자', text: '${state.line1 || '구원'}' },
+    { title: '부드러운 이동', sub: '천천히 중심으로', text: '${state.line2 || '믿음'}' },
+    { title: '또렷한 강조', sub: '그림자 없이 선명하게', text: '${state.line3 || '생명'}' },
+  ];
 
   return (
     <AbsoluteFill
       style={{
-        background: 'radial-gradient(ellipse at 50% 40%, #1a1e29 0%, #0d1017 60%, #06080c 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: '#050914',
+        color: '#ffffff',
         fontFamily: "'Pretendard', sans-serif",
-        overflow: 'hidden',
       }}
     >
-      {/* 바닥 그림자 (박스 위치에 맞춰 함께 따라오며 크기 조절) */}
+      {/* 상단 장절 */}
       <div
         style={{
           position: 'absolute',
-          bottom: '22%',
-          width: 320,
-          height: 36,
-          borderRadius: '50%',
-          background: 'rgba(0, 0, 0, 0.6)',
-          filter: 'blur(16px)',
-          transform: \`translateX(\${translateX}px) scaleX(\${rollProgress})\`,
-        }}
-      />
-
-      {/* 데굴데굴 굴러오는 노란색 메인 박스 */}
-      <div
-        style={{
-          transform: \`translateX(\${translateX}px) rotate(\${rotateDeg}deg) scaleY(\${squashY})\`,
-          width: 280,
-          height: 280,
-          backgroundColor: '#facc15', // 생생한 옐로우
-          backgroundImage: 'linear-gradient(135deg, #fde047 0%, #eab308 100%)',
-          borderRadius: 36,
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(250, 204, 21, 0.35)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '4px solid #fef08a',
-          position: 'relative',
+          top: '7%',
+          width: '100%',
+          textAlign: 'center',
+          fontSize: 28,
+          fontWeight: 900,
+          color: '#ffd166',
         }}
       >
-        {/* 박스 안 내용: 굴러온 후 촥 나타나는 텍스트 */}
-        <div
-          style={{
-            opacity: textOpacity,
-            transform: \`scale(\${Math.max(0, textScale)})\`,
-            textAlign: 'center',
-            color: '#1e293b',
-          }}
-        >
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#854d0e', marginBottom: 6 }}>
-            말씀 카드
+        ${state.verse || '말씀 묵상'}
+      </div>
+
+      {/* 3단 카드 패널 (입력한 각 줄이 각각의 카드에 선명하게 나타남) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: panelY,
+          left: panelGap,
+          right: panelGap,
+          height: panelH,
+          display: 'flex',
+          gap: panelGap,
+        }}
+      >
+        {cards.map((card, i) => (
+          <div
+            key={i}
+            style={{
+              flex: 1,
+              backgroundColor: '#13224d',
+              borderRadius: 14,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* 회전하며 이동하는 노란색 말씀 카드 */}
+            <div
+              style={{
+                position: 'absolute',
+                left: cardX,
+                top: panelH * 0.32,
+                width: cardW,
+                height: cardH,
+                backgroundColor: '#ffc93c',
+                borderRadius: 14,
+                boxShadow: '0 0 20px rgba(255, 201, 60, 0.4)',
+                transform: \`rotate(\${spin}deg)\`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: 26,
+                color: '#050914',
+              }}
+            >
+              {card.text}
+            </div>
+
+            {/* 패널 하단 라벨 */}
+            <div style={{ position: 'absolute', bottom: 24, left: 20 }}>
+              <div style={{ color: '#ffc93c', fontSize: 17, fontWeight: 900 }}>
+                {card.title}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 700, marginTop: 4 }}>
+                {card.sub}
+              </div>
+            </div>
           </div>
-          <div style={{ fontSize: 34, fontWeight: 900, lineHeight: 1.25 }}>
-            두려워<br />말라
-          </div>
-          <div style={{ fontSize: 16, fontWeight: 700, marginTop: 10, color: '#713f12', background: 'rgba(255,255,255,0.4)', padding: '4px 14px', borderRadius: 999 }}>
-            이사야 41:10
-          </div>
-        </div>
+        ))}
       </div>
     </AbsoluteFill>
   );
