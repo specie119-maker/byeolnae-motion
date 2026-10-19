@@ -192,31 +192,126 @@
           <div class="rounded-lg bg-violet-950/70 border border-violet-400/30 px-3 py-2 text-[11px] leading-relaxed text-violet-100">
             <b>만드는 순서</b><br>① 가로·세로 선택 → ② 코드 선택 → ③ 위 문구 3줄 입력 → ④ 아래 실행하기
           </div>
-          <div class="flex items-center gap-1.5 p-1 bg-zinc-900 rounded-lg border border-zinc-800">
-            <button type="button" id="btnLandscape" class="btnAspect flex-1 py-2 rounded-md bg-violet-600 text-white text-xs font-bold transition">▭ 가로 16:9</button>
-            <button type="button" id="btnPortrait" class="btnAspect flex-1 py-2 rounded-md text-zinc-400 hover:text-white text-xs font-bold transition">▯ 세로 9:16</button>
+                    <!-- 가로 16:9 / 세로 9:16 박스 전환 버튼 -->
+          <div class="flex items-center gap-2 p-1.5 bg-zinc-950/80 rounded-2xl border border-zinc-800/90">
+            <button type="button" id="btnLandscape" class="btnAspect flex-1 py-3 px-3 rounded-xl bg-violet-600 border border-violet-400 text-white text-xs sm:text-sm font-black shadow-lg shadow-violet-600/30 transition flex items-center justify-center gap-1.5 active:scale-98">
+              <span class="text-base">▭</span>
+              <span>가로 16:9 (유튜브)</span>
+            </button>
+            <button type="button" id="btnPortrait" class="btnAspect flex-1 py-3 px-3 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-400 hover:text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 active:scale-98">
+              <span class="text-base">▯</span>
+              <span>세로 9:16 (쇼츠)</span>
+            </button>
           </div>
-          <p id="selectedAspectHelp" class="text-[10px] text-zinc-400">가로 영상(유튜브·강의·교회 안내)에 맞춰 고릅니다.</p>
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-violet-200">🎬 모션그래픽 코드 선택</span>
-            <span id="selectedMotionCode" class="text-[10px] text-violet-300">코드를 선택하세요</span>
+          <p id="selectedAspectHelp" class="text-[11px] text-zinc-300 font-medium px-1">▭ 가로 16:9 · 유튜브·강의·교회 안내 영상 (지금 즉시 실행 중)</p>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-xs font-bold text-violet-200 flex items-center gap-1.5">
+              <span>🎬</span>
+              <span>모션그래픽 코드 선택 (누르면 즉시 실행)</span>
+            </span>
+            <span id="selectedMotionCode" class="text-[10px] text-violet-300 font-bold bg-violet-950/80 px-2 py-0.5 rounded-full border border-violet-500/30">CODE 02 · 모션 롤러</span>
           </div>
-          <div class="grid grid-cols-2 gap-1.5" id="motionCodePicker">
-            <button type="button" class="btnMotionCode" data-code="1" data-title="히어로 등장">01 · 히어로 등장</button>
-            <button type="button" class="btnMotionCode" data-code="2" data-title="모션 롤러">02 · 모션 롤러</button>
-            <button type="button" class="btnMotionCode" data-code="3" data-title="특징 콜아웃">03 · 특징 콜아웃</button>
-            <button type="button" class="btnMotionCode" data-code="4" data-title="세로 말씀 쇼츠">04 · 세로 말씀 쇼츠</button>
-            <button type="button" class="btnMotionCode" data-code="5" data-title="값없는 은혜 (Grace)">05 · 값없는 은혜</button>
-            <button type="button" class="btnMotionCode" data-code="6" data-title="기도 손과 말씀">06 · 기도 손·말씀</button>
-            <button type="button" class="btnMotionCode" data-code="7" data-title="면류관 쇼케이스">07 · 면류관 쇼케이스</button>
-            <button type="button" class="btnMotionCode" data-code="8" data-title="패럴랙스 장면">08 · 패럴랙스</button>
-            <button type="button" class="btnMotionCode" data-code="9" data-title="말씀 장면 전환">09 · 장면 전환</button>
-            <button type="button" class="btnMotionCode" data-code="10" data-title="방사형 광선 배경">10 · 광선 배경</button>
+
+          <!-- 10개 박스 버튼 (누르면 코드이름만 나오는 게 아니라 즉시 캔버스 실행) -->
+          <div class="grid grid-cols-2 gap-2" id="motionCodePicker">
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="1" data-title="히어로 등장">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[10px] font-black border border-rose-500/30">01</span>
+                <span class="text-xs">🕊️</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">히어로 등장</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">골드 빔 & 팝업</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-violet-600/30 border border-violet-400 ring-2 ring-violet-400/50 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="2" data-title="모션 롤러">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-black border border-amber-500/30">02</span>
+                <span class="text-xs">🎴</span>
+              </div>
+              <div class="font-bold text-xs text-white">모션 롤러</div>
+              <div class="text-[10px] text-amber-200/80 line-clamp-1">3단 직사각형 회전</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="3" data-title="특징 콜아웃">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-500/30">03</span>
+                <span class="text-xs">🎯</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">특징 콜아웃</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">라인 & 포인트 강조</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="4" data-title="세로 말씀 쇼츠">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-fuchsia-500/20 text-fuchsia-300 font-mono text-[10px] font-black border border-fuchsia-500/30">04</span>
+                <span class="text-xs">📱</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">세로 쇼츠</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">9:16 바운스 슬램</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="5" data-title="값없는 은혜">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[10px] font-black border border-rose-500/30">05</span>
+                <span class="text-xs">✝️</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">값없는 은혜</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">구원 가격표 & 0원</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="6" data-title="기도 손과 말씀">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-black border border-amber-500/30">06</span>
+                <span class="text-xs">🙏</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">기도 손·말씀</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">기도 손 & 후광</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="7" data-title="면류관 쇼케이스">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono text-[10px] font-black border border-indigo-500/30">07</span>
+                <span class="text-xs">👑</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">면류관 쇼케이스</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">3D 면류관 상징</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="8" data-title="패럴랙스">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-mono text-[10px] font-black border border-sky-500/30">08</span>
+                <span class="text-xs">🌊</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">패럴랙스</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">다층 레이어 유영</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="9" data-title="장면 전환">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-mono text-[10px] font-black border border-purple-500/30">09</span>
+                <span class="text-xs">🎬</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">장면 전환</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">3색 묵상 슬라이드</div>
+            </button>
+
+            <button type="button" class="btnMotionCode group relative p-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-violet-500/60 transition text-left flex flex-col justify-between gap-1.5 shadow-sm active:scale-[0.98]" data-code="10" data-title="광선 배경">
+              <div class="flex items-center justify-between w-full">
+                <span class="px-2 py-0.5 rounded-md bg-yellow-500/20 text-yellow-300 font-mono text-[10px] font-black border border-yellow-500/30">10</span>
+                <span class="text-xs">✨</span>
+              </div>
+              <div class="font-bold text-xs text-zinc-100 group-hover:text-white">광선 배경</div>
+              <div class="text-[10px] text-zinc-400 line-clamp-1">360도 회전 라이트</div>
+            </button>
           </div>
-          <button type="button" id="btnRunMotionCode" class="w-full py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-sm font-black shadow-lg transition active:scale-[.99]">
-            ▶ 선택한 코드로 미리보기 실행하기
+          <button type="button" id="btnRunMotionCode" class="w-full py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-sm font-black shadow-lg transition active:scale-[.99] flex items-center justify-center gap-2">
+            <span>▶</span>
+            <span>선택한 코드로 미리보기 실행하기</span>
           </button>
         </div>
+
+
 
         <!-- 폰트 서체 선택 (부드러운 서체) -->
         <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-500/40 space-y-2">
@@ -1718,25 +1813,41 @@ ${url}`;
       });
     });
 
-    // 원본 템플릿 01–10 선택 상태
+        // 원본 템플릿 01–10 박스 버튼 선택 및 즉시 실행 로직
     document.querySelectorAll('.btnMotionCode').forEach(btn => {
-      btn.className += ' px-2.5 py-2 rounded-lg bg-zinc-900 hover:bg-violet-700 text-[11px] text-left text-zinc-200 border border-zinc-700 transition';
       btn.addEventListener('click', () => {
         document.querySelectorAll('.btnMotionCode').forEach(b => {
-          b.classList.remove('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
-          b.classList.add('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
+          b.classList.remove('bg-violet-600/30', 'border-violet-400', 'ring-2', 'ring-violet-400/50');
+          b.classList.add('bg-zinc-900/90', 'border-zinc-800');
+          const titleDiv = b.querySelector('.font-bold');
+          if (titleDiv) titleDiv.className = 'font-bold text-xs text-zinc-100 group-hover:text-white';
         });
-        btn.classList.remove('bg-zinc-900', 'border-zinc-700', 'text-zinc-200');
-        btn.classList.add('bg-violet-600', 'border-violet-300', 'text-white', 'font-bold');
-        const code = String(btn.dataset.code).padStart(2, '0');
-        const title = btn.dataset.title;
-        state.motionCodeSelection = Number(btn.dataset.code);
+
+        btn.classList.remove('bg-zinc-900/90', 'border-zinc-800');
+        btn.classList.add('bg-violet-600/30', 'border-violet-400', 'ring-2', 'ring-violet-400/50');
+        const titleDiv = btn.querySelector('.font-bold');
+        if (titleDiv) titleDiv.className = 'font-bold text-xs text-white';
+
+        const codeNum = Number(btn.dataset.code);
+        state.motionCodeSelection = codeNum;
+        state.motionCode = codeNum; // ★ 즉시 실행 연결!
+
         if (state.motionCodeSelection === 4 && motionAspect !== 'portrait') {
           setMotionAspect('portrait');
           showToast('CODE 04는 원본이 세로 쇼츠라 9:16으로 맞췄습니다.');
+        } else {
+          applyMotionCanvasSize();
         }
-        document.getElementById('selectedMotionCode').innerText = `CODE ${code} · ${title}`;
-        showToast(`🎬 CODE ${code} 선택 완료! 위 문구를 입력한 뒤 [미리보기 실행]을 누르세요.`);
+
+        const codeStr = String(codeNum).padStart(2, '0');
+        document.getElementById('selectedMotionCode').innerText = `CODE ${codeStr} · ${btn.dataset.title}`;
+        
+        // ★ 버튼 누르면 즉시 캔버스 재생 실행!
+        state.frame = 0;
+        state.isPlaying = true;
+        btnPlay.innerText = '❚❚';
+        render();
+        showToast(`▶ CODE ${codeStr} (${btn.dataset.title}) 미리보기를 즉시 실행합니다!`);
       });
     });
 
@@ -1746,26 +1857,56 @@ ${url}`;
       canvas.width = landscape ? 640 : 360;
       canvas.height = landscape ? 360 : 640;
       const frame = canvas.parentElement;
-      frame.classList.remove('aspect-[9/16]', 'aspect-video');
-      frame.classList.add(landscape ? 'aspect-video' : 'aspect-[9/16]');
+      if (frame) {
+        frame.classList.remove('aspect-[9/16]', 'aspect-video');
+        frame.classList.add(landscape ? 'aspect-video' : 'aspect-[9/16]');
+        frame.style.maxWidth = landscape ? '620px' : '340px';
+        frame.style.width = '100%';
+      }
+      const timelineWrap = document.getElementById('timeline')?.parentElement;
+      if (timelineWrap) {
+        timelineWrap.style.maxWidth = landscape ? '620px' : '340px';
+      }
     }
+
     function setMotionAspect(aspect) {
       motionAspect = aspect;
       const landscape = aspect === 'landscape';
       applyMotionCanvasSize();
-      document.getElementById('btnLandscape').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
-      document.getElementById('btnPortrait').className = `btnAspect flex-1 py-2 rounded-md text-xs font-bold transition ${!landscape ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`;
-      document.getElementById('selectedAspectHelp').innerText = landscape ? '가로 16:9 · 유튜브·강의·교회 안내 영상' : '세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스';
-      showToast(landscape ? '▭ 가로 16:9 영상으로 선택했습니다.' : '▯ 세로 9:16 쇼츠로 선택했습니다.');
-      if (state.motionCode) render();
+      
+      const btnL = document.getElementById('btnLandscape');
+      const btnP = document.getElementById('btnPortrait');
+      if (btnL && btnP) {
+        if (landscape) {
+          btnL.className = 'btnAspect flex-1 py-3 px-3 rounded-xl bg-violet-600 border border-violet-400 text-white text-xs sm:text-sm font-black shadow-lg shadow-violet-600/30 transition flex items-center justify-center gap-1.5 active:scale-98';
+          btnP.className = 'btnAspect flex-1 py-3 px-3 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-400 hover:text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 active:scale-98';
+        } else {
+          btnL.className = 'btnAspect flex-1 py-3 px-3 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-400 hover:text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 active:scale-98';
+          btnP.className = 'btnAspect flex-1 py-3 px-3 rounded-xl bg-violet-600 border border-violet-400 text-white text-xs sm:text-sm font-black shadow-lg shadow-violet-600/30 transition flex items-center justify-center gap-1.5 active:scale-98';
+        }
+      }
+
+      document.getElementById('selectedAspectHelp').innerText = landscape 
+        ? '▭ 가로 16:9 · 유튜브·강의·교회 안내 영상 (지금 즉시 실행 중)' 
+        : '▯ 세로 9:16 · 카카오톡·유튜브 쇼츠·인스타 릴스 (지금 즉시 실행 중)';
+      
+      // ★ 가로/세로 버튼을 누르면 코드이름만 나오는 게 아니라 즉시 화면에 실행!
+      if (!state.motionCodeSelection) {
+        state.motionCodeSelection = 2; // 기본 모션롤러
+      }
+      state.motionCode = state.motionCodeSelection;
+      state.frame = 0;
+      state.isPlaying = true;
+      btnPlay.innerText = '❚❚';
+      render();
+      showToast(landscape ? '▶ ▭ 가로 16:9 영상으로 즉시 실행합니다!' : '▶ ▯ 세로 9:16 쇼츠로 즉시 실행합니다!');
     }
     document.getElementById('btnLandscape').addEventListener('click', () => setMotionAspect('landscape'));
     document.getElementById('btnPortrait').addEventListener('click', () => setMotionAspect('portrait'));
 
     document.getElementById('btnRunMotionCode').addEventListener('click', () => {
       if (!state.motionCodeSelection) {
-        showToast('먼저 가로·세로와 CODE 01~10 중 하나를 선택하세요.');
-        return;
+        state.motionCodeSelection = 2;
       }
       state.motionCode = state.motionCodeSelection;
       applyMotionCanvasSize();
@@ -1775,6 +1916,8 @@ ${url}`;
       render();
       showToast(`▶ CODE ${String(state.motionCode).padStart(2, '0')} 미리보기를 실행합니다.`);
     });
+
+
 
 
     // 이미지 다운로드 기능 (모바일 갤러리 저장 호환)
