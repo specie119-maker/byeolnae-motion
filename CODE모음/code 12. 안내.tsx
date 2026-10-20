@@ -7,7 +7,6 @@ import {
   interpolate,
   random,
   spring,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
@@ -15,25 +14,9 @@ import { FONT } from './font';
 
 const GOLD = '#FFC93C';
 
-// ── [캐릭터 이미지 설정] ──
-// 1) 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 이미지 raw 주소
-//    (예: https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/character.png)
-// 2) 또는 프로젝트 public 폴더 안에 넣은 경우: staticFile('character.png')
-const CHAR_IMAGE = 'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/character.png';
-
-// ── [소식 내용 4줄 & 안내 타이틀 설정] ──
-const NOTICE_DATA = {
-  header: '교회 소식 및 안내',
-  badge: '공지사항',
-  title: '이번 주 주요 안내',
-  lines: [
-    '• 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',
-    '• 예배 후 각 부서별 구역 모임 및 친교가 있습니다.',
-    '• 수요일 저녁 8시 온세대 기도회가 진행됩니다.',
-    '• 새가족 등록 및 안내는 로비 안내 데스크를 찾아주세요.',
-  ],
-  footer: '별내사랑의교회',
-};
+// 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 목사님 캐릭터 이미지 경로
+const DEFAULT_CHAR_IMG =
+  'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const BOKEH = Array.from({ length: 14 }, (_, i) => ({
@@ -42,7 +25,27 @@ const BOKEH = Array.from({ length: 14 }, (_, i) => ({
   r: 30 + random(`br${i}`) * 80,
 }));
 
-export const SceneBody = () => {
+export interface PastorNoticeCardProps {
+  charImg?: string;
+  badge?: string;
+  title?: string;
+  line1?: string;
+  line2?: string;
+  line3?: string;
+  line4?: string;
+  organization?: string;
+}
+
+export const SceneBody: React.FC<PastorNoticeCardProps> = ({
+  charImg = DEFAULT_CHAR_IMG,
+  badge = '목회 서신',
+  title = '별내사랑의교회 주간 알림',
+  line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',
+  line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',
+  line3 = '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',
+  line4 = '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.',
+  organization = '별내사랑의교회',
+}) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = f / fps;
@@ -52,10 +55,10 @@ export const SceneBody = () => {
   const swayY = -75 * (1 - enter) + 6 * Math.sin(t * 1.2) * enter;
   const swayX = 2.5 * Math.cos(t * 1.0) * enter;
 
-  // 2) 캐릭터 원형 프로필 팝업
+  // 2) 목사님 캐릭터 원형 프로필 팝업
   const face = spring({ frame: f - 14, fps, config: { damping: 12 } });
 
-  // 3) 상단 타이틀 & 4줄 텍스트 순차 페이드인
+  // 3) 상단 제목 및 4줄 안내문구 순차 페이드인
   const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
   const lineAnims = [
     interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
@@ -64,10 +67,12 @@ export const SceneBody = () => {
     interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
   ];
 
-  // 4) 빛 줄기(Sweep) 효과 (프레임 60과 130에 두 번 스쳐 지나감)
+  // 4) 빛 줄기(Sweep) 효과 (프레임 60과 135에 2번 비스듬히 통과)
   const shine = (s: number) =>
     interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });
-  const sweep = f < 110 ? shine(60) : shine(130);
+  const sweep = f < 110 ? shine(60) : shine(135);
+
+  const lines = [line1, line2, line3, line4];
 
   return (
     <AbsoluteFill
@@ -95,7 +100,7 @@ export const SceneBody = () => {
         />
       ))}
 
-      {/* ── 상단 메인 헤더 ── */}
+      {/* ── 상단 헤더 ── */}
       <div
         style={{
           position: 'absolute',
@@ -107,10 +112,10 @@ export const SceneBody = () => {
           letterSpacing: '-0.5px',
         }}
       >
-        {NOTICE_DATA.header}
+        은혜와 나눔 · 목회 안내 카드
       </div>
 
-      {/* ── 3D 소식 안내 카드 (너비 980px, 높이 420px로 확장) ── */}
+      {/* ── 3D 안내 카드 (너비 980px, 높이 430px) ── */}
       <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>
         <div
           style={{
@@ -129,7 +134,7 @@ export const SceneBody = () => {
             padding: '30px 45px 30px 35px',
           }}
         >
-          {/* 카드 좌측 골드 띠 */}
+          {/* 카드 좌측 골드 바 */}
           <div
             style={{
               position: 'absolute',
@@ -141,7 +146,7 @@ export const SceneBody = () => {
             }}
           />
 
-          {/* 1. 좌측: 원형 캐릭터 프로필 프레임 */}
+          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 */}
           <div
             style={{
               width: 230,
@@ -157,7 +162,7 @@ export const SceneBody = () => {
             }}
           >
             <Img
-              src={CHAR_IMAGE}
+              src={charImg}
               style={{
                 position: 'absolute',
                 width: '100%',
@@ -183,7 +188,7 @@ export const SceneBody = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 14,
-                marginBottom: 18,
+                marginBottom: 20,
                 opacity: titleAnim,
                 transform: `translateX(${(1 - titleAnim) * 35}px)`,
               }}
@@ -198,35 +203,35 @@ export const SceneBody = () => {
                   padding: '5px 16px',
                 }}
               >
-                {NOTICE_DATA.badge}
+                {badge}
               </span>
-              <span style={{ fontSize: 36, fontWeight: 900, color: '#ffffff' }}>
-                {NOTICE_DATA.title}
+              <span style={{ fontSize: 34, fontWeight: 900, color: '#ffffff' }}>
+                {title}
               </span>
             </div>
 
-            {/* 4줄의 상세 소식 목록 (순차적 슬라이드 인) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {NOTICE_DATA.lines.map((line, idx) => (
+            {/* 4줄 상세 소식 (순차 슬라이드) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {lines.map((lineText, idx) => (
                 <div
                   key={idx}
                   style={{
-                    fontSize: 22,
+                    fontSize: 21,
                     fontWeight: 600,
                     color: '#e2e8f0',
-                    lineHeight: 1.4,
+                    lineHeight: 1.35,
                     letterSpacing: '-0.3px',
                     opacity: lineAnims[idx],
                     transform: `translateX(${(1 - lineAnims[idx]) * 30}px)`,
                   }}
                 >
-                  {line}
+                  {lineText}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* 3. 비스듬한 화이트 빛 줄기 스위프 (Light Sweep) */}
+          {/* 3. 비스듬한 라이트 스위프 (Light Sweep) */}
           <div
             style={{
               position: 'absolute',
@@ -244,7 +249,7 @@ export const SceneBody = () => {
         </div>
       </AbsoluteFill>
 
-      {/* ── 하단 중앙 기관명 ── */}
+      {/* ── 하단 기관명 ── */}
       <div
         style={{
           position: 'absolute',
@@ -253,18 +258,18 @@ export const SceneBody = () => {
           textAlign: 'center',
           fontSize: 18,
           fontWeight: 700,
-          color: 'rgba(255,255,255,0.6)',
+          color: 'rgba(255,255,255,0.65)',
           letterSpacing: '1px',
         }}
       >
-        {NOTICE_DATA.footer}
+        {organization}
       </div>
     </AbsoluteFill>
   );
 };
 
-export const Scene = () => (
+export const Scene: React.FC<PastorNoticeCardProps> = (props) => (
   <AbsoluteFill>
-    <SceneBody />
+    <SceneBody {...props} />
   </AbsoluteFill>
 );

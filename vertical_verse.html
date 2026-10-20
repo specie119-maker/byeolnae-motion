@@ -165,6 +165,7 @@
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="9" data-title="장면 전환">09 · 장면 전환</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="10" data-title="광선 배경">10 · 광선 배경</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="힘내세요">11 · 힘내세요</button>
+            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="12" data-title="목회 안내 카드">12 · 목회 안내</button>
           </div>
 
           <!-- 첨부 이미지의 대형 실행 버튼 -->
@@ -524,6 +525,16 @@
     motionCrown.crossOrigin = 'anonymous';
     motionCrown.src = 'images/crown_of_life.png';
     motionCrown.onload = () => render();
+
+    const pastorImg = new Image();
+    pastorImg.crossOrigin = 'anonymous';
+    pastorImg.src = '목사님.png';
+    pastorImg.onerror = () => {
+      if (pastorImg.src.indexOf('raw.githubusercontent.com') === -1) {
+        pastorImg.src = 'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';
+      }
+    };
+    pastorImg.onload = () => render();
 
     // 속도를 매우 부드럽고 천천히 늦춘 Remotion 감쇠 조화 진동(Spring) 수식
     // stiffness: 55, damping: 18로 급격한 튕김 없이 부드럽게 안착
@@ -2236,7 +2247,7 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(bText, cx, bY + bH / 2);
         ctx.restore();
-      } else { // CODE 11 · 힘내세요 (DeskLetteringScene - 따뜻한 햇살 벽면 레터링 & 책상 인테리어)
+      } else if (code === 11) { // CODE 11 · 힘내세요 (DeskLetteringScene - 따뜻한 햇살 벽면 레터링 & 책상 인테리어)
         const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         const springV = (rel, stiffness = 0.28, decayRate = 0.16) => {
           if (rel <= 0) return 0;
@@ -2483,6 +2494,371 @@
           ctx.fillText(l3, W / 2, y3);
           ctx.restore();
         }
+      } else { // CODE 12 · 목회 안내 카드 (PastorNoticeCard - 3D 회전 카드 & 목사님 원형 프로필 & 4줄 안내)
+        const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
+        const GOLD = '#FFC93C';
+        const clamp01 = (v) => Math.min(1, Math.max(0, v));
+        const springV = (rel, stiffness = 0.24, decayRate = 0.15) => {
+          if (rel <= 0) return 0;
+          return 1 - Math.exp(-rel * decayRate) * Math.cos(rel * stiffness);
+        };
+        const t = f / 30;
+
+        // 1) 배경 그라데이션 (방사형 딥 네이비)
+        const bgGrad = ctx.createRadialGradient(W * 0.5, H * 0.45, 10, W * 0.5, H * 0.45, Math.max(W, H) * 0.7);
+        bgGrad.addColorStop(0, '#15234a');
+        bgGrad.addColorStop(0.75, '#050914');
+        bgGrad.addColorStop(1, '#02040a');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2) 은은한 보케 라이트 (14개)
+        const bokehList = [
+          { x: 0.15 * W, y: 0.22 * H, r: 42, c: 0 },
+          { x: 0.84 * W, y: 0.18 * H, r: 68, c: 1 },
+          { x: 0.22 * W, y: 0.78 * H, r: 58, c: 0 },
+          { x: 0.78 * W, y: 0.82 * H, r: 48, c: 1 },
+          { x: 0.08 * W, y: 0.50 * H, r: 35, c: 0 },
+          { x: 0.92 * W, y: 0.45 * H, r: 75, c: 1 },
+          { x: 0.45 * W, y: 0.12 * H, r: 40, c: 0 },
+          { x: 0.60 * W, y: 0.88 * H, r: 52, c: 0 },
+          { x: 0.35 * W, y: 0.32 * H, r: 46, c: 1 },
+          { x: 0.68 * W, y: 0.28 * H, r: 62, c: 0 },
+          { x: 0.52 * W, y: 0.72 * H, r: 38, c: 1 },
+          { x: 0.16 * W, y: 0.86 * H, r: 52, c: 0 },
+          { x: 0.88 * W, y: 0.68 * H, r: 45, c: 1 },
+          { x: 0.32 * W, y: 0.15 * H, r: 58, c: 0 },
+        ];
+        bokehList.forEach((b, i) => {
+          ctx.save();
+          const by = b.y + Math.sin(t * 1.5 + i) * 12;
+          const bgd = ctx.createRadialGradient(b.x, by, 0, b.x, by, b.r);
+          if (b.c === 0) {
+            bgd.addColorStop(0, 'rgba(91,140,255,0.18)');
+            bgd.addColorStop(1, 'rgba(91,140,255,0)');
+          } else {
+            bgd.addColorStop(0, 'rgba(255,201,60,0.15)');
+            bgd.addColorStop(1, 'rgba(255,201,60,0)');
+          }
+          ctx.fillStyle = bgd;
+          ctx.beginPath();
+          ctx.arc(b.x, by, b.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // 3) 상단 메인 헤더
+        const headerText = state.verse || '은혜와 나눔 · 목회 안내 카드';
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `900 ${portrait ? 28 : 34}px ${motionFont}`;
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(255,201,60,0.3)';
+        ctx.shadowBlur = 12;
+        ctx.fillText(headerText, W / 2, portrait ? H * 0.08 : H * 0.09);
+        ctx.restore();
+
+        // 4) 3D 플로팅 공지 카드 애니메이션 파라미터
+        const enter = springV(f - 4, 0.22, 0.12);
+        const swayY = -75 * (1 - enter) + 5.5 * Math.sin(t * 1.2) * enter;
+        const swayX = 2.2 * Math.cos(t * 1.0) * enter;
+
+        // 카드 크기 및 배치 (너비 980px, 높이 430px 기준)
+        const isWide = !portrait;
+        const cardW = isWide ? Math.min(1080, W * 0.92) : Math.min(W * 0.92, 540);
+        const cardH = isWide ? Math.min(460, H * 0.70) : Math.min(H * 0.72, 760);
+        const cardX = (W - cardW) / 2;
+        const cardY = (H - cardH) / 2;
+        const cardRadius = isWide ? 34 : 26;
+
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, Math.max(0, enter * 1.5));
+
+        // 3D 회전 변환
+        ctx.translate(W / 2, H / 2);
+        const radY = (swayY * Math.PI) / 180;
+        const radX = (swayX * Math.PI) / 180;
+        const cosY = Math.cos(radY);
+        const sinY = Math.sin(radY);
+        const cosX = Math.cos(radX);
+        const sinX = Math.sin(radX);
+        ctx.transform(cosY, sinY * 0.12, sinX * 0.06, cosX, 0, 0);
+        ctx.translate(-W / 2, -H / 2);
+
+        // 카드 그림자 & 본체
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.65)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 18;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
+        const cardGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+        cardGrad.addColorStop(0, '#182a5e');
+        cardGrad.addColorStop(0.6, '#0d1736');
+        cardGrad.addColorStop(1, '#0a1129');
+        ctx.fillStyle = cardGrad;
+        ctx.fill();
+        ctx.restore();
+
+        // 카드 테두리 (골드 글로우)
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,201,60,0.55)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
+        ctx.stroke();
+        ctx.restore();
+
+        // 카드 내부 클리핑
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
+        ctx.clip();
+
+        // 카드 좌측 골드 바
+        const stripeW = isWide ? 14 : 10;
+        ctx.fillStyle = GOLD;
+        ctx.fillRect(cardX, cardY, stripeW, cardH);
+
+        // 캐릭터 프로필 & 텍스트 영역 레이아웃
+        const faceAnim = springV(f - 14, 0.25, 0.14);
+
+        if (isWide) {
+          // ── [가로 16:9 와이드 레이아웃] ──
+          const avatarR = 84;
+          const avatarX = cardX + 28 + avatarR;
+          const avatarY = cardY + cardH / 2;
+
+          // 원형 프로필 컨테이너
+          ctx.save();
+          ctx.translate(avatarX, avatarY);
+          ctx.scale(faceAnim, faceAnim);
+          ctx.translate(-avatarX, -avatarY);
+
+          // 배경 원형 그라데이션
+          const faceGrad = ctx.createRadialGradient(avatarX, avatarY - 20, 10, avatarX, avatarY, avatarR);
+          faceGrad.addColorStop(0, '#ffe7a6');
+          faceGrad.addColorStop(1, '#f0a93a');
+          ctx.fillStyle = faceGrad;
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 목사님 이미지 클리핑 렌더링
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR - 3, 0, Math.PI * 2);
+          ctx.clip();
+          if (pastorImg && pastorImg.complete && pastorImg.naturalWidth > 0) {
+            ctx.drawImage(pastorImg, avatarX - avatarR, avatarY - avatarR, avatarR * 2, avatarR * 2);
+          } else {
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(avatarX, avatarY - 15, 36, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(avatarX, avatarY + 70, 60, Math.PI, 0, false);
+            ctx.fill();
+          }
+          ctx.restore();
+
+          // 원형 골드 테두리
+          ctx.strokeStyle = GOLD;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          // 우측 텍스트 정보 영역
+          const textX = avatarX + avatarR + 26;
+          const textCenterY = cardY + cardH / 2;
+
+          // 상단 뱃지 & 소식 메인 제목
+          const titleAnim = clamp01((f - 20) / 16);
+          ctx.save();
+          ctx.globalAlpha = titleAnim;
+          const titleOffsetX = (1 - titleAnim) * 35;
+          const badgeY = textCenterY - 95;
+
+          // 골드 캡슐 뱃지
+          const badgeText = state.badge || '목회 서신';
+          ctx.font = `900 14px ${motionFont}`;
+          const bW = ctx.measureText(badgeText).width + 22;
+          const bH = 26;
+          ctx.fillStyle = GOLD;
+          ctx.beginPath();
+          ctx.roundRect(textX + titleOffsetX, badgeY, bW, bH, bH / 2);
+          ctx.fill();
+          ctx.fillStyle = '#0a1129';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(badgeText, textX + titleOffsetX + bW / 2, badgeY + bH / 2);
+
+          // 소식 메인 제목
+          const mainTitle = state.line1 || '별내사랑의교회 주간 알림';
+          ctx.font = `900 23px ${motionFont}`;
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(mainTitle, textX + titleOffsetX + bW + 12, badgeY + bH / 2);
+          ctx.restore();
+
+          // 4줄의 상세 소식 목록
+          const noticeLines = [
+            state.line2 || '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',
+            state.line3 || '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',
+            '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',
+            '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.'
+          ];
+
+          const lineStartY = badgeY + 44;
+          const lineGap = 29;
+          noticeLines.forEach((lineText, idx) => {
+            const lineAnim = clamp01((f - (32 + idx * 10)) / 14);
+            if (lineAnim <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = lineAnim;
+            const lineOffsetX = (1 - lineAnim) * 30;
+            const lineY = lineStartY + idx * lineGap;
+            ctx.font = `600 15px ${motionFont}`;
+            ctx.fillStyle = '#e2e8f0';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(lineText, textX + lineOffsetX, lineY);
+            ctx.restore();
+          });
+        } else {
+          // ── [세로 9:16 모바일 반응형 레이아웃] ──
+          const avatarR = Math.min(cardW * 0.22, 70);
+          const avatarX = cardX + cardW / 2;
+          const avatarY = cardY + 24 + avatarR;
+
+          ctx.save();
+          ctx.translate(avatarX, avatarY);
+          ctx.scale(faceAnim, faceAnim);
+          ctx.translate(-avatarX, -avatarY);
+
+          const faceGrad = ctx.createRadialGradient(avatarX, avatarY - 15, 8, avatarX, avatarY, avatarR);
+          faceGrad.addColorStop(0, '#ffe7a6');
+          faceGrad.addColorStop(1, '#f0a93a');
+          ctx.fillStyle = faceGrad;
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR - 2.5, 0, Math.PI * 2);
+          ctx.clip();
+          if (pastorImg && pastorImg.complete && pastorImg.naturalWidth > 0) {
+            ctx.drawImage(pastorImg, avatarX - avatarR, avatarY - avatarR, avatarR * 2, avatarR * 2);
+          } else {
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(avatarX, avatarY - 10, 24, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(avatarX, avatarY + 45, 40, Math.PI, 0, false);
+            ctx.fill();
+          }
+          ctx.restore();
+
+          ctx.strokeStyle = GOLD;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.arc(avatarX, avatarY, avatarR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          // 세로 텍스트 영역
+          const titleAnim = clamp01((f - 20) / 16);
+          const textStartY = avatarY + avatarR + 24;
+
+          ctx.save();
+          ctx.globalAlpha = titleAnim;
+          const titleOffsetY = (1 - titleAnim) * 20;
+
+          // 골드 뱃지
+          const badgeText = state.badge || '목회 서신';
+          ctx.font = `900 14px ${motionFont}`;
+          const bW = ctx.measureText(badgeText).width + 22;
+          const bH = 26;
+          ctx.fillStyle = GOLD;
+          ctx.beginPath();
+          ctx.roundRect(cardX + cardW / 2 - bW / 2, textStartY + titleOffsetY, bW, bH, bH / 2);
+          ctx.fill();
+          ctx.fillStyle = '#0a1129';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(badgeText, cardX + cardW / 2, textStartY + titleOffsetY + bH / 2);
+
+          // 타이틀
+          const mainTitle = state.line1 || '별내사랑의교회 주간 알림';
+          ctx.font = `900 24px ${motionFont}`;
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(mainTitle, cardX + cardW / 2, textStartY + titleOffsetY + bH + 20);
+          ctx.restore();
+
+          // 4줄 소식
+          const noticeLines = [
+            state.line2 || '1. 이번 주일 예배 : 오전 11시 본당',
+            state.line3 || '2. 다락방 및 부서별 나눔 모임',
+            '3. 수요일 저녁 8시 온세대 기도회',
+            '4. 환우 및 수험생을 위한 중보기도'
+          ];
+          const linesTop = textStartY + 80;
+          noticeLines.forEach((lineText, idx) => {
+            const lineAnim = clamp01((f - (32 + idx * 10)) / 14);
+            if (lineAnim <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = lineAnim;
+            ctx.font = `600 16px ${motionFont}`;
+            ctx.fillStyle = '#e2e8f0';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(lineText, cardX + 32, linesTop + idx * 36);
+            ctx.restore();
+          });
+        }
+
+        // 5) 비스듬한 화이트 빛 줄기 스위프 (Light Sweep: 60 및 135 프레임)
+        const shineProgress = (startF) => {
+          if (f < startF || f > startF + 30) return null;
+          return (f - startF) / 30;
+        };
+        const pSweep = f < 110 ? shineProgress(60) : shineProgress(135);
+        if (pSweep !== null) {
+          const sweepX = cardX - 120 + pSweep * (cardW + 300);
+          ctx.save();
+          ctx.translate(sweepX, cardY + cardH / 2);
+          ctx.rotate((20 * Math.PI) / 180);
+          const sweepGrad = ctx.createLinearGradient(-80, 0, 80, 0);
+          sweepGrad.addColorStop(0, 'rgba(255,255,255,0)');
+          sweepGrad.addColorStop(0.5, 'rgba(255,255,255,0.28)');
+          sweepGrad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = sweepGrad;
+          ctx.fillRect(-80, -cardH, 160, cardH * 2);
+          ctx.restore();
+        }
+
+        ctx.restore(); // 클리핑 해제
+        ctx.restore(); // 3D 회전 변환 복원
+
+        // 6) 하단 중앙 기관명
+        const footerText = (state.youtube && !state.youtube.startsWith('http')) ? state.youtube : '별내사랑의교회';
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `700 ${portrait ? 15 : 18}px ${motionFont}`;
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(footerText, W / 2, H - (portrait ? 30 : 34));
+        ctx.restore();
       }
     }
 
@@ -2852,6 +3228,28 @@ ${url}`;
             const l2El = document.getElementById('inputLine2');
             const vEl = document.getElementById('inputVerse');
             if (l2El) l2El.value = state.line2;
+            if (vEl) vEl.value = state.verse;
+          }
+        }
+
+        if (state.motionCode === 12) {
+          if (motionAspect !== 'landscape') {
+            setMotionAspect('landscape');
+            showToast('CODE 12는 16:9 와이드 카드라 가로 모드로 맞췄습니다.');
+          }
+          const l1El = document.getElementById('inputLine1');
+          if (l1El && (!state.hasCustomVerse || l1El.value === '일을 행하시는 여호와' || l1El.value === '주 예수 그리스도를 믿으라' || l1El.value === '하나님은 일하시고,')) {
+            state.line1 = '별내사랑의교회 주간 알림';
+            state.line2 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.';
+            state.line3 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.';
+            state.verse = '은혜와 나눔 · 목회 안내 카드';
+            state.badge = '목회 서신';
+            l1El.value = state.line1;
+            const l2El = document.getElementById('inputLine2');
+            const l3El = document.getElementById('inputLine3');
+            const vEl = document.getElementById('inputVerse');
+            if (l2El) l2El.value = state.line2;
+            if (l3El) l3El.value = state.line3;
             if (vEl) vEl.value = state.verse;
           }
         }
@@ -4303,6 +4701,16 @@ export const DeskLetteringScene: React.FC = () => {
     </AbsoluteFill>
   );
 };`;
+      }
+      if (state.motionCode === 12) {
+        const raw = "// frames=200 size=1280x720 (가로 16:9 공지 카드)\nimport React from 'react';\nimport {\n  AbsoluteFill,\n  Easing,\n  Img,\n  interpolate,\n  random,\n  spring,\n  useCurrentFrame,\n  useVideoConfig,\n} from 'remotion';\nimport { FONT } from './font';\n\nconst GOLD = '#FFC93C';\n\n// 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 목사님 캐릭터 이미지 경로\nconst DEFAULT_CHAR_IMG =\n  'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';\n\nconst clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;\nconst BOKEH = Array.from({ length: 14 }, (_, i) => ({\n  x: random(`bx${i}`) * 1280,\n  y: random(`by${i}`) * 720,\n  r: 30 + random(`br${i}`) * 80,\n}));\n\nexport interface PastorNoticeCardProps {\n  charImg?: string;\n  badge?: string;\n  title?: string;\n  line1?: string;\n  line2?: string;\n  line3?: string;\n  line4?: string;\n  organization?: string;\n}\n\nexport const SceneBody: React.FC<PastorNoticeCardProps> = ({\n  charImg = DEFAULT_CHAR_IMG,\n  badge = '목회 서신',\n  title = '별내사랑의교회 주간 알림',\n  line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',\n  line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',\n  line3 = '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',\n  line4 = '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.',\n  organization = '별내사랑의교회',\n}) => {\n  const f = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const t = f / fps;\n\n  // 1) 3D 카드 등장 (rotateY -75도에서 스프링 회전 후 정면 안착)\n  const enter = spring({ frame: f - 4, fps, config: { damping: 16, mass: 0.9 } });\n  const swayY = -75 * (1 - enter) + 6 * Math.sin(t * 1.2) * enter;\n  const swayX = 2.5 * Math.cos(t * 1.0) * enter;\n\n  // 2) 목사님 캐릭터 원형 프로필 팝업\n  const face = spring({ frame: f - 14, fps, config: { damping: 12 } });\n\n  // 3) 상단 제목 및 4줄 안내문구 순차 페이드인\n  const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });\n  const lineAnims = [\n    interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [42, 56], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [52, 66], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n  ];\n\n  // 4) 빛 줄기(Sweep) 효과 (프레임 60과 135에 2번 비스듬히 통과)\n  const shine = (s: number) =>\n    interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });\n  const sweep = f < 110 ? shine(60) : shine(135);\n\n  const lines = [line1, line2, line3, line4];\n\n  return (\n    <AbsoluteFill\n      style={{\n        fontFamily: FONT,\n        color: '#fff',\n        background: 'radial-gradient(ellipse at 50% 45%, #15234a 0%, #050914 75%)',\n        overflow: 'hidden',\n      }}\n    >\n      {/* ── 배경 은은한 보케 라이트 ── */}\n      {BOKEH.map((b, i) => (\n        <div\n          key={i}\n          style={{\n            position: 'absolute',\n            left: b.x - b.r,\n            top: b.y - b.r + Math.sin(t + i) * 10,\n            width: b.r * 2,\n            height: b.r * 2,\n            borderRadius: '50%',\n            background: i % 3 ? 'rgba(91,140,255,0.08)' : 'rgba(255,201,60,0.07)',\n            filter: 'blur(8px)',\n          }}\n        />\n      ))}\n\n      {/* ── 상단 헤더 ── */}\n      <div\n        style={{\n          position: 'absolute',\n          top: 36,\n          width: '100%',\n          textAlign: 'center',\n          fontSize: 34,\n          fontWeight: 900,\n          letterSpacing: '-0.5px',\n        }}\n      >\n        은혜와 나눔 · 목회 안내 카드\n      </div>\n\n      {/* ── 3D 안내 카드 (너비 980px, 높이 430px) ── */}\n      <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>\n        <div\n          style={{\n            width: 980,\n            height: 430,\n            borderRadius: 36,\n            position: 'relative',\n            overflow: 'hidden',\n            opacity: Math.min(1, enter * 1.5),\n            transform: `rotateY(${swayY}deg) rotateX(${swayX}deg)`,\n            background: 'linear-gradient(135deg, #182a5e 0%, #0d1736 60%, #0a1129 100%)',\n            border: '2px solid rgba(255,201,60,0.5)',\n            boxShadow: '0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)',\n            display: 'flex',\n            alignItems: 'center',\n            padding: '30px 45px 30px 35px',\n          }}\n        >\n          {/* 카드 좌측 골드 바 */}\n          <div\n            style={{\n              position: 'absolute',\n              left: 0,\n              top: 0,\n              bottom: 0,\n              width: 14,\n              background: GOLD,\n            }}\n          />\n\n          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 */}\n          <div\n            style={{\n              width: 230,\n              height: 230,\n              minWidth: 230,\n              borderRadius: '50%',\n              overflow: 'hidden',\n              border: `6px solid ${GOLD}`,\n              background: 'radial-gradient(circle at 50% 35%, #ffe7a6, #f0a93a)',\n              transform: `scale(${face})`,\n              position: 'relative',\n              boxShadow: '0 15px 30px rgba(0,0,0,0.4)',\n            }}\n          >\n            <Img\n              src={charImg}\n              style={{\n                position: 'absolute',\n                width: '100%',\n                height: '100%',\n                objectFit: 'cover',\n              }}\n            />\n          </div>\n\n          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식) */}\n          <div\n            style={{\n              marginLeft: 40,\n              flex: 1,\n              display: 'flex',\n              flexDirection: 'column',\n              justifyContent: 'center',\n            }}\n          >\n            {/* 상단 뱃지 & 소식 메인 제목 */}\n            <div\n              style={{\n                display: 'flex',\n                alignItems: 'center',\n                gap: 14,\n                marginBottom: 20,\n                opacity: titleAnim,\n                transform: `translateX(${(1 - titleAnim) * 35}px)`,\n              }}\n            >\n              <span\n                style={{\n                  fontSize: 18,\n                  fontWeight: 900,\n                  color: '#0a1129',\n                  background: GOLD,\n                  borderRadius: 999,\n                  padding: '5px 16px',\n                }}\n              >\n                {badge}\n              </span>\n              <span style={{ fontSize: 34, fontWeight: 900, color: '#ffffff' }}>\n                {title}\n              </span>\n            </div>\n\n            {/* 4줄 상세 소식 (순차 슬라이드) */}\n            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>\n              {lines.map((lineText, idx) => (\n                <div\n                  key={idx}\n                  style={{\n                    fontSize: 21,\n                    fontWeight: 600,\n                    color: '#e2e8f0',\n                    lineHeight: 1.35,\n                    letterSpacing: '-0.3px',\n                    opacity: lineAnims[idx],\n                    transform: `translateX(${(1 - lineAnims[idx]) * 30}px)`,\n                  }}\n                >\n                  {lineText}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          {/* 3. 비스듬한 라이트 스위프 (Light Sweep) */}\n          <div\n            style={{\n              position: 'absolute',\n              top: -80,\n              bottom: -80,\n              left: `${sweep}%`,\n              width: 180,\n              transform: 'rotate(20deg)',\n              background:\n                'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.25), rgba(255,255,255,0))',\n              mixBlendMode: 'screen',\n              pointerEvents: 'none',\n            }}\n          />\n        </div>\n      </AbsoluteFill>\n\n      {/* ── 하단 기관명 ── */}\n      <div\n        style={{\n          position: 'absolute',\n          bottom: 34,\n          width: '100%',\n          textAlign: 'center',\n          fontSize: 18,\n          fontWeight: 700,\n          color: 'rgba(255,255,255,0.65)',\n          letterSpacing: '1px',\n        }}\n      >\n        {organization}\n      </div>\n    </AbsoluteFill>\n  );\n};\n\nexport const Scene: React.FC<PastorNoticeCardProps> = (props) => (\n  <AbsoluteFill>\n    <SceneBody {...props} />\n  </AbsoluteFill>\n);";
+        return raw
+          .replace("은혜와 나눔 · 목회 안내 카드", state.verse || "은혜와 나눔 · 목회 안내 카드")
+          .replace("badge = '목회 서신'", "badge = " + JSON.stringify(state.badge || "목회 서신"))
+          .replace("title = '별내사랑의교회 주간 알림'", "title = " + JSON.stringify(state.line1 || "별내사랑의교회 주간 알림"))
+          .replace("line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.'", "line1 = " + JSON.stringify(state.line2 || "1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다."))
+          .replace("line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.'", "line2 = " + JSON.stringify(state.line3 || "2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다."))
+          .replace("organization = '별내사랑의교회'", "organization = " + JSON.stringify(state.youtube || "별내사랑의교회"));
       }
       return `// Remotion CODE ${String(state.motionCode || 1).padStart(2, '0')} 말씀 모션그래픽
 import React from 'react';
