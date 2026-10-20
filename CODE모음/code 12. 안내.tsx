@@ -100,21 +100,6 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
         />
       ))}
 
-      {/* ── 상단 헤더 ── */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 36,
-          width: '100%',
-          textAlign: 'center',
-          fontSize: 34,
-          fontWeight: 900,
-          letterSpacing: '-0.5px',
-        }}
-      >
-        은혜와 나눔 · 목회 안내 카드
-      </div>
-
       {/* ── 3D 안내 카드 (너비 980px, 높이 430px) ── */}
       <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>
         <div
@@ -146,15 +131,15 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
             }}
           />
 
-          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 */}
+          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 (1/2 축소 & 원안에 얼굴만 확대) */}
           <div
             style={{
-              width: 230,
-              height: 230,
-              minWidth: 230,
+              width: 105,
+              height: 105,
+              minWidth: 105,
               borderRadius: '50%',
               overflow: 'hidden',
-              border: `6px solid ${GOLD}`,
+              border: `4px solid ${GOLD}`,
               background: 'radial-gradient(circle at 50% 35%, #ffe7a6, #f0a93a)',
               transform: `scale(${face})`,
               position: 'relative',
@@ -165,17 +150,19 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
               src={charImg}
               style={{
                 position: 'absolute',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
+                width: '185%',
+                height: '185%',
+                left: '-42%',
+                top: '-15%',
+                objectFit: 'contain',
               }}
             />
           </div>
 
-          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식) */}
+          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식, 박스 축소만큼 텍스트 폭 확장 & 상하 중앙 배치) */}
           <div
             style={{
-              marginLeft: 40,
+              marginLeft: 32,
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
