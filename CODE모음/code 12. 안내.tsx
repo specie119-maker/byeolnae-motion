@@ -14,7 +14,6 @@ import { FONT } from './font';
 
 const GOLD = '#FFC93C';
 
-// 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 목사님 캐릭터 이미지 경로
 const DEFAULT_CHAR_IMG =
   'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';
 
@@ -58,9 +57,9 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
   const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
   const lineAnims = [
     interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
-    interpolate(f, [42, 56], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
-    interpolate(f, [52, 66], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
-    interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
+    interpolate(f, [40, 54], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
+    interpolate(f, [48, 62], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
+    interpolate(f, [56, 70], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
   ];
 
   // 4) 빛 줄기(Sweep) 효과 (프레임 60과 135에 2번 비스듬히 통과)
@@ -68,19 +67,63 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
     interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });
   const sweep = f < 110 ? shine(60) : shine(135);
 
-  // 두 입력칸(line1: 두 번째 줄, line2: 마지막 강조줄)을 긴 문장일 때 각 2줄씩(최대 총 4줄) 분할
-  const splitToTwoLines = (txt: string) => {
+  // 3,4번 문구 삭제 및 1,2번 각 입력칸 당 최대 2줄(총 4줄) 균형 분할
+  const splitToTwo = (txt: string, maxChars = 28) => {
     if (!txt) return [];
-    if (txt.includes('\\n')) return txt.split('\\n').map((s) => s.trim()).filter(Boolean).slice(0, 2);
-    if (txt.length > 36) {
-      const words = txt.split(' ');
-      let mid = Math.ceil(words.length / 2);
-      return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+    const trimmed = String(txt).trim();
+    if (!trimmed) return [];
+    if (trimmed.includes('\n')) {
+      const parts = trimmed.split('\n').map((s) => s.trim()).filter(Boolean);
+      if (parts.length >= 2) return [parts[0], parts.slice(1).join(' ')];
     }
-    return [txt];
+    const sentenceRegex = /(?<=[.!?])\s+/g;
+    let match: RegExpExecArray | null;
+    let splitSentenceIdx = -1;
+    while ((match = sentenceRegex.exec(trimmed)) !== null) {
+      if (match.index > 3 && match.index < trimmed.length - 2) {
+        splitSentenceIdx = match.index;
+        break;
+      }
+    }
+    if (splitSentenceIdx > 0) {
+      const p1 = trimmed.slice(0, splitSentenceIdx).trim();
+      const p2 = trimmed.slice(splitSentenceIdx).trim();
+      if (p1.length <= maxChars && p2.length <= maxChars + 6) {
+        return [p1, p2];
+      }
+    }
+    const words = trimmed.split(/\s+/);
+    if (words.length <= 1) {
+      if (trimmed.length > 14) {
+        const mid = Math.ceil(trimmed.length / 2);
+        return [trimmed.slice(0, mid), trimmed.slice(mid)];
+      }
+      return [trimmed];
+    }
+    if (words.length === 2) {
+      if (words[0].endsWith('.') || words[0].endsWith(')')) {
+        return [trimmed];
+      }
+      return [words[0], words[1]];
+    }
+    const minWordsFirst = words[0].endsWith('.') || words[0].endsWith(')') ? 2 : 1;
+    let bestIdx = minWordsFirst;
+    let minDiff = Infinity;
+    for (let i = minWordsFirst; i < words.length; i++) {
+      const l1 = words.slice(0, i).join(' ');
+      const l2 = words.slice(i).join(' ');
+      if (l1.length > maxChars) break;
+      const diff = Math.abs(l1.length - l2.length);
+      if (diff < minDiff) {
+        minDiff = diff;
+        bestIdx = i;
+      }
+    }
+    return [words.slice(0, bestIdx).join(' '), words.slice(bestIdx).join(' ')];
   };
 
-  const lines = [...splitToTwoLines(line1), ...splitToTwoLines(line2)];
+  const group1 = splitToTwo(line1);
+  const group2 = splitToTwo(line2);
 
   return (
     <AbsoluteFill
@@ -167,7 +210,7 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
             />
           </div>
 
-          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 2칸 입력 기반 최대 4줄 편지 본문) */}
+          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 1,2번 각 2줄씩 최대 4줄) */}
           <div
             style={{
               marginLeft: 32,
@@ -205,26 +248,47 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
               </span>
             </div>
 
-            {/* 2칸 입력 -> 긴 문장 시 최대 4줄 편지 본문 (순차 슬라이드 & 자동 2줄 래핑) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {lines.map((lineText, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    fontSize: 21,
-                    fontWeight: 600,
-                    color: '#e2e8f0',
-                    lineHeight: 1.35,
-                    letterSpacing: '-0.3px',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'keep-all',
-                    opacity: lineAnims[idx] ?? 1,
-                    transform: `translateX(${(1 - (lineAnims[idx] ?? 1)) * 30}px)`,
-                  }}
-                >
-                  {lineText}
-                </div>
-              ))}
+            {/* 1번 문구 (최대 2줄) & 2번 문구 (최대 2줄) - 3,4번 삭제 & 각 입력시 2줄로 총 4줄 출력 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {group1.map((t, i) => (
+                  <div
+                    key={`g1-${i}`}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 600,
+                      color: '#f8fafc',
+                      lineHeight: 1.35,
+                      letterSpacing: '-0.3px',
+                      paddingLeft: i > 0 ? 18 : 0,
+                      opacity: lineAnims[i] ?? 1,
+                      transform: `translateX(${(1 - (lineAnims[i] ?? 1)) * 30}px)`,
+                    }}
+                  >
+                    {t}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {group2.map((t, i) => (
+                  <div
+                    key={`g2-${i}`}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 600,
+                      color: '#e2e8f0',
+                      lineHeight: 1.35,
+                      letterSpacing: '-0.3px',
+                      paddingLeft: i > 0 ? 18 : 0,
+                      opacity: lineAnims[group1.length + i] ?? 1,
+                      transform: `translateX(${(1 - (lineAnims[group1.length + i] ?? 1)) * 30}px)`,
+                    }}
+                  >
+                    {t}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
