@@ -8,8 +8,8 @@ import {
 } from 'remotion';
 import { FONT } from './font';
 
-// 찬양 말씀 구절 목록 (홀수 줄: rgb(230, 43, 117) / 짝수 줄: 검정색)
-const SCRIPTURE_LINES = [
+// 찬양 말씀 구절 목록 (기본값)
+const DEFAULT_LINES = [
   '내 영혼아 여호와를 송축하라',
   '내 속에 있는 것들아',
   '다 그의 거룩한 이름을 송축하라',
@@ -19,23 +19,29 @@ const SCRIPTURE_LINES = [
 ];
 
 export interface AscendingVerseProps {
+  lines?: string[];          // 찬양/말씀 구절 줄 목록 (미입력 시 기본 구절 사용)
   verseRef?: string;         // 성경 출처 (예: 시편 103:1-2)
   organization?: string;     // 기관명 (예: 별내사랑의교회)
 }
 
 export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
+  lines = DEFAULT_LINES,
   verseRef = '시편 103:1-2',
   organization = '별내사랑의교회',
 }) => {
   const frame = useCurrentFrame();
   const { width, height, durationInFrames } = useVideoConfig();
   const isVertical = height > width;
+  const SCRIPTURE_LINES = lines && lines.length > 0 ? lines : DEFAULT_LINES;
+
+  const lineGap = isVertical ? 42 : 62;
+  const totalHeight = (SCRIPTURE_LINES.length - 1) * lineGap + 80;
 
   // 1. 하단에서 상단으로 서서히 올라가는 Y축 이동 계산 (durationInFrames: 300프레임 / 10초)
   const translateY = interpolate(
     frame,
     [0, durationInFrames],
-    [height * 0.50, -height * 0.44],
+    [height * 0.52, -totalHeight - 40],
     { extrapolateRight: 'clamp' }
   );
 
@@ -46,8 +52,6 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
     [0, 1, 1, 0],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
-
-  const lineGap = isVertical ? 42 : 62;
 
   return (
     <AbsoluteFill
