@@ -164,7 +164,7 @@
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="8" data-title="패럴랙스">08 · 패럴랙스</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="9" data-title="장면 전환">09 · 장면 전환</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="10" data-title="광선 배경">10 · 광선 배경</button>
-            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="수채화">11 · 수채화</button>
+            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="힘내세요">11 · 힘내세요</button>
           </div>
 
           <!-- 첨부 이미지의 대형 실행 버튼 -->
@@ -2236,200 +2236,253 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(bText, cx, bY + bH / 2);
         ctx.restore();
-      } else { // CODE 11 · 수채화 (WatercolorScriptureScene - 감성 수채화 파스텔 말씀 카드)
+      } else { // CODE 11 · 힘내세요 (DeskLetteringScene - 따뜻한 햇살 벽면 레터링 & 책상 인테리어)
         const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
-        const springV = (rel, stiffness = 0.22, decayRate = 0.12) => {
+        const springV = (rel, stiffness = 0.28, decayRate = 0.16) => {
           if (rel <= 0) return 0;
           return 1 - Math.exp(-rel * decayRate) * Math.cos(rel * stiffness);
         };
         const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-        const bgScale = springV(f - 5, 0.20, 0.10);
-        const branchScale = springV(f - 15, 0.24, 0.12);
-        const fade1 = clamp01((f - 25) / 20);
-        const fade2 = clamp01((f - 45) / 20);
-        const fade3 = clamp01((f - 65) / 20);
-        const fadeStamp = clamp01((f - 85) / 15);
+        const popSun = springV(f - 10, 0.26, 0.14);
+        const fade1 = clamp01((f - 15) / 17);
+        const fade2 = clamp01((f - 30) / 18);
+        const fade3 = clamp01((f - 45) / 20);
 
-        // 1. 따뜻한 미색 한지/수채화 종이 톤 배경
-        ctx.fillStyle = '#fbfaf8';
+        const cloudFloat = Math.sin(f * 0.08) * 5;
+        const sunRotate = (Math.sin(f * 0.05) * 6 * Math.PI) / 180;
+
+        // 1. 배경: 화이트/그레이 벽면 그라데이션
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#f4f4f4');
+        bgGrad.addColorStop(0.6, '#ebebeb');
+        bgGrad.addColorStop(1, '#dedede');
+        ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // 2. 수채화 핑크 번짐 배경 스프링 팝업
-        if (bgScale > 0) {
-          ctx.save();
-          ctx.translate(W * 0.55, H * (portrait ? 0.48 : 0.50));
-          ctx.scale(bgScale, bgScale);
-          const rad = Math.min(W, H) * (portrait ? 0.65 : 0.42);
-          const grad = ctx.createRadialGradient(0, 0, rad * 0.1, 0, 0, rad);
-          grad.addColorStop(0, 'rgba(244, 114, 182, 0.40)');
-          grad.addColorStop(0.45, 'rgba(251, 207, 232, 0.25)');
-          grad.addColorStop(0.75, 'rgba(253, 242, 248, 0.05)');
-          grad.addColorStop(1, 'rgba(253, 242, 248, 0)');
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, rad * 1.15, rad * 1.45, -0.15, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-
-        // 3. 은은하게 반짝이는 빛 입자 ✨ ✦
+        // 2. 창가 사선 햇살 채광 (Sunlight Rays)
         ctx.save();
-        const starAlpha1 = 0.6 + Math.sin(f * 0.1) * 0.3;
-        ctx.globalAlpha = Math.max(0, Math.min(1, starAlpha1));
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = `900 ${portrait ? 24 : 28}px ${motionFont}`;
-        ctx.fillText('✦', W * 0.78, H * 0.30);
-
-        const starAlpha2 = 0.5 + Math.cos(f * 0.12) * 0.3;
-        ctx.globalAlpha = Math.max(0, Math.min(1, starAlpha2));
-        ctx.fillStyle = '#f472b6';
-        ctx.font = `900 ${portrait ? 18 : 22}px ${motionFont}`;
-        ctx.fillText('✦', W * 0.72, H * 0.45);
+        ctx.translate(-W * 0.1, -H * 0.15);
+        ctx.rotate((-28 * Math.PI) / 180);
+        const sunRay = ctx.createLinearGradient(0, 0, W * 0.8, H * 1.5);
+        sunRay.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+        sunRay.addColorStop(0.4, 'rgba(255, 255, 255, 0.25)');
+        sunRay.addColorStop(0.8, 'transparent');
+        ctx.fillStyle = sunRay;
+        ctx.fillRect(0, 0, W * 0.8, H * 1.5);
         ctx.restore();
 
-        // 4. 파스텔 감성 나뭇가지 일러스트
-        if (branchScale > 0) {
-          ctx.save();
-          const bx = portrait ? W * 0.18 : W * 0.16;
-          const by = portrait ? H * 0.82 : H * 0.84;
-          ctx.translate(bx, by);
-          const bsc = (portrait ? Math.min(W, H) / 720 : Math.min(W, H) / 760) * branchScale;
-          ctx.scale(bsc, bsc);
+        // 3. 하단 데스크 인테리어 (화이트 상판, 노트북, 오렌지 시계, 책상 다리)
+        const deskY = H * (portrait ? 0.72 : 0.68);
+        const deskH = 16;
 
-          // 줄기
-          ctx.strokeStyle = '#2d2a26';
-          ctx.lineWidth = 2.5;
-          ctx.lineCap = 'round';
-          ctx.beginPath();
-          ctx.moveTo(0, 30);
-          ctx.lineTo(0, -100);
-          ctx.moveTo(0, -10);
-          ctx.quadraticCurveTo(-18, -25, -28, -35);
-          ctx.moveTo(0, -35);
-          ctx.quadraticCurveTo(18, -50, 28, -60);
-          ctx.moveTo(0, -60);
-          ctx.quadraticCurveTo(-14, -75, -22, -85);
-          ctx.moveTo(0, -80);
-          ctx.quadraticCurveTo(14, -92, 22, -100);
-          ctx.stroke();
-
-          // 파스텔 잎사귀
-          const drawLeaf = (lx, ly, rx, ry, ang, color) => {
-            ctx.save();
-            ctx.translate(lx, ly);
-            ctx.rotate(ang);
-            ctx.fillStyle = color;
-            ctx.strokeStyle = '#2d2a26';
-            ctx.lineWidth = 1.8;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.restore();
-          };
-          drawLeaf(-28, -36, 7, 11, -0.6, '#bae6fd');
-          drawLeaf(28, -61, 7, 11, 0.6, '#a7f3d0');
-          drawLeaf(-22, -86, 6, 10, -0.7, '#e9d5ff');
-          drawLeaf(22, -101, 6, 10, 0.6, '#fef08a');
-          drawLeaf(0, -104, 5, 9, 0, '#a7f3d0');
-
-          // 화분 받침
-          ctx.fillStyle = '#fef08a';
-          ctx.strokeStyle = '#2d2a26';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(-12, 16);
-          ctx.lineTo(12, 16);
-          ctx.lineTo(9, 24);
-          ctx.lineTo(-9, 24);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          ctx.restore();
-        }
-
-        // 5. 감성 캘리그라피 말씀 본문
+        // 책상 다리 (좌/우 트러스 프레임)
         ctx.save();
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 4;
+        const legLeftX = W * 0.08;
+        const legRightX = W * 0.92;
+        ctx.strokeRect(legLeftX, deskY + deskH, 36, H - (deskY + deskH));
+        ctx.strokeRect(legRightX - 36, deskY + deskH, 36, H - (deskY + deskH));
+
+        // 화이트 데스크 상판
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.10)';
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(W * 0.04, deskY, W * 0.92, deskH, 4);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        // 책상 위 소품: [1] 노트북
+        const lapW = Math.min(190, W * 0.32);
+        const lapH = lapW * 0.62;
+        const lapX = (W - lapW) / 2;
+        const lapY = deskY - lapH;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(lapX, lapY, lapW, lapH, [10, 10, 0, 0]);
+        ctx.fill();
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // 노트북 화면
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.roundRect(lapX + 8, lapY + 8, lapW - 16, lapH - 12, 6);
+        ctx.fill();
+
+        // 화면 텍스트
+        const orgName = (state.youtube && !state.youtube.startsWith('http') ? state.youtube : '별내사랑의교회');
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = `700 ${portrait ? 11 : 13}px ${motionFont}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const cx = W / 2;
+        ctx.fillText(orgName, lapX + lapW / 2, lapY + lapH / 2);
 
-        const p1 = (state.line1 && state.line1.trim()) || '두려워하지 말라 내가 너와 함께 함이라';
-        const p2 = (state.line2 && state.line2.trim()) || '놀라지 말라 나는 네 하나님이 됨이라';
-        const p3 = (state.line3 && state.line3.trim()) || '내가 너를 굳세게 하리라 참으로 너를 도와주리라';
-        const vText = (state.verse && state.verse.trim()) || '이사야 41:10';
+        // [2] 앤틱 오렌지 알람 시계 (우측)
+        const clockR = portrait ? 20 : 25;
+        const clockX = lapX + lapW + (W - (lapX + lapW)) * 0.45;
+        const clockY = deskY - clockR - 8;
+        ctx.fillStyle = '#ea580c';
+        ctx.strokeStyle = '#c2410c';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(clockX, clockY, clockR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
 
-        // 1단락
+        // 시계판
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath();
+        ctx.arc(clockX, clockY, clockR * 0.72, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 시계 바늘
+        ctx.strokeStyle = '#1c1917';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(clockX, clockY);
+        ctx.lineTo(clockX, clockY - clockR * 0.45);
+        ctx.moveTo(clockX, clockY);
+        ctx.lineTo(clockX + clockR * 0.35, clockY);
+        ctx.stroke();
+
+        // 시계 밑 책 받침
+        ctx.fillStyle = '#3b82f6';
+        ctx.beginPath();
+        ctx.roundRect(clockX - clockR * 1.2, deskY - 8, clockR * 2.4, 8, 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 4. 벽면 레터링 & 손그림 일러스트 영역 (상단~중앙)
+        const l1 = (state.line1 && state.line1.trim()) || '다시는';
+        const l2 = (state.line2 && state.line2.trim()) || '오지않을 오늘';
+        const l3 = (state.line3 && state.line3.trim()) || '후회없이 행복하게';
+
+        const textTopY = portrait ? H * 0.16 : H * 0.14;
+        const lineSpacing = portrait ? 58 : 66;
+
+        // ── [1줄] 텍스트 + 방긋 웃는 해님 + 우측 미니 구름 ──
         if (fade1 > 0) {
           ctx.save();
           ctx.globalAlpha = fade1;
-          const y1 = (portrait ? H * 0.28 : H * 0.26) + (1 - fade1) * 16;
-          ctx.fillStyle = '#1e1b18';
-          ctx.font = `900 ${portrait ? 24 : 28}px ${motionFont}`;
-          ctx.fillText(p1, cx, y1);
+          const y1 = textTopY + (1 - fade1) * 15;
+          ctx.font = `900 ${portrait ? 32 : 40}px ${motionFont}`;
+          const t1W = ctx.measureText(l1).width;
+          const sunR = portrait ? 22 : 26;
+          const row1W = t1W + 16 + sunR * 2 + 16 + 40;
+          const startX = W / 2 - row1W / 2;
+
+          // 텍스트
+          ctx.fillStyle = '#262626';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(l1, startX, y1);
+
+          // 방긋 웃는 해님 (SVG 드로잉)
+          const sunX = startX + t1W + 16 + sunR;
+          const sunY = y1;
+          if (popSun > 0) {
+            ctx.save();
+            ctx.translate(sunX, sunY);
+            ctx.scale(popSun, popSun);
+            ctx.rotate(sunRotate);
+
+            // 햇살 광선 8개
+            ctx.fillStyle = '#f59e0b';
+            ctx.strokeStyle = '#1c1917';
+            ctx.lineWidth = 2.5;
+            for (let deg = 0; deg < 360; deg += 45) {
+              ctx.save();
+              ctx.rotate((deg * Math.PI) / 180);
+              ctx.beginPath();
+              ctx.roundRect(-4, -sunR * 1.35, 8, sunR * 0.5, 3);
+              ctx.fill();
+              ctx.stroke();
+              ctx.restore();
+            }
+
+            // 얼굴 원
+            ctx.fillStyle = '#fde047';
+            ctx.strokeStyle = '#1c1917';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, sunR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 눈 2개
+            ctx.fillStyle = '#1c1917';
+            ctx.beginPath();
+            ctx.arc(-sunR * 0.32, -sunR * 0.12, 2.5, 0, Math.PI * 2);
+            ctx.arc(sunR * 0.32, -sunR * 0.12, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 방긋 웃는 입
+            ctx.strokeStyle = '#1c1917';
+            ctx.lineWidth = 2.8;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(0, 2, sunR * 0.42, 0.15 * Math.PI, 0.85 * Math.PI);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 우측 미니 구름
+          const cX = sunX + sunR + 16;
+          const cY = y1 + cloudFloat;
+          ctx.fillStyle = 'rgba(147, 197, 253, 0.9)';
+          ctx.beginPath();
+          ctx.arc(cX + 12, cY, 10, 0, Math.PI * 2);
+          ctx.arc(cX + 24, cY - 4, 13, 0, Math.PI * 2);
+          ctx.arc(cX + 36, cY, 9, 0, Math.PI * 2);
+          ctx.fill();
+
           ctx.restore();
         }
 
-        // 2단락
+        // ── [2줄] 좌측 미니 구름 + 텍스트 ──
         if (fade2 > 0) {
           ctx.save();
           ctx.globalAlpha = fade2;
-          const y2 = (portrait ? H * 0.42 : H * 0.42) + (1 - fade2) * 16;
-          ctx.fillStyle = '#1e1b18';
-          ctx.font = `900 ${portrait ? 26 : 30}px ${motionFont}`;
-          ctx.fillText(p2, cx, y2);
+          const y2 = textTopY + lineSpacing + (1 - fade2) * 15;
+          ctx.font = `900 ${portrait ? 36 : 46}px ${motionFont}`;
+          const t2W = ctx.measureText(l2).width;
+          const row2W = 44 + 14 + t2W;
+          const startX = W / 2 - row2W / 2;
+
+          // 좌측 미니 구름
+          const lcX = startX;
+          const lcY = y2 - cloudFloat;
+          ctx.fillStyle = 'rgba(125, 211, 252, 0.9)';
+          ctx.beginPath();
+          ctx.arc(lcX + 12, lcY, 11, 0, Math.PI * 2);
+          ctx.arc(lcX + 24, lcY - 5, 14, 0, Math.PI * 2);
+          ctx.arc(lcX + 36, lcY, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 텍스트
+          ctx.fillStyle = '#1f2937';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(l2, startX + 56, y2);
           ctx.restore();
         }
 
-        // 3단락 (핵심 강조)
+        // ── [3줄] 텍스트 ──
         if (fade3 > 0) {
           ctx.save();
           ctx.globalAlpha = fade3;
-          const y3 = (portrait ? H * 0.58 : H * 0.58) + (1 - fade3) * 16;
-          ctx.fillStyle = '#0f172a';
-          ctx.font = `900 ${portrait ? 28 : 34}px ${motionFont}`;
-          ctx.fillText(p3, cx, y3);
-          ctx.restore();
-        }
-
-        // 성경 장절 및 하단 붉은 인장 낙관
-        if (fadeStamp > 0) {
-          ctx.save();
-          ctx.globalAlpha = fadeStamp;
-          const vy = (portrait ? H * 0.74 : H * 0.74) + (1 - fadeStamp) * 12;
-          ctx.fillStyle = '#2d2a26';
-          ctx.font = `800 ${portrait ? 18 : 22}px ${motionFont}`;
-          ctx.fillText(vText, cx, vy);
-
-          // 인장 도장 (낙관)
-          const stampY = vy + (portrait ? 34 : 38);
-          ctx.font = `700 ${portrait ? 14 : 16}px ${motionFont}`;
-          const label = '하나님사랑';
-          const lw = ctx.measureText(label).width;
-          const stampBox = portrait ? 24 : 28;
-          const totalW = lw + 8 + stampBox;
-          const sx = cx - totalW / 2;
-
-          ctx.fillStyle = '#4b5563';
-          ctx.textAlign = 'left';
-          ctx.fillText(label, sx, stampY);
-
-          // 붉은 낙관 사각 박스
-          const bx = sx + lw + 8;
-          ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.roundRect(bx, stampY - stampBox / 2, stampBox, stampBox, 5);
-          ctx.stroke();
-
-          ctx.fillStyle = '#ef4444';
-          ctx.font = `900 ${portrait ? 12 : 14}px ${motionFont}`;
+          const y3 = textTopY + lineSpacing * 2 + (1 - fade3) * 15;
+          ctx.font = `900 ${portrait ? 32 : 40}px ${motionFont}`;
+          ctx.fillStyle = '#374151';
           ctx.textAlign = 'center';
-          ctx.fillText('은혜', bx + stampBox / 2, stampY + 1);
+          ctx.textBaseline = 'middle';
+          ctx.fillText(l3, W / 2, y3);
           ctx.restore();
         }
-        ctx.restore();
       }
     }
 
@@ -4125,7 +4178,7 @@ export const Scene = () => (
 );`;
       }
       if (state.motionCode === 11) {
-        return `// frames=180 size=1080x1920 (세로 쇼츠 / 카드뉴스)
+        return `// frames=180 size=1080x1080 (정사각형) / 1080x1920 (세로)
 import React from 'react';
 import {
   AbsoluteFill,
@@ -4135,114 +4188,115 @@ import {
   useVideoConfig,
 } from 'remotion';
 
-export const WatercolorScriptureScene: React.FC = () => {
+export const DeskLetteringScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 1. 수채화 핑크 번짐 배경 스프링 팝업
-  const bgScale = spring({
-    frame: frame - 5,
-    fps,
-    config: { damping: 18, stiffness: 60 },
-  });
+  // 1. 손글씨 순차 등장 애니메이션
+  const popSun = spring({ frame: frame - 10, fps, config: { damping: 12, stiffness: 120 } });
+  const fade1 = interpolate(frame, [15, 32], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const fade2 = interpolate(frame, [30, 48], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const fade3 = interpolate(frame, [45, 65], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
-  // 2. 나뭇가지 돋아나는 모션
-  const branchSpring = spring({
-    frame: frame - 15,
-    fps,
-    config: { damping: 14, stiffness: 90 },
-  });
-
-  // 3. 말씀 구절 한 줄씩 은은한 페이드인
-  const fade1 = interpolate(frame, [25, 45], [0, 1], { extrapolateRight: 'clamp' });
-  const fade2 = interpolate(frame, [45, 65], [0, 1], { extrapolateRight: 'clamp' });
-  const fade3 = interpolate(frame, [65, 85], [0, 1], { extrapolateRight: 'clamp' });
-  const fadeStamp = interpolate(frame, [85, 100], [0, 1], { extrapolateRight: 'clamp' });
+  // 2. 구름과 해님의 미세한 숨쉬기 모션
+  const cloudFloat = Math.sin(frame * 0.08) * 4;
+  const sunRotate = Math.sin(frame * 0.05) * 6;
 
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: '#fbfaf8',
+        backgroundColor: '#e5e5e5',
         fontFamily: "'Nanum Gothic', sans-serif",
-        color: '#1e1b18',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px 60px',
-        overflow: 'hidden',
       }}
     >
-      {/* [배경] 수채화 핑크 번짐 */}
+      {/* 1. 배경: 화이트 벽면 & 사선 창가 자연광 그림자 */}
       <div
         style={{
           position: 'absolute',
-          width: 820,
-          height: 1100,
-          borderRadius: '45% 55% 60% 40% / 50% 45% 55% 50%',
-          background:
-            'radial-gradient(ellipse at 55% 45%, rgba(244, 114, 182, 0.45) 0%, rgba(251, 207, 232, 0.3) 45%, rgba(253, 242, 248, 0) 75%)',
-          filter: 'blur(36px)',
-          transform: \`scale(\${bgScale})\`,
+          inset: 0,
+          background: 'linear-gradient(135deg, #f4f4f4 0%, #ebebeb 60%, #dedede 100%)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: -200,
+          left: -100,
+          width: 600,
+          height: 1400,
+          background: 'linear-gradient(105deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.3) 40%, transparent 70%)',
+          transform: 'rotate(-28deg)',
+          filter: 'blur(30px)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* 은은하게 반짝이는 빛 입자 ✨ */}
-      <div style={{ position: 'absolute', top: '32%', right: '18%', fontSize: 28, color: '#fbbf24', opacity: 0.6 + Math.sin(frame * 0.1) * 0.3 }}>✦</div>
-      <div style={{ position: 'absolute', top: '46%', right: '22%', fontSize: 20, color: '#f472b6', opacity: 0.5 + Math.cos(frame * 0.12) * 0.3 }}>✦</div>
-
-      {/* [좌측 하단] 파스텔 감성 나뭇가지 일러스트 */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 100,
-          bottom: 340,
-          transformOrigin: 'bottom center',
-          transform: \`scale(\${branchSpring})\`,
-          zIndex: 5,
-        }}
-      >
-        <svg width=\"180\" height=\"300\" viewBox=\"0 0 120 200\" fill=\"none\">
-          <path d=\"M 60 190 L 60 40 M 60 140 Q 40 120 30 110 M 60 110 Q 80 90 90 80 M 60 80 Q 45 65 35 55 M 60 60 Q 75 45 85 35\" stroke=\"#2d2a26\" strokeWidth=\"2.5\" strokeLinecap=\"round\" />
-          <ellipse cx=\"28\" cy=\"108\" rx=\"8\" ry=\"12\" transform=\"rotate(-35 28 108)\" fill=\"#bae6fd\" stroke=\"#2d2a26\" strokeWidth=\"1.8\" />
-          <ellipse cx=\"92\" cy=\"78\" rx=\"8\" ry=\"12\" transform=\"rotate(35 92 78)\" fill=\"#a7f3d0\" stroke=\"#2d2a26\" strokeWidth=\"1.8\" />
-          <ellipse cx=\"32\" cy=\"52\" rx=\"7\" ry=\"11\" transform=\"rotate(-40 32 52)\" fill=\"#e9d5ff\" stroke=\"#2d2a26\" strokeWidth=\"1.8\" />
-          <ellipse cx=\"88\" cy=\"32\" rx=\"7\" ry=\"11\" transform=\"rotate(35 88 32)\" fill=\"#fef08a\" stroke=\"#2d2a26\" strokeWidth=\"1.8\" />
-          <ellipse cx=\"60\" cy=\"30\" rx=\"6\" ry=\"10\" fill=\"#a7f3d0\" stroke=\"#2d2a26\" strokeWidth=\"1.8\" />
-          <path d=\"M 46 170 L 74 170 L 70 178 L 50 178 Z\" fill=\"#fef08a\" stroke=\"#2d2a26\" strokeWidth=\"2\" />
-        </svg>
-      </div>
-
-      {/* [중앙 텍스트 블록] 감성 캘리그라피 말씀 본문 */}
+      {/* 2. 벽면 레터링 & 손그림 일러스트 영역 */}
       <div
         style={{
           position: 'relative',
           zIndex: 10,
+          marginTop: 130,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          maxWidth: 780,
-          marginTop: -60,
         }}
       >
-        <div style={{ opacity: fade1, transform: \`translateY(\${(1 - fade1) * 16}px)\`, marginBottom: 20 }}>
-          <div style={{ fontSize: 56, fontWeight: 900, lineHeight: 1.25 }}>\${state.line1 || '두려워하지 말라 내가 너와 함께 함이라'}</div>
+        {/* [1줄] 텍스트 + 방긋 웃는 해님 + 우측 미니 구름 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
+          <span style={{ fontSize: 54, fontWeight: 800, color: '#262626', opacity: fade1, transform: \`translateY(\${(1 - fade1) * 15}px)\` }}>
+            \${state.line1 || '다시는'}
+          </span>
+          <div style={{ transform: \`scale(\${popSun}) rotate(\${sunRotate}deg)\`, transformOrigin: 'center center' }}>
+            <svg width="68" height="68" viewBox="0 0 100 100" fill="none">
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, idx) => (
+                <rect key={idx} x="46" y="6" width="8" height="16" rx="4" fill="#f59e0b" stroke="#1c1917" strokeWidth="3.5" transform={\`rotate(\${angle} 50 50)\`} />
+              ))}
+              <circle cx="50" cy="50" r="28" fill="#fde047" stroke="#1c1917" strokeWidth="4" />
+              <circle cx="41" cy="46" r="3" fill="#1c1917" />
+              <circle cx="59" cy="46" r="3" fill="#1c1917" />
+              <path d="M 40 55 Q 50 65 60 55" stroke="#1c1917" strokeWidth="4" strokeLinecap="round" fill="none" />
+            </svg>
+          </div>
+          <div style={{ transform: \`translateY(\${cloudFloat}px)\`, opacity: fade1 }}>
+            <svg width="54" height="34" viewBox="0 0 80 50" fill="none">
+              <path d="M 15 35 A 12 12 0 0 1 25 15 A 18 18 0 0 1 55 15 A 14 14 0 0 1 70 30 A 10 10 0 0 1 65 42 L 15 42 A 10 10 0 0 1 15 35 Z" fill="#93c5fd" opacity="0.85" />
+            </svg>
+          </div>
         </div>
-        <div style={{ opacity: fade2, transform: \`translateY(\${(1 - fade2) * 16}px)\`, marginBottom: 24 }}>
-          <div style={{ fontSize: 56, fontWeight: 900, lineHeight: 1.25 }}>\${state.line2 || '놀라지 말라 나는 네 하나님이 됨이라'}</div>
+
+        {/* [2줄] 좌측 미니 구름 + 텍스트 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 12, opacity: fade2, transform: \`translateY(\${(1 - fade2) * 15}px)\` }}>
+          <div style={{ transform: \`translateY(\${-cloudFloat}px)\` }}>
+            <svg width="60" height="36" viewBox="0 0 80 50" fill="none">
+              <path d="M 15 35 A 12 12 0 0 1 25 15 A 18 18 0 0 1 55 15 A 14 14 0 0 1 70 30 A 10 10 0 0 1 65 42 L 15 42 A 10 10 0 0 1 15 35 Z" fill="#7dd3fc" opacity="0.9" />
+            </svg>
+          </div>
+          <span style={{ fontSize: 62, fontWeight: 900, color: '#1f2937' }}>
+            \${state.line2 || '오지않을 오늘'}
+          </span>
         </div>
-        <div style={{ opacity: fade3, transform: \`translateY(\${(1 - fade3) * 16}px)\`, marginBottom: 32 }}>
-          <div style={{ fontSize: 58, fontWeight: 900, lineHeight: 1.25 }}>\${state.line3 || '내가 너를 굳세게 하리라 참으로 너를 도와주리라'}</div>
+
+        {/* [3줄] 텍스트 */}
+        <div style={{ opacity: fade3, transform: \`translateY(\${(1 - fade3) * 15}px)\` }}>
+          <span style={{ fontSize: 54, fontWeight: 800, color: '#374151' }}>
+            \${state.line3 || '후회없이 행복하게'}
+          </span>
         </div>
-        <div style={{ opacity: fadeStamp, fontSize: 36, fontWeight: 800, color: '#2d2a26', marginBottom: 20 }}>
-          \${state.verse || '이사야 41:10'}
-        </div>
-        <div style={{ opacity: fadeStamp, transform: \`scale(\${fadeStamp})\`, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: '#4b5563' }}>하나님사랑</span>
-          <div style={{ width: 32, height: 32, border: '2px solid #ef4444', borderRadius: 6, color: '#ef4444', fontSize: 15, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            은혜
+      </div>
+
+      {/* 3. 하단 데스크 인테리어 소품 */}
+      <div style={{ position: 'relative', width: '100%', height: 380, zIndex: 5 }}>
+        <div style={{ position: 'absolute', bottom: 120, left: '3%', right: '3%', height: 18, backgroundColor: '#ffffff', borderRadius: 4, boxShadow: '0 12px 28px rgba(0,0,0,0.08)' }} />
+        <div style={{ position: 'absolute', bottom: 138, left: '50%', transform: 'translateX(-50%)', width: 250, height: 155, backgroundColor: '#1e293b', borderRadius: '10px 10px 0 0', border: '5px solid #0f172a', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '94%', height: '90%', backgroundColor: '#334155', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>
+            \${state.youtube || '별내사랑의교회'}
           </div>
         </div>
       </div>
