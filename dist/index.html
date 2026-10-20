@@ -2247,253 +2247,140 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(bText, cx, bY + bH / 2);
         ctx.restore();
-      } else if (code === 11) { // CODE 11 · 힘내세요 (DeskLetteringScene - 따뜻한 햇살 벽면 레터링 & 책상 인테리어)
+      } else if (code === 11) { // CODE 11 · 힘내세요 (AscendingVerseScene - 시편 103편 1~2절 스크롤 찬양 말씀)
         const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
-        const springV = (rel, stiffness = 0.28, decayRate = 0.16) => {
-          if (rel <= 0) return 0;
-          return 1 - Math.exp(-rel * decayRate) * Math.cos(rel * stiffness);
-        };
-        const clamp01 = (v) => Math.min(1, Math.max(0, v));
+        const duration = 300; // 10초 (300프레임)
+        const loopF = f % duration;
+        const progress = loopF / duration;
 
-        const popSun = springV(f - 10, 0.26, 0.14);
-        const fade1 = clamp01((f - 15) / 17);
-        const fade2 = clamp01((f - 30) / 18);
-        const fade3 = clamp01((f - 45) / 20);
-
-        const cloudFloat = Math.sin(f * 0.08) * 5;
-        const sunRotate = (Math.sin(f * 0.05) * 6 * Math.PI) / 180;
-
-        // 1. 배경: 화이트/그레이 벽면 그라데이션
-        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-        bgGrad.addColorStop(0, '#f4f4f4');
-        bgGrad.addColorStop(0.6, '#ebebeb');
-        bgGrad.addColorStop(1, '#dedede');
+        // 1. 배경: 부드러운 웜 아이보리/크림 베이지 그라데이션
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#FBF9F5');
+        bgGrad.addColorStop(0.5, '#F5F0E8');
+        bgGrad.addColorStop(1, '#ECE4D8');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // 2. 창가 사선 햇살 채광 (Sunlight Rays)
+        // 2. 배경 햇살 은은한 웜 글로우
         ctx.save();
-        ctx.translate(-W * 0.1, -H * 0.15);
-        ctx.rotate((-28 * Math.PI) / 180);
-        const sunRay = ctx.createLinearGradient(0, 0, W * 0.8, H * 1.5);
-        sunRay.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
-        sunRay.addColorStop(0.4, 'rgba(255, 255, 255, 0.25)');
-        sunRay.addColorStop(0.8, 'transparent');
-        ctx.fillStyle = sunRay;
-        ctx.fillRect(0, 0, W * 0.8, H * 1.5);
+        const glowR = W * 0.45;
+        const glowGrad = ctx.createRadialGradient(W / 2, H * 0.28, 0, W / 2, H * 0.28, glowR);
+        glowGrad.addColorStop(0, 'rgba(254, 243, 199, 0.65)');
+        glowGrad.addColorStop(0.7, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(W / 2, H * 0.28, glowR, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
 
-        // 3. 하단 데스크 인테리어 (화이트 상판, 노트북, 오렌지 시계, 책상 다리)
-        const deskY = H * (portrait ? 0.72 : 0.68);
-        const deskH = 16;
-
-        // 책상 다리 (좌/우 트러스 프레임)
+        // 3. 상단 고정 얇은 장식 뱃지
+        const verseRef = state.verse || '시편 103:1-2';
+        const badgeY = portrait ? H * 0.08 : H * 0.06;
         ctx.save();
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 4;
-        const legLeftX = W * 0.08;
-        const legRightX = W * 0.92;
-        ctx.strokeRect(legLeftX, deskY + deskH, 36, H - (deskY + deskH));
-        ctx.strokeRect(legRightX - 36, deskY + deskH, 36, H - (deskY + deskH));
+        ctx.font = `700 ${portrait ? 15 : 13}px ${motionFont}`;
+        const bText = `✦ ${verseRef} ✦`;
+        const bW = ctx.measureText(bText).width + (portrait ? 36 : 28);
+        const bH = portrait ? 34 : 28;
+        const bX = (W - bW) / 2;
 
-        // 화이트 데스크 상판
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.10)';
-        ctx.shadowBlur = 18;
-        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.04)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 3;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.beginPath();
-        ctx.roundRect(W * 0.04, deskY, W * 0.92, deskH, 4);
+        ctx.roundRect(bX, badgeY - bH / 2, bW, bH, bH / 2);
         ctx.fill();
         ctx.shadowColor = 'transparent';
 
-        // 책상 위 소품: [1] 노트북
-        const lapW = Math.min(190, W * 0.32);
-        const lapH = lapW * 0.62;
-        const lapX = (W - lapW) / 2;
-        const lapY = deskY - lapH;
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.roundRect(lapX, lapY, lapW, lapH, [10, 10, 0, 0]);
-        ctx.fill();
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'rgba(217, 204, 185, 0.8)';
+        ctx.lineWidth = 1;
         ctx.stroke();
 
-        // 노트북 화면
-        ctx.fillStyle = '#334155';
-        ctx.beginPath();
-        ctx.roundRect(lapX + 8, lapY + 8, lapW - 16, lapH - 12, 6);
-        ctx.fill();
-
-        // 화면 텍스트
-        const orgName = (state.youtube && !state.youtube.startsWith('http') ? state.youtube : '별내사랑의교회');
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = `700 ${portrait ? 11 : 13}px ${motionFont}`;
+        ctx.fillStyle = '#8C7A6B';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(orgName, lapX + lapW / 2, lapY + lapH / 2);
-
-        // [2] 앤틱 오렌지 알람 시계 (우측)
-        const clockR = portrait ? 20 : 25;
-        const clockX = lapX + lapW + (W - (lapX + lapW)) * 0.45;
-        const clockY = deskY - clockR - 8;
-        ctx.fillStyle = '#ea580c';
-        ctx.strokeStyle = '#c2410c';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(clockX, clockY, clockR, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        // 시계판
-        ctx.fillStyle = '#fffbeb';
-        ctx.beginPath();
-        ctx.arc(clockX, clockY, clockR * 0.72, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 시계 바늘
-        ctx.strokeStyle = '#1c1917';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(clockX, clockY);
-        ctx.lineTo(clockX, clockY - clockR * 0.45);
-        ctx.moveTo(clockX, clockY);
-        ctx.lineTo(clockX + clockR * 0.35, clockY);
-        ctx.stroke();
-
-        // 시계 밑 책 받침
-        ctx.fillStyle = '#3b82f6';
-        ctx.beginPath();
-        ctx.roundRect(clockX - clockR * 1.2, deskY - 8, clockR * 2.4, 8, 2);
-        ctx.fill();
+        ctx.fillText(bText, W / 2, badgeY);
         ctx.restore();
 
-        // 4. 벽면 레터링 & 손그림 일러스트 영역 (상단~중앙)
-        const l1 = (state.line1 && state.line1.trim()) || '다시는';
-        const l2 = (state.line2 && state.line2.trim()) || '오지않을 오늘';
-        const l3 = (state.line3 && state.line3.trim()) || '후회없이 행복하게';
-
-        const textTopY = portrait ? H * 0.16 : H * 0.14;
-        const lineSpacing = portrait ? 58 : 66;
-
-        // ── [1줄] 텍스트 + 방긋 웃는 해님 + 우측 미니 구름 ──
-        if (fade1 > 0) {
-          ctx.save();
-          ctx.globalAlpha = fade1;
-          const y1 = textTopY + (1 - fade1) * 15;
-          ctx.font = `900 ${portrait ? 32 : 40}px ${motionFont}`;
-          const t1W = ctx.measureText(l1).width;
-          const sunR = portrait ? 22 : 26;
-          const row1W = t1W + 16 + sunR * 2 + 16 + 40;
-          const startX = W / 2 - row1W / 2;
-
-          // 텍스트
-          ctx.fillStyle = '#262626';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(l1, startX, y1);
-
-          // 방긋 웃는 해님 (SVG 드로잉)
-          const sunX = startX + t1W + 16 + sunR;
-          const sunY = y1;
-          if (popSun > 0) {
-            ctx.save();
-            ctx.translate(sunX, sunY);
-            ctx.scale(popSun, popSun);
-            ctx.rotate(sunRotate);
-
-            // 햇살 광선 8개
-            ctx.fillStyle = '#f59e0b';
-            ctx.strokeStyle = '#1c1917';
-            ctx.lineWidth = 2.5;
-            for (let deg = 0; deg < 360; deg += 45) {
-              ctx.save();
-              ctx.rotate((deg * Math.PI) / 180);
-              ctx.beginPath();
-              ctx.roundRect(-4, -sunR * 1.35, 8, sunR * 0.5, 3);
-              ctx.fill();
-              ctx.stroke();
-              ctx.restore();
-            }
-
-            // 얼굴 원
-            ctx.fillStyle = '#fde047';
-            ctx.strokeStyle = '#1c1917';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(0, 0, sunR, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            // 눈 2개
-            ctx.fillStyle = '#1c1917';
-            ctx.beginPath();
-            ctx.arc(-sunR * 0.32, -sunR * 0.12, 2.5, 0, Math.PI * 2);
-            ctx.arc(sunR * 0.32, -sunR * 0.12, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 방긋 웃는 입
-            ctx.strokeStyle = '#1c1917';
-            ctx.lineWidth = 2.8;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.arc(0, 2, sunR * 0.42, 0.15 * Math.PI, 0.85 * Math.PI);
-            ctx.stroke();
-            ctx.restore();
-          }
-
-          // 우측 미니 구름
-          const cX = sunX + sunR + 16;
-          const cY = y1 + cloudFloat;
-          ctx.fillStyle = 'rgba(147, 197, 253, 0.9)';
-          ctx.beginPath();
-          ctx.arc(cX + 12, cY, 10, 0, Math.PI * 2);
-          ctx.arc(cX + 24, cY - 4, 13, 0, Math.PI * 2);
-          ctx.arc(cX + 36, cY, 9, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.restore();
+        // 4. 부드러운 페이드 인/아웃 및 Y축 롤링 스크롤 (10초 / 300프레임)
+        // 시작 위치: 화면 중앙 아래 (+H * 0.48) -> 종료 위치: 화면 상단 위 (-H * 0.40)
+        const translateY = (H * 0.48) + progress * (-H * 0.88);
+        let globalOpacity = 1;
+        if (loopF < 25) {
+          globalOpacity = loopF / 25;
+        } else if (loopF > duration - 30) {
+          globalOpacity = Math.max(0, (duration - loopF) / 30);
         }
 
-        // ── [2줄] 좌측 미니 구름 + 텍스트 ──
-        if (fade2 > 0) {
+        const SCRIPTURE_LINES = [
+          '내 영혼아 여호와를 송축하라',
+          '내 속에 있는 것들아',
+          '다 그의 거룩한 이름을 송축하라',
+          '내 영혼아',
+          '여호와를 송축하며',
+          '그의 모든 은택을 잊지 말지어다',
+        ];
+
+        const lineGap = portrait ? 38 : 26;
+        const totalLinesHeight = (SCRIPTURE_LINES.length - 1) * lineGap + 40;
+        const startY = H / 2 - totalLinesHeight / 2 + translateY;
+
+        ctx.save();
+        ctx.globalAlpha = globalOpacity;
+
+        SCRIPTURE_LINES.forEach((lineText, idx) => {
+          const isBold = idx % 2 === 0;
+          const y = startY + idx * lineGap;
+
           ctx.save();
-          ctx.globalAlpha = fade2;
-          const y2 = textTopY + lineSpacing + (1 - fade2) * 15;
-          ctx.font = `900 ${portrait ? 36 : 46}px ${motionFont}`;
-          const t2W = ctx.measureText(l2).width;
-          const row2W = 44 + 14 + t2W;
-          const startX = W / 2 - row2W / 2;
-
-          // 좌측 미니 구름
-          const lcX = startX;
-          const lcY = y2 - cloudFloat;
-          ctx.fillStyle = 'rgba(125, 211, 252, 0.9)';
-          ctx.beginPath();
-          ctx.arc(lcX + 12, lcY, 11, 0, Math.PI * 2);
-          ctx.arc(lcX + 24, lcY - 5, 14, 0, Math.PI * 2);
-          ctx.arc(lcX + 36, lcY, 10, 0, Math.PI * 2);
-          ctx.fill();
-
-          // 텍스트
-          ctx.fillStyle = '#1f2937';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(l2, startX + 56, y2);
-          ctx.restore();
-        }
-
-        // ── [3줄] 텍스트 ──
-        if (fade3 > 0) {
-          ctx.save();
-          ctx.globalAlpha = fade3;
-          const y3 = textTopY + lineSpacing * 2 + (1 - fade3) * 15;
-          ctx.font = `900 ${portrait ? 32 : 40}px ${motionFont}`;
-          ctx.fillStyle = '#374151';
+          ctx.shadowColor = isBold ? 'rgba(0, 0, 0, 0.12)' : 'rgba(0, 0, 0, 0.06)';
+          ctx.shadowBlur = isBold ? 8 : 4;
+          ctx.shadowOffsetY = isBold ? 3 : 2;
+          ctx.font = `${isBold ? 900 : 500} ${portrait ? (isBold ? 22 : 18) : (isBold ? 20 : 16)}px ${motionFont}`;
+          ctx.fillStyle = isBold ? '#1F1C18' : '#655A4E';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(l3, W / 2, y3);
+          ctx.fillText(lineText, W / 2, y);
           ctx.restore();
-        }
+        });
+
+        // 십자가 심볼
+        const crossY = startY + SCRIPTURE_LINES.length * lineGap + 6;
+        ctx.font = `600 ${portrait ? 18 : 15}px ${motionFont}`;
+        ctx.fillStyle = '#B09A84';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✝', W / 2, crossY);
+        ctx.restore();
+
+        // 5. 상단 및 하단 부드러운 페이드 마스크 오버레이
+        const maskH = portrait ? 130 : 70;
+        // 상단 마스크
+        const topMask = ctx.createLinearGradient(0, 0, 0, maskH);
+        topMask.addColorStop(0, '#FBF9F5');
+        topMask.addColorStop(0.4, 'rgba(251, 249, 245, 0.95)');
+        topMask.addColorStop(1, 'rgba(251, 249, 245, 0)');
+        ctx.fillStyle = topMask;
+        ctx.fillRect(0, 0, W, maskH);
+
+        // 하단 마스크
+        const botMask = ctx.createLinearGradient(0, H - maskH, 0, H);
+        botMask.addColorStop(0, 'rgba(236, 228, 216, 0)');
+        botMask.addColorStop(0.6, 'rgba(236, 228, 216, 0.95)');
+        botMask.addColorStop(1, '#ECE4D8');
+        ctx.fillStyle = botMask;
+        ctx.fillRect(0, H - maskH, W, maskH);
+
+        // 6. 하단 고정 기관명
+        const orgName = (state.youtube && !state.youtube.startsWith('http')) ? state.youtube : '별내사랑의교회';
+        const footerY = portrait ? H * 0.95 : H * 0.94;
+        ctx.save();
+        ctx.font = `700 ${portrait ? 13 : 12}px ${motionFont}`;
+        ctx.fillStyle = '#8C7A6B';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(orgName, W / 2, footerY);
+        ctx.restore();
       } else { // CODE 12 · 목회 안내 카드 (PastorNoticeCard - 3D 회전 카드 & 목사님 원형 프로필 & 4줄 안내)
         const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         const GOLD = '#FFC93C';
@@ -3212,17 +3099,23 @@ ${url}`;
         }
 
         if (state.motionCode === 11) {
+          state.totalFrames = 300;
+          const totalLbl = document.getElementById('lblTotalFrames');
+          if (totalLbl) totalLbl.innerText = '300';
+          const tl = document.getElementById('timeline');
+          if (tl) tl.max = '300';
+          state.verse = '시편 103:1-2';
+          state.line1 = '내 영혼아 여호와를 송축하라';
+          state.line2 = '내 속에 있는 것들아';
+          state.line3 = '그의 모든 은택을 잊지 말지어다';
+          const vEl = document.getElementById('inputVerse');
           const l1El = document.getElementById('inputLine1');
-          if (l1El && (!state.hasCustomVerse || l1El.value === '일을 행하시는 여호와' || l1El.value === '주 예수 그리스도를 믿으라')) {
-            state.line1 = '하나님은 일하시고,';
-            state.line2 = '마침내 이루십니다 ✨';
-            state.verse = '예레미야 33:2';
-            l1El.value = state.line1;
-            const l2El = document.getElementById('inputLine2');
-            const vEl = document.getElementById('inputVerse');
-            if (l2El) l2El.value = state.line2;
-            if (vEl) vEl.value = state.verse;
-          }
+          const l2El = document.getElementById('inputLine2');
+          const l3El = document.getElementById('inputLine3');
+          if (vEl) vEl.value = state.verse;
+          if (l1El) l1El.value = state.line1;
+          if (l2El) l2El.value = state.line2;
+          if (l3El) l3El.value = state.line3;
         }
 
         if (state.motionCode === 12) {
@@ -3551,7 +3444,7 @@ export const MotionThreeCardsScene: React.FC = () => {
   );
 };`;
       }
-      if (state.motionCode === 5 || state.motionCode === 11) {
+      if (state.motionCode === 5) {
         return `// frames=180 size=1080x1920 (9:16 세로 쇼츠)
 import React from 'react';
 import {
@@ -4569,131 +4462,200 @@ export const Scene = () => (
 );`;
       }
       if (state.motionCode === 11) {
-        return `// frames=180 size=1080x1080 (정사각형) / 1080x1920 (세로)
+        return `// frames=300 size=1080x1920 (세로 9:16) 또는 1280x720 (가로) 공용
 import React from 'react';
 import {
   AbsoluteFill,
   interpolate,
-  spring,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
+import { FONT } from './font';
 
-export const DeskLetteringScene: React.FC = () => {
+// 찬양 말씀 구절 목록 (홀수 줄: 짙은 먹색 / 짝수 줄: 보통 먹색)
+const SCRIPTURE_LINES = [
+  '내 영혼아 여호와를 송축하라',
+  '내 속에 있는 것들아',
+  '다 그의 거룩한 이름을 송축하라',
+  '내 영혼아',
+  '여호와를 송축하며',
+  '그의 모든 은택을 잊지 말지어다',
+];
+
+export interface AscendingVerseProps {
+  verseRef?: string;         // 성경 출처 (예: 시편 103:1-2)
+  organization?: string;     // 기관명 (예: 별내사랑의교회)
+}
+
+export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
+  verseRef = '${state.verse || '시편 103:1-2'}',
+  organization = '${state.youtube || '별내사랑의교회'}',
+}) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { width, height, durationInFrames } = useVideoConfig();
+  const isVertical = height > width;
 
-  // 1. 손글씨 순차 등장 애니메이션
-  const popSun = spring({ frame: frame - 10, fps, config: { damping: 12, stiffness: 120 } });
-  const fade1 = interpolate(frame, [15, 32], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const fade2 = interpolate(frame, [30, 48], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const fade3 = interpolate(frame, [45, 65], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // 1. 하단에서 상단으로 서서히 올라가는 Y축 이동 계산 (durationInFrames: 300프레임 / 10초)
+  // 시작 위치: 화면 중앙 아래 (+height * 0.48) -> 종료 위치: 화면 상단 위 (-height * 0.40)
+  const translateY = interpolate(
+    frame,
+    [0, durationInFrames],
+    [height * 0.48, -height * 0.40],
+    { extrapolateRight: 'clamp' }
+  );
 
-  // 2. 구름과 해님의 미세한 숨쉬기 모션
-  const cloudFloat = Math.sin(frame * 0.08) * 4;
-  const sunRotate = Math.sin(frame * 0.05) * 6;
+  // 2. 시작과 끝 부분의 부드러운 페이드 인/아웃
+  const globalOpacity = interpolate(
+    frame,
+    [0, 25, durationInFrames - 30, durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
 
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: '#e5e5e5',
-        fontFamily: "'Nanum Gothic', sans-serif",
+        // 부담스럽지 않은 환하고 따뜻한 웜 아이보리/크림 베이지 배경
+        background: 'linear-gradient(180deg, #FBF9F5 0%, #F5F0E8 50%, #ECE4D8 100%)',
+        fontFamily: FONT,
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      {/* 1. 배경: 화이트 벽면 & 사선 창가 자연광 그림자 */}
+      {/* ── 배경 은은한 햇살 웜 글로우 ── */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(135deg, #f4f4f4 0%, #ebebeb 60%, #dedede 100%)',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: -200,
-          left: -100,
-          width: 600,
-          height: 1400,
-          background: 'linear-gradient(105deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.3) 40%, transparent 70%)',
-          transform: 'rotate(-28deg)',
-          filter: 'blur(30px)',
+          top: '20%',
+          width: width * 0.9,
+          height: width * 0.9,
+          background: 'radial-gradient(circle, rgba(254, 243, 199, 0.6) 0%, rgba(255, 255, 255, 0) 70%)',
+          borderRadius: '50%',
+          filter: 'blur(40px)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* 2. 벽면 레터링 & 손그림 일러스트 영역 */}
+      {/* ── 상단 고정 얇은 장식 뱃지 ── */}
       <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          top: isVertical ? '8%' : '6%',
+          zIndex: 20,
+          background: 'rgba(255, 255, 255, 0.75)',
+          border: '1px solid rgba(217, 204, 185, 0.7)',
+          backdropFilter: 'blur(8px)',
+          padding: isVertical ? '8px 24px' : '6px 20px',
+          borderRadius: 999,
+          fontSize: isVertical ? 20 : 16,
+          fontWeight: 700,
+          color: '#8C7A6B',
+          letterSpacing: '1px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+        }}
+      >
+        ✦ {verseRef} ✦
+      </div>
+
+      {/* ── 상·하단 부드러운 페이드 마스크 오버레이 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: isVertical ? 240 : 120,
+          background: 'linear-gradient(180deg, #FBF9F5 40%, rgba(251, 249, 245, 0) 100%)',
           zIndex: 10,
-          marginTop: 130,
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: isVertical ? 240 : 120,
+          background: 'linear-gradient(0deg, #ECE4D8 40%, rgba(236, 228, 216, 0) 100%)',
+          zIndex: 10,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── 아래에서 위로 올라가는 텍스트 본체 ── */}
+      <div
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
+          transform: \`translateY(\${translateY}px)\`,
+          opacity: globalOpacity,
+          width: '90%',
+          gap: isVertical ? 38 : 22,
         }}
       >
-        {/* [1줄] 텍스트 + 방긋 웃는 해님 + 우측 미니 구름 */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
-          <span style={{ fontSize: 54, fontWeight: 800, color: '#262626', opacity: fade1, transform: \`translateY(\${(1 - fade1) * 15}px)\` }}>
-            \${state.line1 || '다시는'}
-          </span>
-          <div style={{ transform: \`scale(\${popSun}) rotate(\${sunRotate}deg)\`, transformOrigin: 'center center' }}>
-            <svg width="68" height="68" viewBox="0 0 100 100" fill="none">
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, idx) => (
-                <rect key={idx} x="46" y="6" width="8" height="16" rx="4" fill="#f59e0b" stroke="#1c1917" strokeWidth="3.5" transform={\`rotate(\${angle} 50 50)\`} />
-              ))}
-              <circle cx="50" cy="50" r="28" fill="#fde047" stroke="#1c1917" strokeWidth="4" />
-              <circle cx="41" cy="46" r="3" fill="#1c1917" />
-              <circle cx="59" cy="46" r="3" fill="#1c1917" />
-              <path d="M 40 55 Q 50 65 60 55" stroke="#1c1917" strokeWidth="4" strokeLinecap="round" fill="none" />
-            </svg>
-          </div>
-          <div style={{ transform: \`translateY(\${cloudFloat}px)\`, opacity: fade1 }}>
-            <svg width="54" height="34" viewBox="0 0 80 50" fill="none">
-              <path d="M 15 35 A 12 12 0 0 1 25 15 A 18 18 0 0 1 55 15 A 14 14 0 0 1 70 30 A 10 10 0 0 1 65 42 L 15 42 A 10 10 0 0 1 15 35 Z" fill="#93c5fd" opacity="0.85" />
-            </svg>
-          </div>
-        </div>
+        {SCRIPTURE_LINES.map((line, idx) => {
+          // 한 줄은 진하게(짝수 인덱스), 한 줄은 보통(홀수 인덱스)
+          const isBoldLine = idx % 2 === 0;
 
-        {/* [2줄] 좌측 미니 구름 + 텍스트 */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 12, opacity: fade2, transform: \`translateY(\${(1 - fade2) * 15}px)\` }}>
-          <div style={{ transform: \`translateY(\${-cloudFloat}px)\` }}>
-            <svg width="60" height="36" viewBox="0 0 80 50" fill="none">
-              <path d="M 15 35 A 12 12 0 0 1 25 15 A 18 18 0 0 1 55 15 A 14 14 0 0 1 70 30 A 10 10 0 0 1 65 42 L 15 42 A 10 10 0 0 1 15 35 Z" fill="#7dd3fc" opacity="0.9" />
-            </svg>
-          </div>
-          <span style={{ fontSize: 62, fontWeight: 900, color: '#1f2937' }}>
-            \${state.line2 || '오지않을 오늘'}
-          </span>
-        </div>
+          return (
+            <div
+              key={idx}
+              style={{
+                fontSize: isVertical ? (isBoldLine ? 54 : 44) : (isBoldLine ? 40 : 32),
+                fontWeight: isBoldLine ? 900 : 500,
+                // 진한 줄: 깊이 있는 차콜 브라운(#1F1C18) / 보통 줄: 부드러운 웜 토프(#655A4E)
+                color: isBoldLine ? '#1F1C18' : '#655A4E',
+                letterSpacing: '-1px',
+                lineHeight: 1.3,
+                textShadow: isBoldLine ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+              }}
+            >
+              {line}
+            </div>
+          );
+        })}
 
-        {/* [3줄] 텍스트 */}
-        <div style={{ opacity: fade3, transform: \`translateY(\${(1 - fade3) * 15}px)\` }}>
-          <span style={{ fontSize: 54, fontWeight: 800, color: '#374151' }}>
-            \${state.line3 || '후회없이 행복하게'}
-          </span>
+        {/* 텍스트 롤링 마지막 여백 및 십자가 심볼 */}
+        <div
+          style={{
+            marginTop: 20,
+            fontSize: isVertical ? 30 : 22,
+            color: '#B09A84',
+          }}
+        >
+          ✝
         </div>
       </div>
 
-      {/* 3. 하단 데스크 인테리어 소품 */}
-      <div style={{ position: 'relative', width: '100%', height: 380, zIndex: 5 }}>
-        <div style={{ position: 'absolute', bottom: 120, left: '3%', right: '3%', height: 18, backgroundColor: '#ffffff', borderRadius: 4, boxShadow: '0 12px 28px rgba(0,0,0,0.08)' }} />
-        <div style={{ position: 'absolute', bottom: 138, left: '50%', transform: 'translateX(-50%)', width: 250, height: 155, backgroundColor: '#1e293b', borderRadius: '10px 10px 0 0', border: '5px solid #0f172a', borderBottom: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: '94%', height: '90%', backgroundColor: '#334155', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>
-            \${state.youtube || '별내사랑의교회'}
-          </div>
-        </div>
+      {/* ── 하단 고정 기관명 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: isVertical ? '5%' : '4%',
+          zIndex: 20,
+          fontSize: isVertical ? 20 : 16,
+          fontWeight: 700,
+          color: '#8C7A6B',
+          letterSpacing: '1.5px',
+        }}
+      >
+        {organization}
       </div>
     </AbsoluteFill>
   );
-};`;
+};
+
+export const Scene: React.FC<AscendingVerseProps> = (props) => (
+  <AbsoluteFill>
+    <AscendingVerseScene {...props} />
+  </AbsoluteFill>
+);`;
       }
       if (state.motionCode === 12) {
         const raw = "// frames=200 size=1280x720 (가로 16:9 공지 카드)\nimport React from 'react';\nimport {\n  AbsoluteFill,\n  Easing,\n  Img,\n  interpolate,\n  random,\n  spring,\n  useCurrentFrame,\n  useVideoConfig,\n} from 'remotion';\nimport { FONT } from './font';\n\nconst GOLD = '#FFC93C';\n\n// 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 목사님 캐릭터 이미지 경로\nconst DEFAULT_CHAR_IMG =\n  'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';\n\nconst clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;\nconst BOKEH = Array.from({ length: 14 }, (_, i) => ({\n  x: random(`bx${i}`) * 1280,\n  y: random(`by${i}`) * 720,\n  r: 30 + random(`br${i}`) * 80,\n}));\n\nexport interface PastorNoticeCardProps {\n  charImg?: string;\n  badge?: string;\n  title?: string;\n  line1?: string;\n  line2?: string;\n  line3?: string;\n  line4?: string;\n  organization?: string;\n}\n\nexport const SceneBody: React.FC<PastorNoticeCardProps> = ({\n  charImg = DEFAULT_CHAR_IMG,\n  badge = '목회 서신',\n  title = '별내사랑의교회 주간 알림',\n  line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',\n  line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',\n  line3 = '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',\n  line4 = '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.',\n  organization = '별내사랑의교회',\n}) => {\n  const f = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const t = f / fps;\n\n  // 1) 3D 카드 등장 (rotateY -75도에서 스프링 회전 후 정면 안착)\n  const enter = spring({ frame: f - 4, fps, config: { damping: 16, mass: 0.9 } });\n  const swayY = -75 * (1 - enter) + 6 * Math.sin(t * 1.2) * enter;\n  const swayX = 2.5 * Math.cos(t * 1.0) * enter;\n\n  // 2) 목사님 캐릭터 원형 프로필 팝업\n  const face = spring({ frame: f - 14, fps, config: { damping: 12 } });\n\n  // 3) 상단 제목 및 4줄 안내문구 순차 페이드인\n  const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });\n  const lineAnims = [\n    interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [42, 56], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [52, 66], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n  ];\n\n  // 4) 빛 줄기(Sweep) 효과 (프레임 60과 135에 2번 비스듬히 통과)\n  const shine = (s: number) =>\n    interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });\n  const sweep = f < 110 ? shine(60) : shine(135);\n\n  const lines = [line1, line2, line3, line4];\n\n  return (\n    <AbsoluteFill\n      style={{\n        fontFamily: FONT,\n        color: '#fff',\n        background: 'radial-gradient(ellipse at 50% 45%, #15234a 0%, #050914 75%)',\n        overflow: 'hidden',\n      }}\n    >\n      {/* ── 배경 은은한 보케 라이트 ── */}\n      {BOKEH.map((b, i) => (\n        <div\n          key={i}\n          style={{\n            position: 'absolute',\n            left: b.x - b.r,\n            top: b.y - b.r + Math.sin(t + i) * 10,\n            width: b.r * 2,\n            height: b.r * 2,\n            borderRadius: '50%',\n            background: i % 3 ? 'rgba(91,140,255,0.08)' : 'rgba(255,201,60,0.07)',\n            filter: 'blur(8px)',\n          }}\n        />\n      ))}\n\n      {/* ── 3D 안내 카드 (너비 980px, 높이 430px) ── */}\n      <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>\n        <div\n          style={{\n            width: 980,\n            height: 430,\n            borderRadius: 36,\n            position: 'relative',\n            overflow: 'hidden',\n            opacity: Math.min(1, enter * 1.5),\n            transform: `rotateY(${swayY}deg) rotateX(${swayX}deg)`,\n            background: 'linear-gradient(135deg, #182a5e 0%, #0d1736 60%, #0a1129 100%)',\n            border: '2px solid rgba(255,201,60,0.5)',\n            boxShadow: '0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)',\n            display: 'flex',\n            alignItems: 'center',\n            padding: '30px 45px 30px 35px',\n          }}\n        >\n          {/* 카드 좌측 골드 바 */}\n          <div\n            style={{\n              position: 'absolute',\n              left: 0,\n              top: 0,\n              bottom: 0,\n              width: 14,\n              background: GOLD,\n            }}\n          />\n\n          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 (1/2 축소 & 원안에 얼굴만 확대) */}\n          <div\n            style={{\n              width: 105,\n              height: 105,\n              minWidth: 105,\n              borderRadius: '50%',\n              overflow: 'hidden',\n              border: `4px solid ${GOLD}`,\n              background: 'radial-gradient(circle at 50% 35%, #ffe7a6, #f0a93a)',\n              transform: `scale(${face})`,\n              position: 'relative',\n              boxShadow: '0 15px 30px rgba(0,0,0,0.4)',\n            }}\n          >\n            <Img\n              src={charImg}\n              style={{\n                position: 'absolute',\n                width: '185%',\n                height: '185%',\n                left: '-42%',\n                top: '-15%',\n                objectFit: 'contain',\n              }}\n            />\n          </div>\n\n          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식, 박스 축소만큼 텍스트 폭 확장 & 상하 중앙 배치) */}\n          <div\n            style={{\n              marginLeft: 32,\n              flex: 1,\n              display: 'flex',\n              flexDirection: 'column',\n              justifyContent: 'center',\n            }}\n          >\n            {/* 상단 뱃지 & 소식 메인 제목 */}\n            <div\n              style={{\n                display: 'flex',\n                alignItems: 'center',\n                gap: 14,\n                marginBottom: 20,\n                opacity: titleAnim,\n                transform: `translateX(${(1 - titleAnim) * 35}px)`,\n              }}\n            >\n              <span\n                style={{\n                  fontSize: 18,\n                  fontWeight: 900,\n                  color: '#0a1129',\n                  background: GOLD,\n                  borderRadius: 999,\n                  padding: '5px 16px',\n                }}\n              >\n                {badge}\n              </span>\n              <span style={{ fontSize: 34, fontWeight: 900, color: '#ffffff' }}>\n                {title}\n              </span>\n            </div>\n\n            {/* 4줄 상세 소식 (순차 슬라이드) */}\n            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>\n              {lines.map((lineText, idx) => (\n                <div\n                  key={idx}\n                  style={{\n                    fontSize: 21,\n                    fontWeight: 600,\n                    color: '#e2e8f0',\n                    lineHeight: 1.35,\n                    letterSpacing: '-0.3px',\n                    opacity: lineAnims[idx],\n                    transform: `translateX(${(1 - lineAnims[idx]) * 30}px)`,\n                  }}\n                >\n                  {lineText}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          {/* 3. 비스듬한 라이트 스위프 (Light Sweep) */}\n          <div\n            style={{\n              position: 'absolute',\n              top: -80,\n              bottom: -80,\n              left: `${sweep}%`,\n              width: 180,\n              transform: 'rotate(20deg)',\n              background:\n                'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.25), rgba(255,255,255,0))',\n              mixBlendMode: 'screen',\n              pointerEvents: 'none',\n            }}\n          />\n        </div>\n      </AbsoluteFill>\n\n      {/* ── 하단 기관명 ── */}\n      <div\n        style={{\n          position: 'absolute',\n          bottom: 34,\n          width: '100%',\n          textAlign: 'center',\n          fontSize: 18,\n          fontWeight: 700,\n          color: 'rgba(255,255,255,0.65)',\n          letterSpacing: '1px',\n        }}\n      >\n        {organization}\n      </div>\n    </AbsoluteFill>\n  );\n};\n\nexport const Scene: React.FC<PastorNoticeCardProps> = (props) => (\n  <AbsoluteFill>\n    <SceneBody {...props} />\n  </AbsoluteFill>\n);";
