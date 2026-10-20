@@ -164,7 +164,7 @@
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="8" data-title="패럴랙스">08 · 패럴랙스</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="9" data-title="장면 전환">09 · 장면 전환</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="10" data-title="광선 배경">10 · 광선 배경</button>
-            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="힘내세요">11 · 힘내세요</button>
+            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="글위로움직이기">11 · 글위로움직이기 📜</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs sm:text-sm text-left text-amber-300 font-bold border border-amber-500/60 transition active:scale-[0.98]" data-code="12" data-title="편지">12 · 편지 💌</button>
           </div>
 
@@ -2247,7 +2247,7 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(bText, cx, bY + bH / 2);
         ctx.restore();
-      } else if (code === 11) { // CODE 11 · 힘내세요 (AscendingVerseScene - 시편 103편 1~2절 스크롤 찬양 말씀)
+      } else if (code === 11) { // CODE 11 · 글위로움직이기 (AscendingVerseScene - 가로 2배 글씨 & 아래서 커지고 위로 올라갈수록 작아지는 3D 롤링)
         const motionFont = state.fontFamily || "'Nanum Gothic', sans-serif";
         const duration = 300; // 10초 (300프레임)
         const loopF = f % duration;
@@ -2277,10 +2277,10 @@
         const verseRef = state.verse || '시편 103:1-2';
         const badgeY = portrait ? H * 0.08 : H * 0.06;
         ctx.save();
-        ctx.font = `700 ${portrait ? 15 : 13}px ${motionFont}`;
+        ctx.font = `700 ${portrait ? 15 : 14}px ${motionFont}`;
         const bText = `✦ ${verseRef} ✦`;
-        const bW = ctx.measureText(bText).width + (portrait ? 36 : 28);
-        const bH = portrait ? 34 : 28;
+        const bW = ctx.measureText(bText).width + (portrait ? 36 : 30);
+        const bH = portrait ? 34 : 30;
         const bX = (W - bW) / 2;
 
         ctx.shadowColor = 'rgba(0, 0, 0, 0.04)';
@@ -2303,8 +2303,8 @@
         ctx.restore();
 
         // 4. 부드러운 페이드 인/아웃 및 Y축 롤링 스크롤 (10초 / 300프레임)
-        // 시작 위치: 화면 중앙 아래 (+H * 0.48) -> 종료 위치: 화면 상단 위 (-H * 0.40)
-        const translateY = (H * 0.48) + progress * (-H * 0.88);
+        // 시작 위치: 화면 중앙 아래 (+H * 0.50) -> 종료 위치: 화면 상단 위 (-H * 0.44)
+        const translateY = (H * 0.50) + progress * (-H * 0.94);
         let globalOpacity = 1;
         if (loopF < 25) {
           globalOpacity = loopF / 25;
@@ -2321,7 +2321,8 @@
           '그의 모든 은택을 잊지 말지어다',
         ];
 
-        const lineGap = portrait ? 38 : 26;
+        // 가로 모드 글씨 크기 2배 반영에 맞춰 여유로운 줄간격 설정
+        const lineGap = portrait ? 40 : 54;
         const totalLinesHeight = (SCRIPTURE_LINES.length - 1) * lineGap + 40;
         const startY = H / 2 - totalLinesHeight / 2 + translateY;
 
@@ -2329,32 +2330,49 @@
         ctx.globalAlpha = globalOpacity;
 
         SCRIPTURE_LINES.forEach((lineText, idx) => {
-          const isBold = idx % 2 === 0;
+          const isMagenta = idx % 2 === 0;
           const y = startY + idx * lineGap;
 
+          // 맨 아래에서는 가장 크게, 위로 올라갈수록 글씨가 점점 작아지게 (3D 원근 스케일 0.72 ~ 1.28)
+          const normY = Math.min(1, Math.max(0, y / H));
+          const lineScale = 0.72 + normY * 0.56;
+
           ctx.save();
-          ctx.shadowColor = isBold ? 'rgba(0, 0, 0, 0.12)' : 'rgba(0, 0, 0, 0.06)';
-          ctx.shadowBlur = isBold ? 8 : 4;
-          ctx.shadowOffsetY = isBold ? 3 : 2;
-          ctx.font = `${isBold ? 900 : 500} ${portrait ? (isBold ? 22 : 18) : (isBold ? 20 : 16)}px ${motionFont}`;
-          ctx.fillStyle = isBold ? '#1F1C18' : '#655A4E';
+          ctx.translate(W / 2, y);
+          ctx.scale(lineScale, lineScale);
+
+          ctx.shadowColor = isMagenta ? 'rgba(230, 43, 117, 0.22)' : 'rgba(0, 0, 0, 0.12)';
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetY = 2;
+
+          // 가로에서는 글씨 크기 2배 (40px/32px), 세로는 현재 사이즈 유지 (22px/18px)
+          const baseSize = portrait ? (isMagenta ? 22 : 18) : (isMagenta ? 40 : 32);
+          ctx.font = `${isMagenta ? 900 : 700} ${baseSize}px ${motionFont}`;
+          // 한 줄은 rgb(230, 43, 117), 다른 한 줄은 검정색
+          ctx.fillStyle = isMagenta ? 'rgb(230, 43, 117)' : '#000000';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(lineText, W / 2, y);
+          ctx.fillText(lineText, 0, 0);
           ctx.restore();
         });
 
         // 십자가 심볼
-        const crossY = startY + SCRIPTURE_LINES.length * lineGap + 6;
-        ctx.font = `600 ${portrait ? 18 : 15}px ${motionFont}`;
-        ctx.fillStyle = '#B09A84';
+        const crossY = startY + SCRIPTURE_LINES.length * lineGap + 8;
+        const crossNormY = Math.min(1, Math.max(0, crossY / H));
+        const crossScale = 0.72 + crossNormY * 0.56;
+        ctx.save();
+        ctx.translate(W / 2, crossY);
+        ctx.scale(crossScale, crossScale);
+        ctx.font = `700 ${portrait ? 20 : 32}px ${motionFont}`;
+        ctx.fillStyle = 'rgb(230, 43, 117)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('✝', W / 2, crossY);
+        ctx.fillText('✝', 0, 0);
+        ctx.restore();
         ctx.restore();
 
         // 5. 상단 및 하단 부드러운 페이드 마스크 오버레이
-        const maskH = portrait ? 130 : 70;
+        const maskH = portrait ? 130 : 80;
         // 상단 마스크
         const topMask = ctx.createLinearGradient(0, 0, 0, maskH);
         topMask.addColorStop(0, '#FBF9F5');
@@ -3186,26 +3204,212 @@ ${url}`;
         }
 
         if (state.motionCode === 11) {
-          state.totalFrames = 300;
-          const totalLbl = document.getElementById('lblTotalFrames');
-          if (totalLbl) totalLbl.innerText = '300';
-          const tl = document.getElementById('timeline');
-          if (tl) tl.max = '300';
-          state.verse = '시편 103:1-2';
-          state.line1 = '내 영혼아 여호와를 송축하라';
-          state.line2 = '내 속에 있는 것들아';
-          state.line3 = '그의 모든 은택을 잊지 말지어다';
-          const vEl = document.getElementById('inputVerse');
-          const l1El = document.getElementById('inputLine1');
-          const l2El = document.getElementById('inputLine2');
-          const l3El = document.getElementById('inputLine3');
-          if (vEl) vEl.value = state.verse;
-          if (l1El) l1El.value = state.line1;
-          if (l2El) l2El.value = state.line2;
-          if (l3El) l3El.value = state.line3;
-        }
+        return `// frames=300 size=1080x1920 (세로 9:16) 또는 1280x720 (가로) 공용
+import React from 'react';
+import {
+  AbsoluteFill,
+  interpolate,
+  useCurrentFrame,
+  useVideoConfig,
+} from 'remotion';
+import { FONT } from './font';
 
-        if (state.motionCode === 12) {
+// 찬양 말씀 구절 목록 (홀수 줄: rgb(230, 43, 117) / 짝수 줄: 검정색)
+const SCRIPTURE_LINES = [
+  '내 영혼아 여호와를 송축하라',
+  '내 속에 있는 것들아',
+  '다 그의 거룩한 이름을 송축하라',
+  '내 영혼아',
+  '여호와를 송축하며',
+  '그의 모든 은택을 잊지 말지어다',
+];
+
+export interface AscendingVerseProps {
+  verseRef?: string;         // 성경 출처 (예: 시편 103:1-2)
+  organization?: string;     // 기관명 (예: 별내사랑의교회)
+}
+
+export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
+  verseRef = '${state.verse || '시편 103:1-2'}',
+  organization = '${state.youtube || '별내사랑의교회'}',
+}) => {
+  const frame = useCurrentFrame();
+  const { width, height, durationInFrames } = useVideoConfig();
+  const isVertical = height > width;
+
+  // 1. 하단에서 상단으로 서서히 올라가는 Y축 이동 계산 (durationInFrames: 300프레임 / 10초)
+  const translateY = interpolate(
+    frame,
+    [0, durationInFrames],
+    [height * 0.50, -height * 0.44],
+    { extrapolateRight: 'clamp' }
+  );
+
+  // 2. 시작과 끝 부분의 부드러운 페이드 인/아웃
+  const globalOpacity = interpolate(
+    frame,
+    [0, 25, durationInFrames - 30, durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
+  const lineGap = isVertical ? 42 : 62;
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: 'linear-gradient(180deg, #FBF9F5 0%, #F5F0E8 50%, #ECE4D8 100%)',
+        fontFamily: FONT,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* ── 배경 은은한 햇살 웜 글로우 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20%',
+          width: width * 0.9,
+          height: width * 0.9,
+          background: 'radial-gradient(circle, rgba(254, 243, 199, 0.6) 0%, rgba(255, 255, 255, 0) 70%)',
+          borderRadius: '50%',
+          filter: 'blur(40px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── 상단 고정 얇은 장식 뱃지 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: isVertical ? '8%' : '6%',
+          zIndex: 20,
+          background: 'rgba(255, 255, 255, 0.75)',
+          border: '1px solid rgba(217, 204, 185, 0.7)',
+          backdropFilter: 'blur(8px)',
+          padding: isVertical ? '8px 24px' : '6px 20px',
+          borderRadius: 999,
+          fontSize: isVertical ? 20 : 16,
+          fontWeight: 700,
+          color: '#8C7A6B',
+          letterSpacing: '1px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+        }}
+      >
+        ✦ {verseRef} ✦
+      </div>
+
+      {/* ── 상·하단 부드러운 페이드 마스크 오버레이 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: isVertical ? 240 : 130,
+          background: 'linear-gradient(180deg, #FBF9F5 40%, rgba(251, 249, 245, 0) 100%)',
+          zIndex: 10,
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: isVertical ? 240 : 130,
+          background: 'linear-gradient(0deg, #ECE4D8 40%, rgba(236, 228, 216, 0) 100%)',
+          zIndex: 10,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── 아래에서 위로 올라가는 텍스트 본체 (맨 아래서 가장 크고 올라갈수록 작아지는 원근감) ── */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          transform: \`translateY(\\${translateY}px)\`,
+          opacity: globalOpacity,
+          width: '90%',
+          gap: lineGap,
+        }}
+      >
+        {SCRIPTURE_LINES.map((line, idx) => {
+          const isMagenta = idx % 2 === 0;
+          // 맨 아래에서 가장 크고 위로 올라갈수록 작아지는 스케일 계산
+          const approxY = height * 0.5 + translateY + idx * lineGap;
+          const lineScale = interpolate(approxY, [height * 0.1, height * 0.9], [0.72, 1.28], {
+            extrapolateLeft: 'clamp',
+            extrapolateRight: 'clamp',
+          });
+
+          return (
+            <div
+              key={idx}
+              style={{
+                // 가로 글씨크기 2배 (80px / 64px), 세로는 현재 크기 유지 (54px / 44px)
+                fontSize: isVertical ? (isMagenta ? 54 : 44) : (isMagenta ? 80 : 64),
+                fontWeight: isMagenta ? 900 : 700,
+                // 한 줄은 rgb(230, 43, 117), 다른 한 줄은 검정색
+                color: isMagenta ? 'rgb(230, 43, 117)' : '#000000',
+                letterSpacing: '-1px',
+                lineHeight: 1.3,
+                transform: \`scale(\\${lineScale})\`,
+                transformOrigin: 'center center',
+                textShadow: isMagenta
+                  ? '0 3px 10px rgba(230, 43, 117, 0.22)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              {line}
+            </div>
+          );
+        })}
+
+        {/* 텍스트 롤링 마지막 십자가 심볼 */}
+        <div
+          style={{
+            marginTop: 10,
+            fontSize: isVertical ? 36 : 48,
+            color: 'rgb(230, 43, 117)',
+          }}
+        >
+          ✝
+        </div>
+      </div>
+
+      {/* ── 하단 고정 기관명 ── */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: isVertical ? '5%' : '4%',
+          zIndex: 20,
+          fontSize: isVertical ? 20 : 16,
+          fontWeight: 700,
+          color: '#8C7A6B',
+          letterSpacing: '1.5px',
+        }}
+      >
+        {organization}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+export const Scene: React.FC<AscendingVerseProps> = (props) => (
+  <AbsoluteFill>
+    <AscendingVerseScene {...props} />
+  </AbsoluteFill>
+);`;
+      }
+      if (state.motionCode === 12) {
           if (motionAspect !== 'landscape') {
             setMotionAspect('landscape');
             showToast('CODE 12는 16:9 와이드 카드라 가로 모드로 맞췄습니다.');

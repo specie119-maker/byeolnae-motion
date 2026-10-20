@@ -8,7 +8,7 @@ import {
 } from 'remotion';
 import { FONT } from './font';
 
-// 찬양 말씀 구절 목록 (홀수 줄: 짙은 먹색 / 짝수 줄: 보통 먹색)
+// 찬양 말씀 구절 목록 (홀수 줄: rgb(230, 43, 117) / 짝수 줄: 검정색)
 const SCRIPTURE_LINES = [
   '내 영혼아 여호와를 송축하라',
   '내 속에 있는 것들아',
@@ -32,11 +32,10 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
   const isVertical = height > width;
 
   // 1. 하단에서 상단으로 서서히 올라가는 Y축 이동 계산 (durationInFrames: 300프레임 / 10초)
-  // 시작 위치: 화면 중앙 아래 (+height * 0.48) -> 종료 위치: 화면 상단 위 (-height * 0.40)
   const translateY = interpolate(
     frame,
     [0, durationInFrames],
-    [height * 0.48, -height * 0.40],
+    [height * 0.50, -height * 0.44],
     { extrapolateRight: 'clamp' }
   );
 
@@ -48,10 +47,11 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
   );
 
+  const lineGap = isVertical ? 42 : 62;
+
   return (
     <AbsoluteFill
       style={{
-        // 부담스럽지 않은 환하고 따뜻한 웜 아이보리/크림 베이지 배경
         background: 'linear-gradient(180deg, #FBF9F5 0%, #F5F0E8 50%, #ECE4D8 100%)',
         fontFamily: FONT,
         overflow: 'hidden',
@@ -103,7 +103,7 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          height: isVertical ? 240 : 120,
+          height: isVertical ? 240 : 130,
           background: 'linear-gradient(180deg, #FBF9F5 40%, rgba(251, 249, 245, 0) 100%)',
           zIndex: 10,
           pointerEvents: 'none',
@@ -115,14 +115,14 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: isVertical ? 240 : 120,
+          height: isVertical ? 240 : 130,
           background: 'linear-gradient(0deg, #ECE4D8 40%, rgba(236, 228, 216, 0) 100%)',
           zIndex: 10,
           pointerEvents: 'none',
         }}
       />
 
-      {/* ── 아래에서 위로 올라가는 텍스트 본체 ── */}
+      {/* ── 아래에서 위로 올라가는 텍스트 본체 (맨 아래서 가장 크고 올라갈수록 작아지는 원근감) ── */}
       <div
         style={{
           display: 'flex',
@@ -132,24 +132,34 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
           transform: `translateY(${translateY}px)`,
           opacity: globalOpacity,
           width: '90%',
-          gap: isVertical ? 38 : 22,
+          gap: lineGap,
         }}
       >
         {SCRIPTURE_LINES.map((line, idx) => {
-          // 한 줄은 진하게(짝수 인덱스), 한 줄은 보통(홀수 인덱스)
-          const isBoldLine = idx % 2 === 0;
+          const isMagenta = idx % 2 === 0;
+          // 맨 아래에서 가장 크고 위로 올라갈수록 작아지는 스케일 계산
+          const approxY = height * 0.5 + translateY + idx * lineGap;
+          const lineScale = interpolate(approxY, [height * 0.1, height * 0.9], [0.72, 1.28], {
+            extrapolateLeft: 'clamp',
+            extrapolateRight: 'clamp',
+          });
 
           return (
             <div
               key={idx}
               style={{
-                fontSize: isVertical ? (isBoldLine ? 54 : 44) : (isBoldLine ? 40 : 32),
-                fontWeight: isBoldLine ? 900 : 500,
-                // 진한 줄: 깊이 있는 차콜 브라운(#1F1C18) / 보통 줄: 부드러운 웜 토프(#655A4E)
-                color: isBoldLine ? '#1F1C18' : '#655A4E',
+                // 가로 글씨크기 2배 (80px / 64px), 세로는 현재 크기 유지 (54px / 44px)
+                fontSize: isVertical ? (isMagenta ? 54 : 44) : (isMagenta ? 80 : 64),
+                fontWeight: isMagenta ? 900 : 700,
+                // 한 줄은 rgb(230, 43, 117), 다른 한 줄은 검정색
+                color: isMagenta ? 'rgb(230, 43, 117)' : '#000000',
                 letterSpacing: '-1px',
                 lineHeight: 1.3,
-                textShadow: isBoldLine ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                transform: `scale(${lineScale})`,
+                transformOrigin: 'center center',
+                textShadow: isMagenta
+                  ? '0 3px 10px rgba(230, 43, 117, 0.22)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.08)',
               }}
             >
               {line}
@@ -157,12 +167,12 @@ export const AscendingVerseScene: React.FC<AscendingVerseProps> = ({
           );
         })}
 
-        {/* 텍스트 롤링 마지막 여백 및 십자가 심볼 */}
+        {/* 텍스트 롤링 마지막 십자가 심볼 */}
         <div
           style={{
-            marginTop: 20,
-            fontSize: isVertical ? 30 : 22,
-            color: '#B09A84',
+            marginTop: 10,
+            fontSize: isVertical ? 36 : 48,
+            color: 'rgb(230, 43, 117)',
           }}
         >
           ✝
