@@ -243,7 +243,12 @@ const server = http.createServer((req, res) => {
     };
 
     // MP4/MP3 파일 직접 접근 시 다운로드 파라미터 처리
-    const headers = { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' };
+    const headers = { 
+      'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+      'Cache-Control': ext === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    };
     if ((ext === '.mp4' || ext === '.mp3') && parsedUrl.searchParams.has('download')) {
       headers['Content-Disposition'] = `attachment; filename="${encodeURIComponent(path.basename(filePath))}"`;
     }
