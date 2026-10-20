@@ -165,7 +165,7 @@
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="9" data-title="장면 전환">09 · 장면 전환</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="10" data-title="광선 배경">10 · 광선 배경</button>
             <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-xs sm:text-sm text-left text-zinc-300 border border-zinc-700/80 transition active:scale-[0.98]" data-code="11" data-title="힘내세요">11 · 힘내세요</button>
-            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs sm:text-sm text-left text-amber-300 font-bold border border-amber-500/60 transition active:scale-[0.98]" data-code="12" data-title="소식 안내">12 · 소식 안내 📢</button>
+            <button type="button" class="btnMotionCode w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs sm:text-sm text-left text-amber-300 font-bold border border-amber-500/60 transition active:scale-[0.98]" data-code="12" data-title="편지">12 · 편지 💌</button>
           </div>
 
           <!-- 첨부 이미지의 대형 실행 버튼 -->
@@ -2585,13 +2585,59 @@
           ctx.fillText(mainTitle, textX + titleOffsetX + bW + 14, badgeY + bH / 2);
           ctx.restore();
 
-          // 4줄의 상세 소식 목록: 좌측 정렬 유지, 상하 카드 여백 대칭
-          const noticeLines = [
-            state.line2 || '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',
-            state.line3 || '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',
-            '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',
-            '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.'
-          ];
+          // 두 입력칸(두번째 줄, 마지막 강조줄)에 긴 문장 작성 시 각 2줄씩(최대 4줄) 분할하여 잘림 없이 표시 (3,4번 문구 삭제)
+          const textMaxW = (cardX + cardW - 65) - textX;
+          const wrapToTwo = (text, maxW) => {
+            if (!text) return [];
+            const trimmed = String(text).trim();
+            if (!trimmed) return [];
+            if (trimmed.includes('\n')) {
+              return trimmed.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 2);
+            }
+            ctx.save();
+            ctx.font = `600 16px ${motionFont}`;
+            if (ctx.measureText(trimmed).width <= maxW) {
+              ctx.restore();
+              return [trimmed];
+            }
+            const words = trimmed.split(' ');
+            let l1 = '';
+            let splitIdx = -1;
+            for (let i = 0; i < words.length; i++) {
+              const test = l1 ? (l1 + ' ' + words[i]) : words[i];
+              if (ctx.measureText(test).width <= maxW) {
+                l1 = test;
+              } else {
+                splitIdx = i;
+                break;
+              }
+            }
+            let l2 = '';
+            if (splitIdx > 0) {
+              l2 = words.slice(splitIdx).join(' ');
+            } else {
+              for (let i = trimmed.length - 1; i >= 1; i--) {
+                const sub = trimmed.slice(0, i);
+                if (ctx.measureText(sub).width <= maxW) {
+                  l1 = sub;
+                  l2 = trimmed.slice(i).trim();
+                  break;
+                }
+              }
+            }
+            if (l2 && ctx.measureText(l2).width > maxW) {
+              while (l2.length > 0 && ctx.measureText(l2 + '...').width > maxW) {
+                l2 = l2.slice(0, -1);
+              }
+              l2 = l2.trim() + '...';
+            }
+            ctx.restore();
+            return [l1 || trimmed, l2].filter(Boolean);
+          };
+
+          const l2Lines = wrapToTwo(state.line2 || '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.', textMaxW);
+          const l3Lines = wrapToTwo(state.line3 || '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.', textMaxW);
+          const noticeLines = [...l2Lines, ...l3Lines];
 
           const lineStartY = badgeY + 50;
           const lineGap = 32;
@@ -2683,24 +2729,65 @@
           ctx.fillText(mainTitle, cardX + cardW / 2, textStartY + titleOffsetY + bH + 20);
           ctx.restore();
 
-          // 4줄 소식
-          const noticeLines = [
-            state.line2 || '1. 이번 주일 예배 : 오전 11시 본당',
-            state.line3 || '2. 다락방 및 부서별 나눔 모임',
-            '3. 수요일 저녁 8시 온세대 기도회',
-            '4. 환우 및 수험생을 위한 중보기도'
+          // 2칸 입력 -> 긴 문장 시 최대 4줄 소식 (3,4번 문구 삭제)
+          const vertMaxW = cardW - 70;
+          const wrapToTwoVert = (text, maxW) => {
+            if (!text) return [];
+            const trimmed = String(text).trim();
+            if (!trimmed) return [];
+            if (trimmed.includes('\n')) {
+              return trimmed.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 2);
+            }
+            ctx.save();
+            ctx.font = `600 15px ${motionFont}`;
+            if (ctx.measureText(trimmed).width <= maxW) {
+              ctx.restore();
+              return [trimmed];
+            }
+            const words = trimmed.split(' ');
+            let l1 = '';
+            let splitIdx = -1;
+            for (let i = 0; i < words.length; i++) {
+              const test = l1 ? (l1 + ' ' + words[i]) : words[i];
+              if (ctx.measureText(test).width <= maxW) {
+                l1 = test;
+              } else {
+                splitIdx = i;
+                break;
+              }
+            }
+            let l2 = '';
+            if (splitIdx > 0) {
+              l2 = words.slice(splitIdx).join(' ');
+            } else {
+              for (let i = trimmed.length - 1; i >= 1; i--) {
+                const sub = trimmed.slice(0, i);
+                if (ctx.measureText(sub).width <= maxW) {
+                  l1 = sub;
+                  l2 = trimmed.slice(i).trim();
+                  break;
+                }
+              }
+            }
+            ctx.restore();
+            return [l1 || trimmed, l2].filter(Boolean);
+          };
+
+          const vertNoticeLines = [
+            ...wrapToTwoVert(state.line2 || '1. 이번 주일 예배 : 오전 11시 본당', vertMaxW),
+            ...wrapToTwoVert(state.line3 || '2. 다락방 및 부서별 나눔 모임', vertMaxW)
           ];
           const linesTop = textStartY + 80;
-          noticeLines.forEach((lineText, idx) => {
+          vertNoticeLines.forEach((lineText, idx) => {
             const lineAnim = clamp01((f - (32 + idx * 10)) / 14);
             if (lineAnim <= 0) return;
             ctx.save();
             ctx.globalAlpha = lineAnim;
-            ctx.font = `600 16px ${motionFont}`;
+            ctx.font = `600 15px ${motionFont}`;
             ctx.fillStyle = '#e2e8f0';
-            ctx.textAlign = 'left';
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(lineText, cardX + 32, linesTop + idx * 36);
+            ctx.fillText(lineText, cardX + cardW / 2, linesTop + idx * 30);
             ctx.restore();
           });
         }
@@ -4658,7 +4745,7 @@ export const Scene: React.FC<AscendingVerseProps> = (props) => (
 );`;
       }
       if (state.motionCode === 12) {
-        const raw = "// frames=200 size=1280x720 (가로 16:9 공지 카드)\nimport React from 'react';\nimport {\n  AbsoluteFill,\n  Easing,\n  Img,\n  interpolate,\n  random,\n  spring,\n  useCurrentFrame,\n  useVideoConfig,\n} from 'remotion';\nimport { FONT } from './font';\n\nconst GOLD = '#FFC93C';\n\n// 깃허브 저장소(specie119-maker/byeolnae-motion)에 올린 목사님 캐릭터 이미지 경로\nconst DEFAULT_CHAR_IMG =\n  'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/목사님.png';\n\nconst clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;\nconst BOKEH = Array.from({ length: 14 }, (_, i) => ({\n  x: random(`bx${i}`) * 1280,\n  y: random(`by${i}`) * 720,\n  r: 30 + random(`br${i}`) * 80,\n}));\n\nexport interface PastorNoticeCardProps {\n  charImg?: string;\n  badge?: string;\n  title?: string;\n  line1?: string;\n  line2?: string;\n  line3?: string;\n  line4?: string;\n  organization?: string;\n}\n\nexport const SceneBody: React.FC<PastorNoticeCardProps> = ({\n  charImg = DEFAULT_CHAR_IMG,\n  badge = '목회 서신',\n  title = '별내사랑의교회 주간 알림',\n  line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',\n  line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',\n  line3 = '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',\n  line4 = '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.',\n  organization = '별내사랑의교회',\n}) => {\n  const f = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const t = f / fps;\n\n  // 1) 3D 카드 등장 (rotateY -75도에서 스프링 회전 후 정면 안착)\n  const enter = spring({ frame: f - 4, fps, config: { damping: 16, mass: 0.9 } });\n  const swayY = -75 * (1 - enter) + 6 * Math.sin(t * 1.2) * enter;\n  const swayX = 2.5 * Math.cos(t * 1.0) * enter;\n\n  // 2) 목사님 캐릭터 원형 프로필 팝업\n  const face = spring({ frame: f - 14, fps, config: { damping: 12 } });\n\n  // 3) 상단 제목 및 4줄 안내문구 순차 페이드인\n  const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });\n  const lineAnims = [\n    interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [42, 56], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [52, 66], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n  ];\n\n  // 4) 빛 줄기(Sweep) 효과 (프레임 60과 135에 2번 비스듬히 통과)\n  const shine = (s: number) =>\n    interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });\n  const sweep = f < 110 ? shine(60) : shine(135);\n\n  const lines = [line1, line2, line3, line4];\n\n  return (\n    <AbsoluteFill\n      style={{\n        fontFamily: FONT,\n        color: '#fff',\n        background: 'radial-gradient(ellipse at 50% 45%, #15234a 0%, #050914 75%)',\n        overflow: 'hidden',\n      }}\n    >\n      {/* ── 배경 은은한 보케 라이트 ── */}\n      {BOKEH.map((b, i) => (\n        <div\n          key={i}\n          style={{\n            position: 'absolute',\n            left: b.x - b.r,\n            top: b.y - b.r + Math.sin(t + i) * 10,\n            width: b.r * 2,\n            height: b.r * 2,\n            borderRadius: '50%',\n            background: i % 3 ? 'rgba(91,140,255,0.08)' : 'rgba(255,201,60,0.07)',\n            filter: 'blur(8px)',\n          }}\n        />\n      ))}\n\n      {/* ── 3D 안내 카드 (너비 980px, 높이 430px) ── */}\n      <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>\n        <div\n          style={{\n            width: 980,\n            height: 430,\n            borderRadius: 36,\n            position: 'relative',\n            overflow: 'hidden',\n            opacity: Math.min(1, enter * 1.5),\n            transform: `rotateY(${swayY}deg) rotateX(${swayX}deg)`,\n            background: 'linear-gradient(135deg, #182a5e 0%, #0d1736 60%, #0a1129 100%)',\n            border: '2px solid rgba(255,201,60,0.5)',\n            boxShadow: '0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)',\n            display: 'flex',\n            alignItems: 'center',\n            padding: '30px 45px 30px 35px',\n          }}\n        >\n          {/* 카드 좌측 골드 바 */}\n          <div\n            style={{\n              position: 'absolute',\n              left: 0,\n              top: 0,\n              bottom: 0,\n              width: 14,\n              background: GOLD,\n            }}\n          />\n\n          {/* 1. 좌측: 원형 목사님 캐릭터 프레임 (1/2 축소 & 원안에 얼굴만 확대) */}\n          <div\n            style={{\n              width: 105,\n              height: 105,\n              minWidth: 105,\n              borderRadius: '50%',\n              overflow: 'hidden',\n              border: `4px solid ${GOLD}`,\n              background: 'radial-gradient(circle at 50% 35%, #ffe7a6, #f0a93a)',\n              transform: `scale(${face})`,\n              position: 'relative',\n              boxShadow: '0 15px 30px rgba(0,0,0,0.4)',\n            }}\n          >\n            <Img\n              src={charImg}\n              style={{\n                position: 'absolute',\n                width: '185%',\n                height: '185%',\n                left: '-42%',\n                top: '-15%',\n                objectFit: 'contain',\n              }}\n            />\n          </div>\n\n          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식, 박스 축소만큼 텍스트 폭 확장 & 상하 중앙 배치) */}\n          <div\n            style={{\n              marginLeft: 32,\n              flex: 1,\n              display: 'flex',\n              flexDirection: 'column',\n              justifyContent: 'center',\n            }}\n          >\n            {/* 상단 뱃지 & 소식 메인 제목 */}\n            <div\n              style={{\n                display: 'flex',\n                alignItems: 'center',\n                gap: 14,\n                marginBottom: 20,\n                opacity: titleAnim,\n                transform: `translateX(${(1 - titleAnim) * 35}px)`,\n              }}\n            >\n              <span\n                style={{\n                  fontSize: 18,\n                  fontWeight: 900,\n                  color: '#0a1129',\n                  background: GOLD,\n                  borderRadius: 999,\n                  padding: '5px 16px',\n                }}\n              >\n                {badge}\n              </span>\n              <span style={{ fontSize: 34, fontWeight: 900, color: '#ffffff' }}>\n                {title}\n              </span>\n            </div>\n\n            {/* 4줄 상세 소식 (순차 슬라이드) */}\n            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>\n              {lines.map((lineText, idx) => (\n                <div\n                  key={idx}\n                  style={{\n                    fontSize: 21,\n                    fontWeight: 600,\n                    color: '#e2e8f0',\n                    lineHeight: 1.35,\n                    letterSpacing: '-0.3px',\n                    opacity: lineAnims[idx],\n                    transform: `translateX(${(1 - lineAnims[idx]) * 30}px)`,\n                  }}\n                >\n                  {lineText}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          {/* 3. 비스듬한 라이트 스위프 (Light Sweep) */}\n          <div\n            style={{\n              position: 'absolute',\n              top: -80,\n              bottom: -80,\n              left: `${sweep}%`,\n              width: 180,\n              transform: 'rotate(20deg)',\n              background:\n                'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.25), rgba(255,255,255,0))',\n              mixBlendMode: 'screen',\n              pointerEvents: 'none',\n            }}\n          />\n        </div>\n      </AbsoluteFill>\n\n      {/* ── 하단 기관명 ── */}\n      <div\n        style={{\n          position: 'absolute',\n          bottom: 34,\n          width: '100%',\n          textAlign: 'center',\n          fontSize: 18,\n          fontWeight: 700,\n          color: 'rgba(255,255,255,0.65)',\n          letterSpacing: '1px',\n        }}\n      >\n        {organization}\n      </div>\n    </AbsoluteFill>\n  );\n};\n\nexport const Scene: React.FC<PastorNoticeCardProps> = (props) => (\n  <AbsoluteFill>\n    <SceneBody {...props} />\n  </AbsoluteFill>\n);";
+        const raw = "// frames=200 size=1280x720 (\uac00\ub85c 16:9 \ud3b8\uc9c0 \uce74\ub4dc)\nimport React from 'react';\nimport {\n  AbsoluteFill,\n  Easing,\n  Img,\n  interpolate,\n  random,\n  spring,\n  useCurrentFrame,\n  useVideoConfig,\n} from 'remotion';\nimport { FONT } from './font';\n\nconst GOLD = '#FFC93C';\n\n// \uae43\ud5c8\ube0c \uc800\uc7a5\uc18c(specie119-maker/byeolnae-motion)\uc5d0 \uc62c\ub9b0 \ubaa9\uc0ac\ub2d8 \uce90\ub9ad\ud130 \uc774\ubbf8\uc9c0 \uacbd\ub85c\nconst DEFAULT_CHAR_IMG =\n  'https://raw.githubusercontent.com/specie119-maker/byeolnae-motion/main/\ubaa9\uc0ac\ub2d8.png';\n\nconst clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;\nconst BOKEH = Array.from({ length: 14 }, (_, i) => ({\n  x: random(`bx${i}`) * 1280,\n  y: random(`by${i}`) * 720,\n  r: 30 + random(`br${i}`) * 80,\n}));\n\nexport interface PastorNoticeCardProps {\n  charImg?: string;\n  badge?: string;\n  title?: string;\n  line1?: string;\n  line2?: string;\n  organization?: string;\n}\n\nexport const SceneBody: React.FC<PastorNoticeCardProps> = ({\n  charImg = DEFAULT_CHAR_IMG,\n  badge = '\ubaa9\ud68c \uc11c\uc2e0',\n  title = '\ubcc4\ub0b4\uc0ac\ub791\uc758\uad50\ud68c \uc8fc\uac04 \uc54c\ub9bc',\n  line1 = '1. \uc774\ubc88 \uc8fc\uc77c \uc608\ubc30\ub294 \uc624\uc804 11\uc2dc\uc5d0 \ubcf8\ub2f9\uc5d0\uc11c \ub4dc\ub824\uc9d1\ub2c8\ub2e4.',\n  line2 = '2. \uc608\ubc30 \ud6c4 \uac01 \ub2e4\ub77d\ubc29 \ubc0f \ubd80\uc11c\ubcc4 \ub098\ub214 \ubaa8\uc784\uc774 \uc788\uc2b5\ub2c8\ub2e4.',\n  organization = '\ubcc4\ub0b4\uc0ac\ub791\uc758\uad50\ud68c',\n}) => {\n  const f = useCurrentFrame();\n  const { fps } = useVideoConfig();\n  const t = f / fps;\n\n  // 1) 3D \uce74\ub4dc \ub4f1\uc7a5 (rotateY -75\ub3c4\uc5d0\uc11c \uc2a4\ud504\ub9c1 \ud68c\uc804 \ud6c4 \uc815\uba74 \uc548\ucc29)\n  const enter = spring({ frame: f - 4, fps, config: { damping: 16, mass: 0.9 } });\n  const swayY = -75 * (1 - enter) + 6 * Math.sin(t * 1.2) * enter;\n  const swayX = 2.5 * Math.cos(t * 1.0) * enter;\n\n  // 2) \ubaa9\uc0ac\ub2d8 \uce90\ub9ad\ud130 \uc6d0\ud615 \ud504\ub85c\ud544 \ud31d\uc5c5\n  const face = spring({ frame: f - 14, fps, config: { damping: 12 } });\n\n  // 3) \uc0c1\ub2e8 \uc81c\ubaa9 \ubc0f \uc548\ub0b4\ubb38\uad6c \uc21c\ucc28 \ud398\uc774\ub4dc\uc778\n  const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });\n  const lineAnims = [\n    interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [42, 56], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [52, 66], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n    interpolate(f, [62, 76], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),\n  ];\n\n  // 4) \ube5b \uc904\uae30(Sweep) \ud6a8\uacfc (\ud504\ub808\uc784 60\uacfc 135\uc5d0 2\ubc88 \ube44\uc2a4\ub4ec\ud788 \ud1b5\uacfc)\n  const shine = (s: number) =>\n    interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });\n  const sweep = f < 110 ? shine(60) : shine(135);\n\n  // \ub450 \uc785\ub825\uce78(line1: \ub450 \ubc88\uc9f8 \uc904, line2: \ub9c8\uc9c0\ub9c9 \uac15\uc870\uc904)\uc744 \uae34 \ubb38\uc7a5\uc77c \ub54c \uac01 2\uc904\uc529(\ucd5c\ub300 \ucd1d 4\uc904) \ubd84\ud560\n  const splitToTwoLines = (txt: string) => {\n    if (!txt) return [];\n    if (txt.includes('\\n')) return txt.split('\\n').map((s) => s.trim()).filter(Boolean).slice(0, 2);\n    if (txt.length > 36) {\n      const words = txt.split(' ');\n      let mid = Math.ceil(words.length / 2);\n      return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];\n    }\n    return [txt];\n  };\n\n  const lines = [...splitToTwoLines(line1), ...splitToTwoLines(line2)];\n\n  return (\n    <AbsoluteFill\n      style={{\n        fontFamily: FONT,\n        color: '#fff',\n        background: 'radial-gradient(ellipse at 50% 45%, #15234a 0%, #050914 75%)',\n        overflow: 'hidden',\n      }}\n    >\n      {/* \u2500\u2500 \ubc30\uacbd \uc740\uc740\ud55c \ubcf4\ucf00 \ub77c\uc774\ud2b8 \u2500\u2500 */}\n      {BOKEH.map((b, i) => (\n        <div\n          key={i}\n          style={{\n            position: 'absolute',\n            left: b.x - b.r,\n            top: b.y - b.r + Math.sin(t + i) * 10,\n            width: b.r * 2,\n            height: b.r * 2,\n            borderRadius: '50%',\n            background: i % 3 ? 'rgba(91,140,255,0.08)' : 'rgba(255,201,60,0.07)',\n            filter: 'blur(8px)',\n          }}\n        />\n      ))}\n\n      {/* \u2500\u2500 3D \uc548\ub0b4 \uce74\ub4dc (\ub108\ube44 980px, \ub192\uc774 430px) \u2500\u2500 */}\n      <AbsoluteFill style={{ perspective: 1200, alignItems: 'center', justifyContent: 'center' }}>\n        <div\n          style={{\n            width: 980,\n            height: 430,\n            borderRadius: 36,\n            position: 'relative',\n            overflow: 'hidden',\n            opacity: Math.min(1, enter * 1.5),\n            transform: `rotateY(${swayY}deg) rotateX(${swayX}deg)`,\n            background: 'linear-gradient(135deg, #182a5e 0%, #0d1736 60%, #0a1129 100%)',\n            border: '2px solid rgba(255,201,60,0.5)',\n            boxShadow: '0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)',\n            display: 'flex',\n            alignItems: 'center',\n            padding: '30px 45px 30px 35px',\n          }}\n        >\n          {/* \uce74\ub4dc \uc88c\uce21 \uace8\ub4dc \ubc14 */}\n          <div\n            style={{\n              position: 'absolute',\n              left: 0,\n              top: 0,\n              bottom: 0,\n              width: 14,\n              background: GOLD,\n            }}\n          />\n\n          {/* 1. \uc88c\uce21: \uc6d0\ud615 \ubaa9\uc0ac\ub2d8 \uce90\ub9ad\ud130 \ud504\ub808\uc784 (1/2 \ucd95\uc18c & \uc6d0\uc548\uc5d0 \uc5bc\uad74\ub9cc \ud655\ub300) */}\n          <div\n            style={{\n              width: 105,\n              height: 105,\n              minWidth: 105,\n              borderRadius: '50%',\n              overflow: 'hidden',\n              border: `4px solid ${GOLD}`,\n              background: 'radial-gradient(circle at 50% 35%, #ffe7a6, #f0a93a)',\n              transform: `scale(${face})`,\n              position: 'relative',\n              boxShadow: '0 15px 30px rgba(0,0,0,0.4)',\n            }}\n          >\n            <Img\n              src={charImg}\n              style={{\n                position: 'absolute',\n                width: '185%',\n                height: '185%',\n                left: '-42%',\n                top: '-15%',\n                objectFit: 'contain',\n              }}\n            />\n          </div>\n\n          {/* 2. \uc6b0\uce21: \ud14d\uc2a4\ud2b8 \uc815\ubcf4 \uc601\uc5ed (\ud0c0\uc774\ud2c0 + 2\uce78 \uc785\ub825 \uae30\ubc18 \ucd5c\ub300 4\uc904 \ud3b8\uc9c0 \ubcf8\ubb38) */}\n          <div\n            style={{\n              marginLeft: 32,\n              flex: 1,\n              display: 'flex',\n              flexDirection: 'column',\n              justifyContent: 'center',\n            }}\n          >\n            {/* \uc0c1\ub2e8 \ubc43\uc9c0 & \uc18c\uc2dd \uba54\uc778 \uc81c\ubaa9 */}\n            <div\n              style={{\n                display: 'flex',\n                alignItems: 'center',\n                gap: 14,\n                marginBottom: 20,\n                opacity: titleAnim,\n                transform: `translateX(${(1 - titleAnim) * 35}px)`,\n              }}\n            >\n              <span\n                style={{\n                  fontSize: 18,\n                  fontWeight: 900,\n                  color: '#0a1129',\n                  background: GOLD,\n                  borderRadius: 999,\n                  padding: '5px 16px',\n                }}\n              >\n                {badge}\n              </span>\n              <span style={{ fontSize: 34, fontWeight: 900, color: '#ffffff' }}>\n                {title}\n              </span>\n            </div>\n\n            {/* 2\uce78 \uc785\ub825 -> \uae34 \ubb38\uc7a5 \uc2dc \ucd5c\ub300 4\uc904 \ud3b8\uc9c0 \ubcf8\ubb38 (\uc21c\ucc28 \uc2ac\ub77c\uc774\ub4dc & \uc790\ub3d9 2\uc904 \ub798\ud551) */}\n            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>\n              {lines.map((lineText, idx) => (\n                <div\n                  key={idx}\n                  style={{\n                    fontSize: 21,\n                    fontWeight: 600,\n                    color: '#e2e8f0',\n                    lineHeight: 1.35,\n                    letterSpacing: '-0.3px',\n                    whiteSpace: 'pre-wrap',\n                    wordBreak: 'keep-all',\n                    opacity: lineAnims[idx] ?? 1,\n                    transform: `translateX(${(1 - (lineAnims[idx] ?? 1)) * 30}px)`,\n                  }}\n                >\n                  {lineText}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          {/* 3. \ube44\uc2a4\ub4ec\ud55c \ub77c\uc774\ud2b8 \uc2a4\uc704\ud504 (Light Sweep) */}\n          <div\n            style={{\n              position: 'absolute',\n              top: -80,\n              bottom: -80,\n              left: `${sweep}%`,\n              width: 180,\n              transform: 'rotate(20deg)',\n              background:\n                'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.25), rgba(255,255,255,0))',\n              mixBlendMode: 'screen',\n              pointerEvents: 'none',\n            }}\n          />\n        </div>\n      </AbsoluteFill>\n\n      {/* \u2500\u2500 \ud558\ub2e8 \uae30\uad00\uba85 \u2500\u2500 */}\n      <div\n        style={{\n          position: 'absolute',\n          bottom: 34,\n          width: '100%',\n          textAlign: 'center',\n          fontSize: 18,\n          fontWeight: 700,\n          color: 'rgba(255,255,255,0.65)',\n          letterSpacing: '1px',\n        }}\n      >\n        {organization}\n      </div>\n    </AbsoluteFill>\n  );\n};\n\nexport const Scene: React.FC<PastorNoticeCardProps> = (props) => (\n  <AbsoluteFill>\n    <SceneBody {...props} />\n  </AbsoluteFill>\n);";
         return raw
           .replace("badge = '목회 서신'", "badge = " + JSON.stringify(state.badge || "목회 서신"))
           .replace("title = '별내사랑의교회 주간 알림'", "title = " + JSON.stringify(state.line1 || "별내사랑의교회 주간 알림"))

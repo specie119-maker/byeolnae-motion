@@ -1,4 +1,4 @@
-// frames=200 size=1280x720 (가로 16:9 공지 카드)
+// frames=200 size=1280x720 (가로 16:9 편지 카드)
 import React from 'react';
 import {
   AbsoluteFill,
@@ -31,8 +31,6 @@ export interface PastorNoticeCardProps {
   title?: string;
   line1?: string;
   line2?: string;
-  line3?: string;
-  line4?: string;
   organization?: string;
 }
 
@@ -42,8 +40,6 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
   title = '별내사랑의교회 주간 알림',
   line1 = '1. 이번 주일 예배는 오전 11시에 본당에서 드려집니다.',
   line2 = '2. 예배 후 각 다락방 및 부서별 나눔 모임이 있습니다.',
-  line3 = '3. 매주 수요일 저녁 8시 온세대 기도회가 열립니다.',
-  line4 = '4. 환우분들과 수험생들을 위해 중보기도 부탁드립니다.',
   organization = '별내사랑의교회',
 }) => {
   const f = useCurrentFrame();
@@ -58,7 +54,7 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
   // 2) 목사님 캐릭터 원형 프로필 팝업
   const face = spring({ frame: f - 14, fps, config: { damping: 12 } });
 
-  // 3) 상단 제목 및 4줄 안내문구 순차 페이드인
+  // 3) 상단 제목 및 안내문구 순차 페이드인
   const titleAnim = interpolate(f, [20, 36], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
   const lineAnims = [
     interpolate(f, [32, 46], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) }),
@@ -72,7 +68,19 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
     interpolate(f, [s, s + 30], [-60, 160], { ...clamp, easing: Easing.inOut(Easing.quad) });
   const sweep = f < 110 ? shine(60) : shine(135);
 
-  const lines = [line1, line2, line3, line4];
+  // 두 입력칸(line1: 두 번째 줄, line2: 마지막 강조줄)을 긴 문장일 때 각 2줄씩(최대 총 4줄) 분할
+  const splitToTwoLines = (txt: string) => {
+    if (!txt) return [];
+    if (txt.includes('\\n')) return txt.split('\\n').map((s) => s.trim()).filter(Boolean).slice(0, 2);
+    if (txt.length > 36) {
+      const words = txt.split(' ');
+      let mid = Math.ceil(words.length / 2);
+      return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+    }
+    return [txt];
+  };
+
+  const lines = [...splitToTwoLines(line1), ...splitToTwoLines(line2)];
 
   return (
     <AbsoluteFill
@@ -159,7 +167,7 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
             />
           </div>
 
-          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 4줄 소식, 박스 축소만큼 텍스트 폭 확장 & 상하 중앙 배치) */}
+          {/* 2. 우측: 텍스트 정보 영역 (타이틀 + 2칸 입력 기반 최대 4줄 편지 본문) */}
           <div
             style={{
               marginLeft: 32,
@@ -197,7 +205,7 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
               </span>
             </div>
 
-            {/* 4줄 상세 소식 (순차 슬라이드) */}
+            {/* 2칸 입력 -> 긴 문장 시 최대 4줄 편지 본문 (순차 슬라이드 & 자동 2줄 래핑) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {lines.map((lineText, idx) => (
                 <div
@@ -208,8 +216,10 @@ export const SceneBody: React.FC<PastorNoticeCardProps> = ({
                     color: '#e2e8f0',
                     lineHeight: 1.35,
                     letterSpacing: '-0.3px',
-                    opacity: lineAnims[idx],
-                    transform: `translateX(${(1 - lineAnims[idx]) * 30}px)`,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'keep-all',
+                    opacity: lineAnims[idx] ?? 1,
+                    transform: `translateX(${(1 - (lineAnims[idx] ?? 1)) * 30}px)`,
                   }}
                 >
                   {lineText}
